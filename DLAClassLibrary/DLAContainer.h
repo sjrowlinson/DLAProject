@@ -150,7 +150,24 @@ protected:
 	std::vector<std::pair<size_t, double>> bounding_radii_vec;
 	size_t bound_radii_npoints = 50;
 
+	/**
+	 * @brief Spawns particle in a random boundary position dependent upon attractor type and current size of aggregate
+	 *
+	 * @param _x Position to set spawn in x co-ordinate
+	 * @param _y Position to set spawn in y co-ordinate
+	 * @param _spawn_diam Variable to set for allowed spawning diameter
+	 * @param _dist std::uniform_real_distribution<> for prng
+	 */
 	virtual void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept = 0;
+	/**
+	 * @brief Spawns particle in a random boundary position dependent upon attractor type and current size of aggregate
+	 *
+	 * @param _x Position to set spawn in x co-ordinate
+	 * @param _y Position to set spawn in y co-ordinate
+	 * @param _z Position to set spawn in z co-ordinate
+	 * @param _spawn_diam Variable to set for allowed spawning diameter
+	 * @param _dist std::uniform_real_distribution<> for prng
+	 */
 	virtual void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept = 0;
 
 	/**
