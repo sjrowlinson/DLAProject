@@ -22,7 +22,7 @@ namespace DLAProject {
         public MainWindow() {
             InitializeComponent();
             ManagedDLA2DContainer dla_2d = new ManagedDLA2DContainer();
-            
+            dla_2d.Generate(100);
         }
     }
 }

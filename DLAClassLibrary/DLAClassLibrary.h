@@ -57,6 +57,8 @@ namespace DLAClassLibrary {
 		 */
 		ManagedDLA2DContainer(LatticeType _lattice_type, AttractorType _attractor_type, double _coeff_stick) : native_DLA_container_ptr(new DLA_2d(_lattice_type, _attractor_type, _coeff_stick)) {}
 
+		ManagedDLA2DContainer(ManagedDLA2DContainer^ _other) : native_DLA_container_ptr(new DLA_2d(*dynamic_cast<DLA_2d*>(_other->native_DLA_container_ptr))) {}
+
 		/**
 		 * @brief Destructor, deletes native DLA class handle
 		 */
@@ -165,6 +167,12 @@ namespace DLAClassLibrary {
 		 * @param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1]
 		 */
 		ManagedDLA3DContainer(LatticeType _lattice_type, AttractorType _attractor_type, double _coeff_stick) : native_DLA_container_ptr(new DLA_3d(_lattice_type, _attractor_type, _coeff_stick)) {}
+
+		ManagedDLA3DContainer(ManagedDLA3DContainer^ _other) : native_DLA_container_ptr(new DLA_3d(*dynamic_cast<DLA_3d*>(_other->native_DLA_container_ptr))) {}
+
+		~ManagedDLA3DContainer() {
+			delete native_DLA_container_ptr;
+		}
 
 		/**
 		* @brief Gets the coefficient of stickiness of the aggregate
