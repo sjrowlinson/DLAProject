@@ -2,10 +2,8 @@
     DYNAMIC LINK LIBRARY : DLAClassLibrary Project Overview
 ========================================================================
 
-AppWizard has created this DLAClassLibrary DLL for you.  
-
 This file contains a summary of what you will find in each of the files that
-make up your DLAClassLibrary application.
+make up the DLAClassLibrary application.
 
 DLAClassLibrary.vcxproj
     This is the main project file for VC++ projects generated using an Application Wizard. 
@@ -24,15 +22,19 @@ DLAClassLibrary.cpp
     This is the main DLL source file.
 
 DLAClassLibrary.h
-    This file contains a class declaration.
+    This file contains the ManagedDLA2DContainer and ManagedDLA3DContainer class declarations.
+
+utilities.h
+    This is an unmanaged native c++ code file containing useful utilities for DLA class code.
+    
+DLAContainer.h
+    Contains the unmanaged c++ abstract class declaration for DLAContainer.
+    
+DLA_2d.h
+    This contains the unmanaged c++ class declaration DLA_2d inheriting from DLAContainer.
+    
+DLA_3d.h 
+    This contains the unmanaged c++ class declaration DLA_3d inheriting from DLAContainer.
 
 AssemblyInfo.cpp
 	Contains custom attributes for modifying assembly metadata.
-
-/////////////////////////////////////////////////////////////////////////////
-Other notes:
-
-AppWizard uses "TODO:" to indicate parts of the source code you
-should add to or customize.
-
-/////////////////////////////////////////////////////////////////////////////
