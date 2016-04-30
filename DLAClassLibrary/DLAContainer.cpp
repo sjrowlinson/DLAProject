@@ -1,4 +1,6 @@
+#include "Stdafx.h"
 #include "DLAContainer.h"
+
 
 DLAContainer::DLAContainer(const double& _coeff_stick) : lattice_type(LatticeType::SQUARE), attractor_type(AttractorType::POINT) {
 	set_coeff_stick(_coeff_stick);

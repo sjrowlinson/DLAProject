@@ -29,7 +29,7 @@ namespace DLAClassLibrary {
 
 		ManagedDLA2DContainer(LatticeType _lattice_type, AttractorType _attractor_type, double _coeff_stick) : native_DLA_container_ptr(new DLA_2d(_lattice_type, _attractor_type, _coeff_stick)) {}
 
-		ManagedDLA2DContainer() {
+		~ManagedDLA2DContainer() {
 			delete native_DLA_container_ptr;
 		}
 
@@ -54,7 +54,7 @@ namespace DLAClassLibrary {
 		}
 
 		double estimate_fractal_dimension() {
-			native_DLA_container_ptr->estimate_fractal_dimension();
+			return native_DLA_container_ptr->estimate_fractal_dimension();
 		}
 
 	};
@@ -98,7 +98,7 @@ namespace DLAClassLibrary {
 		}
 
 		double estimate_fractal_dimension() {
-			native_DLA_container_ptr->estimate_fractal_dimension();
+			return native_DLA_container_ptr->estimate_fractal_dimension();
 		}
 
 	};

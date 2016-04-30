@@ -1,3 +1,4 @@
+#include "Stdafx.h"
 #include "DLA_3d.h"
 
 DLA_3d::DLA_3d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {
