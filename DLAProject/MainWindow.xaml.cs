@@ -21,7 +21,8 @@ namespace DLAProject {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
-            ManagedDLA2DContainer m = new ManagedDLA2DContainer();
+            ManagedDLA2DContainer dla_2d = new ManagedDLA2DContainer();
+            
         }
     }
 }

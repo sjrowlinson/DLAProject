@@ -151,41 +151,75 @@ protected:
 	size_t bound_radii_npoints = 50;
 
 	/**
-	* @brief Update the position of a particle via unbiased random walk motion
-	*
-	* @param _x Position in x co-ordinate
-	* @param _y Position in y co-ordinate
-	* @param _movement_choice Probability determining direction of movement
-	*/
+	 * @brief Update the position of a particle via unbiased random walk motion
+	 *
+	 * @param _x Position in x co-ordinate
+	 * @param _y Position in y co-ordinate
+	 * @param _movement_choice Probability determining direction of movement
+	 */
 	void update_particle_position(int& _x, int& _y, const double& _movement_choice) const noexcept;
+	/**
+	 * @brief Update the position of a particle via unbiased random walk motion
+	 *
+	 * @param _x Position in x co-ordinate
+	 * @param _y Position in y co-ordinate
+	 * @param _z Position in z co-ordinate
+	 * @param _movement_choice Probability determining direction of movement
+	 */
 	void update_particle_position(int& _x, int& _y, int& _z, const double& _movement_choice) const noexcept;
 
 	/**
-	* @brief Check for collision of a particle with a lattice boundary and reflect if true
-	*
-	* @param _x Position in x co-ordinate
-	* @param _y Position in y co-ordinate
-	* @param _prev_x Previous position in x
-	* @param _prev_y Previous position in y
-	* @param _spawn_diam Current diameter of spawning zone
-	* @return true if boundary collision occurred, false otherwise
-	*/
+	 * @brief Check for collision of a particle with a lattice boundary and reflect if true
+	 *
+	 * @param _x Position in x co-ordinate
+	 * @param _y Position in y co-ordinate
+	 * @param _prev_x Previous position in x
+	 * @param _prev_y Previous position in y
+	 * @param _spawn_diam Current diameter of spawning zone
+	 * @return true if boundary collision occurred, false otherwise
+	 */
 	bool lattice_boundary_collision(int& _x, int& _y, const int& _prev_x, const int& _prev_y, const int& _spawn_diam) const noexcept;
+	/**
+	 * @brief Check for collision of a particle with a lattice boundary and reflect if true
+	 *
+	 * @param _x Position in x co-ordinate
+	 * @param _y Position in y co-ordinate
+	 * @param _z Position in z co-ordinate
+	 * @param _prev_x Previous position in x
+	 * @param _prev_y Previous position in y
+	 * @param _prev_z Previous position in z
+	 * @param _spawn_diam Current diameter of spawning zone
+	 * @return true if boundary collision occurred, false otherwise
+	 */
 	bool lattice_boundary_collision(int& _x, int& _y, int& _z, const int& _prev_x, const int& _prev_y, const int& _prev_z, const int& _spawn_diam) const noexcept;
 
 	/**
-	* @brief Check for collision of a particle with the aggregate and add particle to
-	*        aggregrate structure if true (subject to _sticky_pr <= coeff_stick)
-	*
-	* @param _x Position in x co-ordinate
-	* @param _y Position in y co-ordinate
-	* @param _prev_x Previous position in x
-	* @param _prev_y Previous position in y
-	* @param _sticky_pr Constraint on stickiness, if <= coeff_stick then sticking occurs
-	* @param _count Current number of particles in aggregate
-	* @return true if aggregrate collision occurred and particle was added, false otherwise
-	*/
-	virtual bool aggregate_collision(int& _x, int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) = 0;
-	virtual bool aggregate_collision(int& _x, int& _y, int& _z, const int& _prev_x, const int& _prev_y, const int& _prev_z, const double& _sticky_pr, size_t& _count) = 0;
+	 * @brief Check for collision of a particle with the aggregate and add particle to
+	 *        aggregrate structure if true (subject to _sticky_pr <= coeff_stick)
+	 *
+	 * @param _x Position in x co-ordinate
+	 * @param _y Position in y co-ordinate
+	 * @param _prev_x Previous position in x
+	 * @param _prev_y Previous position in y
+	 * @param _sticky_pr Constraint on stickiness, if <= coeff_stick then sticking occurs
+ 	 * @param _count Current number of particles in aggregate
+ 	 * @return true if aggregrate collision occurred and particle was added, false otherwise
+	 */
+	virtual bool aggregate_collision(const int& _x, const int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) = 0;
+	/**
+	 * @brief Check for collision of a particle with the aggregate and add particle to
+	 *        aggregrate structure if true (subject to _sticky_pr <= coeff_stick)
+	 *
+	 * @param _x Position in x co-ordinate
+	 * @param _y Position in y co-ordinate
+	 * @param _z Position in z co-ordinate
+	 * @param _prev_x Previous position in x
+	 * @param _prev_y Previous position in y
+	 * @param _prev_z Previous position in z
+	 * @param _sticky_pr Constraint on stickiness, if <= coeff_stick then sticking occurs
+	 * @param _count Current number of particles in aggregate
+	 * @return true if aggregrate collision occurred and particle was added, false otherwise
+	 */
+	virtual bool aggregate_collision(const int& _x, const int& _y, const int& _z, const int& _prev_x, const int& _prev_y, const int& _prev_z, const double& _sticky_pr, size_t& _count) = 0;
 
 };

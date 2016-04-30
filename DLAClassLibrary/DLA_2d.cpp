@@ -140,7 +140,6 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	if (_sort_by_map_value) {
 		// std::vector container to store aggregate_map values
 		std::vector<std::pair<size_t, std::pair<int, int>>> agg_vec;
-		//agg_vec.resize(aggregate_map.size()); // resize agg_vec to size of aggregate_map
 		// deep copy elements of aggregate_map to agg_vec
 		for (auto it = aggregate_map.cbegin(); it != aggregate_map.cend(); ++it) {
 			agg_vec.push_back(std::make_pair(it->second, it->first));
@@ -169,10 +168,12 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	return _os;
 }
 
-bool DLA_2d::aggregate_collision(int& _x, int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) {
+bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) {
+	// find the given point in the aggregrete, yields aggregrate_map.end() if not in container
 	auto search = aggregate_map.find(std::make_pair(_x, _y));
 	// co-ordinates _x, _y occur in the aggregate, collision occurred
 	if (search != aggregate_map.end() && _sticky_pr <= coeff_stick) {
+		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		aggregate_map.insert(std::make_pair(std::make_pair(_prev_x, _prev_y), ++_count));
 		aggregate_pq.push(std::make_pair(_prev_x, _prev_y));
 		return true;
@@ -180,6 +181,6 @@ bool DLA_2d::aggregate_collision(int& _x, int& _y, const int& _prev_x, const int
 	return false;
 }
 
-bool DLA_2d::aggregate_collision(int&, int&, int&, const int&, const int&, const int&, const double&, size_t&) {
+bool DLA_2d::aggregate_collision(const int&, const int&, const int&, const int&, const int&, const int&, const double&, size_t&) {
 	return false;
 }
