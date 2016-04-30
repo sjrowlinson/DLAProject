@@ -30,11 +30,20 @@ utilities.h
 DLAContainer.h
     Contains the unmanaged c++ abstract class declaration for DLAContainer.
     
+DLAContainer.cpp
+    Implementation file for DLAContainer class.
+    
 DLA_2d.h
     This contains the unmanaged c++ class declaration DLA_2d inheriting from DLAContainer.
     
+DLA_2d.cpp
+    Implementation file for DLA_2d class.
+    
 DLA_3d.h 
     This contains the unmanaged c++ class declaration DLA_3d inheriting from DLAContainer.
+
+DLA_3d.cpp
+    Implementation file for DLA_3d class.
 
 AssemblyInfo.cpp
 	Contains custom attributes for modifying assembly metadata.
