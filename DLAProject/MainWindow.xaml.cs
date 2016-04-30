@@ -25,7 +25,7 @@ namespace DLAProject {
             InitializeComponent();
 
             ManagedDLA2DContainer dla_2d = new ManagedDLA2DContainer();
-            dla_2d.Generate(10);
+            ManagedDLA3DContainer dla_3d = new ManagedDLA3DContainer(ManagedLatticeType._SQUARE, ManagedAttractorType._POINT);
         }
     }
 }

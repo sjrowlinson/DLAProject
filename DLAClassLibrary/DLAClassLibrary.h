@@ -10,6 +10,17 @@ using namespace System;
 
 namespace DLAClassLibrary {
 
+	public enum class ManagedLatticeType {
+		_SQUARE,
+		_TRIANGLE,
+	};
+
+	public enum class ManagedAttractorType {
+		_POINT,
+		_LINE,
+		_PLANE,
+	};
+
 	/**
 	 * @class ManagedDLA2DContainer
 	 *
@@ -45,7 +56,7 @@ namespace DLAClassLibrary {
 		 * @param _lattice_type Type of lattice aggregate is to be built upon
 		 * @param _attractor_type Type of attractor for initial system seed
 		 */
-		ManagedDLA2DContainer(LatticeType _lattice_type, AttractorType _attractor_type) : native_DLA_container_ptr(new DLA_2d(_lattice_type, _attractor_type)) {}
+		ManagedDLA2DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type) : native_DLA_container_ptr(new DLA_2d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type))) {}
 
 		/**
 		 * @brief Initialises a ManagedDLA2DContainer with given lattice and attractor types and a given stickiness
@@ -55,7 +66,8 @@ namespace DLAClassLibrary {
 		 * @param _attractor_type Type of attractor for initial system seed
 		 * @param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1]
 		 */
-		ManagedDLA2DContainer(LatticeType _lattice_type, AttractorType _attractor_type, double _coeff_stick) : native_DLA_container_ptr(new DLA_2d(_lattice_type, _attractor_type, _coeff_stick)) {}
+		ManagedDLA2DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type, double _coeff_stick) : 
+			native_DLA_container_ptr(new DLA_2d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type), _coeff_stick)) {}
 
 		ManagedDLA2DContainer(ManagedDLA2DContainer^ _other) : native_DLA_container_ptr(new DLA_2d(*dynamic_cast<DLA_2d*>(_other->native_DLA_container_ptr))) {}
 
@@ -156,7 +168,7 @@ namespace DLAClassLibrary {
 		 * @param _lattice_type Type of lattice aggregate is to be built upon
 		 * @param _attractor_type Type of attractor for initial system seed
 		 */
-		ManagedDLA3DContainer(LatticeType _lattice_type, AttractorType _attractor_type) : native_DLA_container_ptr(new DLA_3d(_lattice_type, _attractor_type)) {}
+		ManagedDLA3DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type) : native_DLA_container_ptr(new DLA_3d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type))) {}
 
 		/**
 		 * @brief Initialises a ManagedDLA3DContainer with given lattice and attractor types and a given stickiness
@@ -166,7 +178,8 @@ namespace DLAClassLibrary {
 		 * @param _attractor_type Type of attractor for initial system seed
 		 * @param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1]
 		 */
-		ManagedDLA3DContainer(LatticeType _lattice_type, AttractorType _attractor_type, double _coeff_stick) : native_DLA_container_ptr(new DLA_3d(_lattice_type, _attractor_type, _coeff_stick)) {}
+		ManagedDLA3DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type, double _coeff_stick) : 
+			native_DLA_container_ptr(new DLA_3d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type), _coeff_stick)) {}
 
 		ManagedDLA3DContainer(ManagedDLA3DContainer^ _other) : native_DLA_container_ptr(new DLA_3d(*dynamic_cast<DLA_3d*>(_other->native_DLA_container_ptr))) {}
 
