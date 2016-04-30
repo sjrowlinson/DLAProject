@@ -9,9 +9,11 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using DLAClassLibrary;
 
 namespace DLAProject {
@@ -21,8 +23,8 @@ namespace DLAProject {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
+
             ManagedDLA2DContainer dla_2d = new ManagedDLA2DContainer();
-            dla_2d.Generate(100);
         }
     }
 }

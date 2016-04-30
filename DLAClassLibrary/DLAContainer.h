@@ -150,6 +150,9 @@ protected:
 	std::vector<std::pair<size_t, double>> bounding_radii_vec;
 	size_t bound_radii_npoints = 50;
 
+	virtual void spawn_particle(int& _x, int& _y, int& _spawn_diam, const std::uniform_real_distribution<>& _dist) const noexcept = 0;
+	virtual void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, const std::uniform_real_distribution<>& _dist) const noexcept = 0;
+
 	/**
 	 * @brief Update the position of a particle via unbiased random walk motion
 	 *

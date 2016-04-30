@@ -41,61 +41,36 @@ void DLA_2d::clear() {
 void DLA_2d::generate(size_t _n) {
 	// clear any existing aggregrate data
 	clear();
-
 	// push original aggregate point to map and priority queue
+	// TODO: alter original sticky seed code for different attractor types (2D)
 	size_t count = 0;
 	std::pair<int, int> origin_sticky = std::make_pair(0, 0);
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
 
-	// initialise particle position (altered during spawn routine)
+	// initialise variables for particle position, altered immediately in generation loop
 	int x = 0;
 	int y = 0;
 	int prev_x = x;
 	int prev_y = y;
 
 	bool has_next_spawned = false;
+	// variable to store current allowed size of bounding
+	// box spawning zone
 	int spawn_diameter = 0;
-	// offset to prevent particles spawning directly onto aggregate
-	const unsigned int boundary_offset = 16;
 
 	// uniform distribution in [0,1] for probability generation
 	std::uniform_real_distribution<> dist(0.0, 1.0);
 
+	// intervals to record bounding radii data at
 	size_t fractal_data_interval = _n / bound_radii_npoints;
 	size_t prev_count_taken = count;
-
+	// aggregate generation loop
 	while (count < _n) {
 		// spawn the next particle if previous particle
 		// successfully stuck to aggregate structure
 		if (!has_next_spawned) {
-			// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
-			// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
-			spawn_diameter = 2 * static_cast<int>(std::sqrt(aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second)) + boundary_offset;
-
-			// generate random probability for spawn placement
-			double placement_pr = dist(mt_eng);
-
-			// spawn on upper line of lattice boundary
-			if (placement_pr < 0.25) {
-				x = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				y = spawn_diameter / 2;
-			}
-			// spawn on lower line of lattice boundary
-			else if (placement_pr >= 0.25 && placement_pr < 0.5) {
-				x = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				y = -spawn_diameter / 2;
-			}
-			// spawn on right line of lattice boundary
-			else if (placement_pr >= 0.5 && placement_pr < 0.75) {
-				x = spawn_diameter / 2;
-				y = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-			}
-			// spawn on left line of lattice boundary
-			else {
-				x = -spawn_diameter / 2;
-				y = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-			}
+			spawn_particle(x, y, spawn_diameter, dist);
 			has_next_spawned = true;
 		}
 
@@ -106,8 +81,7 @@ void DLA_2d::generate(size_t _n) {
 
 		// update position of particle via unbiased random walk
 		update_particle_position(x, y, movement_choice);
-		//std::cout << x << "\t" << y << std::endl;
-		// check for collision with particle walls and reflect if true
+		// check for collision with bounding walls and reflect if true
 		lattice_boundary_collision(x, y, prev_x, prev_y, spawn_diameter);
 
 		double stick_pr = dist(mt_eng);
@@ -118,7 +92,8 @@ void DLA_2d::generate(size_t _n) {
 		if (aggregate_collision(x, y, prev_x, prev_y, stick_pr, count)) {
 			has_next_spawned = false;
 		}
-
+		// record no. of particles in aggregate and corresponding minimal
+		// bounding radii to the field bounding_radii_vec
 		if (!(size() % fractal_data_interval) && size() != prev_count_taken) {
 			double rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
 			bounding_radii_vec.push_back(std::make_pair(aggregate_map.size(), std::sqrt(rmax_sqd)));
@@ -166,6 +141,39 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		}
 	}
 	return _os;
+}
+
+void DLA_2d::spawn_particle(int& _x, int& _y, int& _spawn_diam, const std::uniform_real_distribution<>& _dist) const noexcept {
+	const int boundary_offset = 16;
+	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
+	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
+	_spawn_diam = 2 * static_cast<int>(std::sqrt(aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second)) + boundary_offset;
+	
+	double placement_pr = _dist(mt_eng);
+	// spawn on upper line of lattice boundary
+	if (placement_pr < 0.25) {
+		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_y = _spawn_diam / 2;
+	}
+	// spawn on lower line of lattice boundary
+	else if (placement_pr >= 0.25 && placement_pr < 0.5) {
+		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_y = -_spawn_diam / 2;
+	}
+	// spawn on right line of lattice boundary
+	else if (placement_pr >= 0.5 && placement_pr < 0.75) {
+		_x = _spawn_diam / 2;
+		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+	}
+	// spawn on left line of lattice boundary
+	else {
+		_x = -_spawn_diam / 2;
+		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+	}
+}
+
+void DLA_2d::spawn_particle(int&, int&, int&, int&, const std::uniform_real_distribution<>&) const noexcept {
+	return;
 }
 
 bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) {

@@ -39,11 +39,15 @@ void DLA_3d::clear() {
 }
 
 void DLA_3d::generate(size_t _n) {
+	// clear any existing aggregate data
+	clear();
+	// push original sticky point to map and priority queue
+	// TODO: alter original sticky seed code for different attractor types (3D)
 	size_t count = 0;
 	triple<int, int, int> origin_sticky = make_triple(0, 0, 0);
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
-
+    // initialise variable for particle position, altered immediately in generation loop
 	int x = 0;
 	int y = 0;
 	int z = 0;
@@ -52,57 +56,22 @@ void DLA_3d::generate(size_t _n) {
 	int prev_z = z;
 
 	bool has_next_spawned = false;
+	// variable to store current allowed size of bounding
+	// box spawning zone
 	int spawn_diameter = 0;
-	const unsigned int boundary_offset = 16;
 
+	// uniform distribution in [0,1] for probability generation
 	std::uniform_real_distribution<> dist(0.0, 1.0);
 
+	// intervals to record bounding radii data at
 	size_t fractal_data_interval = _n / bound_radii_npoints;
 	size_t prev_count_taken = count;
-
+	// aggregate generation loop
 	while (count < _n) {
+		// spawn the next particle if previous particle
+		// successfully stuck to aggregate structure
 		if (!has_next_spawned) {
-			int rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second + aggregate_pq.top().third*aggregate_pq.top().third;
-			spawn_diameter = 2 * static_cast<int>(std::sqrt(rmax_sqd)) + boundary_offset;
-
-			double placement_pr = dist(mt_eng);
-
-			// Spawn on negative constant z plane of bounding box
-			if (placement_pr < 1.0 / 6.0) {
-				x = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				y = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				z = -spawn_diameter / 2;
-			}
-			// Spawn on positive constant z plane of bounding box
-			else if (placement_pr >= 1.0 / 6.0 && placement_pr < 2.0 / 6.0) {
-				x = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				y = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				z = spawn_diameter / 2;
-			}
-			// Spawn on negative constant x plane of bounding box
-			else if (placement_pr >= 2.0 / 6.0 && placement_pr < 3.0 / 6.0) {
-				x = -spawn_diameter / 2;
-				y = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				z = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-			}
-			// Spawn on positive constant x plane of bounding box
-			else if (placement_pr >= 3.0 / 6.0 && placement_pr < 4.0 / 6.0) {
-				x = spawn_diameter / 2;
-				y = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				z = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-			}
-			// Spawn on negative constant y plane of bounding box
-			else if (placement_pr >= 4.0 / 6.0 && placement_pr < 5.0 / 6.0) {
-				x = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				y = -spawn_diameter / 2;
-				z = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-			}
-			// Spawn on positive constant z plane of bounding box
-			else if (placement_pr >= 5.0 / 6.0 && placement_pr < 1.0) {
-				x = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-				y = spawn_diameter / 2;
-				z = static_cast<int>(spawn_diameter*(dist(mt_eng) - 0.5));
-			}
+			spawn_particle(x, y, z, spawn_diameter, dist);
 			has_next_spawned = true;
 		}
 		double movement_choice = dist(mt_eng);
@@ -110,17 +79,21 @@ void DLA_3d::generate(size_t _n) {
 		prev_x = x;
 		prev_y = y;
 		prev_z = z;
-
+		// update position of particle via unbiased random walk
 		update_particle_position(x, y, z, movement_choice);
-
+		// check for collision with bounding walls and reflect if true
 		lattice_boundary_collision(x, y, z, prev_x, prev_y, prev_z, spawn_diameter);
 
 		double stick_pr = dist(mt_eng);
 
+		// check for collision with aggregate structure and add particle to 
+		// the aggregate (both to map and pq) if true, set flag ready for
+		// next particle spawn
 		if (aggregate_collision(x, y, z, prev_x, prev_y, prev_z, stick_pr, count)) {
 			has_next_spawned = false;
 		}
-
+		// record no. of particles in aggregate and corresponding minimal
+		// bounding radii to the field bounding_radii_vec
 		if (!(size() % fractal_data_interval) && size() != prev_count_taken) {
 			double rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second + aggregate_pq.top().third*aggregate_pq.top().third;
 			bounding_radii_vec.push_back(std::make_pair(aggregate_map.size(), std::sqrt(rmax_sqd)));
@@ -169,6 +142,56 @@ std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		}
 	}
 	return _os;
+}
+
+void DLA_3d::spawn_particle(int&, int&, int&, const std::uniform_real_distribution<>&) const noexcept {
+	// 2d lattice case not applicable to 3d aggregrates
+	return;
+}
+
+void DLA_3d::spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, const std::uniform_real_distribution<>& _dist) const noexcept {
+	const int boundary_offset = 16;
+	int rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second + aggregate_pq.top().third*aggregate_pq.top().third;
+	_spawn_diam = 2 * static_cast<int>(std::sqrt(rmax_sqd)) + boundary_offset;
+
+	double placement_pr = _dist(mt_eng);
+
+	// Spawn on negative constant z plane of bounding box
+	if (placement_pr < 1.0 / 6.0) {
+		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_z = -_spawn_diam / 2;
+	}
+	// Spawn on positive constant z plane of bounding box
+	else if (placement_pr >= 1.0 / 6.0 && placement_pr < 2.0 / 6.0) {
+		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_z = _spawn_diam / 2;
+	}
+	// Spawn on negative constant x plane of bounding box
+	else if (placement_pr >= 2.0 / 6.0 && placement_pr < 3.0 / 6.0) {
+		_x = -_spawn_diam / 2;
+		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+	}
+	// Spawn on positive constant x plane of bounding box
+	else if (placement_pr >= 3.0 / 6.0 && placement_pr < 4.0 / 6.0) {
+		_x = _spawn_diam / 2;
+		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+	}
+	// Spawn on negative constant y plane of bounding box
+	else if (placement_pr >= 4.0 / 6.0 && placement_pr < 5.0 / 6.0) {
+		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_y = -_spawn_diam / 2;
+		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+	}
+	// Spawn on positive constant z plane of bounding box
+	else if (placement_pr >= 5.0 / 6.0 && placement_pr < 1.0) {
+		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_y = _spawn_diam / 2;
+		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+	}
 }
 
 bool DLA_3d::aggregate_collision(const int&, const int&, const int&, const int&, const double&, size_t&) {

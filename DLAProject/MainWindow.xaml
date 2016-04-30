@@ -6,5 +6,22 @@
         xmlns:local="clr-namespace:DLAProject"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800">
-    <Grid/>
+    <Grid Background="Black">
+        <Viewport3D Name="World">
+            <Viewport3D.Camera>
+                <OrthographicCamera Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="128"></OrthographicCamera>
+            </Viewport3D.Camera>
+
+            <Viewport3D.Children>
+                <ModelVisual3D>
+                    <ModelVisual3D.Content>
+                        <Model3DGroup x:Name="WorldModels">
+                            <AmbientLight Color="#FFFFFFFF"></AmbientLight>
+                        </Model3DGroup>
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
+            </Viewport3D.Children>
+
+        </Viewport3D>
+    </Grid>
 </Window>

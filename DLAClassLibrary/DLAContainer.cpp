@@ -161,7 +161,7 @@ void DLAContainer::update_particle_position(int& _x, int& _y, int& _z, const dou
 			--_z;
 		}
 		break;
-		// TODO: add extra cases for differemt LatticeType constants
+		// TODO: add extra cases for different LatticeType constants
 	}
 }
 

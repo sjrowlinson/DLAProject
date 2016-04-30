@@ -51,6 +51,9 @@ private:
 	// particle furthest from origin in constant time
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
 
+	void spawn_particle(int& _x, int& _y, int& _spawn_diam, const std::uniform_real_distribution<>& _dist) const noexcept override;
+	void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, const std::uniform_real_distribution<>& _dist) const noexcept override;
+
 	bool aggregate_collision(const int& _x, const int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) override;
 	bool aggregate_collision(const int& _x, const int& _y, const int& _z, const int& _prev_x, const int& _prev_y, const int& _prev_z, const double& _sticky_pr, size_t& count) override;
 
