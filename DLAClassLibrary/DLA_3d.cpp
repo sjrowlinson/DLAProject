@@ -64,7 +64,12 @@ void DLA_3d::generate(size_t _n) {
 	std::uniform_real_distribution<> dist(0.0, 1.0);
 
 	// intervals to record bounding radii data at
-	size_t fractal_data_interval = _n / bound_radii_npoints;
+	size_t fractal_data_interval;
+	// prevents division by zero in generation loop interval checking
+	if (_n > bound_radii_npoints)
+		fractal_data_interval = _n / bound_radii_npoints;
+	else
+		fractal_data_interval = _n;
 	size_t prev_count_taken = count;
 	// aggregate generation loop
 	while (count < _n) {
@@ -144,12 +149,12 @@ std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	return _os;
 }
 
-void DLA_3d::spawn_particle(int&, int&, int&, const std::uniform_real_distribution<>&) const noexcept {
+void DLA_3d::spawn_particle(int&, int&, int&, std::uniform_real_distribution<>&) noexcept {
 	// 2d lattice case not applicable to 3d aggregrates
 	return;
 }
 
-void DLA_3d::spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, const std::uniform_real_distribution<>& _dist) const noexcept {
+void DLA_3d::spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
 	const int boundary_offset = 16;
 	int rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second + aggregate_pq.top().third*aggregate_pq.top().third;
 	_spawn_diam = 2 * static_cast<int>(std::sqrt(rmax_sqd)) + boundary_offset;

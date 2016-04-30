@@ -25,6 +25,7 @@ namespace DLAProject {
             InitializeComponent();
 
             ManagedDLA2DContainer dla_2d = new ManagedDLA2DContainer();
+            dla_2d.Generate(10);
         }
     }
 }

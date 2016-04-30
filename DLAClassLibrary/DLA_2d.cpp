@@ -63,7 +63,12 @@ void DLA_2d::generate(size_t _n) {
 	std::uniform_real_distribution<> dist(0.0, 1.0);
 
 	// intervals to record bounding radii data at
-	size_t fractal_data_interval = _n / bound_radii_npoints;
+	size_t fractal_data_interval;
+	// prevents division by zero in generation loop interval checking
+	if (_n > bound_radii_npoints)
+		fractal_data_interval = _n / bound_radii_npoints;
+	else
+		fractal_data_interval = _n;
 	size_t prev_count_taken = count;
 	// aggregate generation loop
 	while (count < _n) {
@@ -143,7 +148,7 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	return _os;
 }
 
-void DLA_2d::spawn_particle(int& _x, int& _y, int& _spawn_diam, const std::uniform_real_distribution<>& _dist) const noexcept {
+void DLA_2d::spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
@@ -172,7 +177,7 @@ void DLA_2d::spawn_particle(int& _x, int& _y, int& _spawn_diam, const std::unifo
 	}
 }
 
-void DLA_2d::spawn_particle(int&, int&, int&, int&, const std::uniform_real_distribution<>&) const noexcept {
+void DLA_2d::spawn_particle(int&, int&, int&, int&, std::uniform_real_distribution<>&) noexcept {
 	return;
 }
 
