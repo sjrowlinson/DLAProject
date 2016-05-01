@@ -110,9 +110,10 @@ void DLA_3d::generate(size_t _n) {
 }
 
 double DLA_3d::estimate_fractal_dimension() const {
+	// find radius which minimally bounds the aggregate
 	int rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second + aggregate_pq.top().third*aggregate_pq.top().third;
 	double bounding_radius = std::sqrt(rmax_sqd);
-
+	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
 
