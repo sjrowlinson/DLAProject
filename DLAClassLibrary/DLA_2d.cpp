@@ -71,6 +71,7 @@ void DLA_2d::generate(size_t _n) {
 		fractal_data_interval = _n;
 	size_t prev_count_taken = count;
 	// aggregate generation loop
+	// TODO: consider removing local var count and replacing loop condition with size() < _n 
 	while (count < _n) {
 		// spawn the next particle if previous particle
 		// successfully stuck to aggregate structure
