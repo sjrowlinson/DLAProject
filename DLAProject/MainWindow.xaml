@@ -5,23 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DLAProject"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
-    <Grid Background="Black">
-        <Viewport3D Name="World">
-            <Viewport3D.Camera>
-                <OrthographicCamera Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="128"></OrthographicCamera>
-            </Viewport3D.Camera>
-
-            <Viewport3D.Children>
-                <ModelVisual3D>
-                    <ModelVisual3D.Content>
-                        <Model3DGroup x:Name="WorldModels">
-                            <AmbientLight Color="#FFFFFFFF"></AmbientLight>
-                        </Model3DGroup>
-                    </ModelVisual3D.Content>
-                </ModelVisual3D>
-            </Viewport3D.Children>
-
-        </Viewport3D>
+        Title="MainWindow" Height="768" Width="1366">
+    <Grid>
+        <StackPanel HorizontalAlignment="Left" Height="727" VerticalAlignment="Top" Width="681"/>
+        <Slider Maximum="5000" TickPlacement="BottomRight" TickFrequency="100" IsSnapToTickEnabled="True" x:Name="particles_slider" HorizontalAlignment="Left" Margin="943,50,0,0" VerticalAlignment="Top" Height="25" Width="337"/>
+        <Label x:Name="NParticles_Label" Content="Number of Particles" HorizontalAlignment="Left" Margin="815,49,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="123"/>
+        <TextBox Text="{Binding ElementName=particles_slider, Path=Value, UpdateSourceTrigger=PropertyChanged}" x:Name="particle_val" HorizontalAlignment="Left" Height="23" Margin="1285,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Width="40"/>
+        <Label x:Name="AggSticky_Label" Content="Aggregate Stickiness" HorizontalAlignment="Left" Margin="815,116,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="123"/>
+        <Slider Maximum="1.0" TickPlacement="BottomRight" TickFrequency="0.01" IsSnapToTickEnabled="True" x:Name="stickiness_slider" HorizontalAlignment="Left" Margin="943,116,0,0" VerticalAlignment="Top" Height="25" Width="337"/>
+        <TextBox Text="{Binding Value, ElementName=stickiness_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="sticky_val" HorizontalAlignment="Left" Height="23" Margin="1285,116,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Width="40" RenderTransformOrigin="0.496,3.33"/>
+        <Button x:Name="generate_button" Content="Generate" HorizontalAlignment="Left" Margin="815,200,0,0" VerticalAlignment="Top" Width="75"/>
     </Grid>
 </Window>
