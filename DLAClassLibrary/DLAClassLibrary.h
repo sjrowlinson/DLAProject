@@ -91,10 +91,16 @@ namespace DLAClassLibrary {
 		 * @brief Sets the coefficient of stickiness of the aggregrate
 		 *
 		 * @param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1]
-	     * @throw Throws std::invalid_argument exception if _coeff_stick not in (0,1]
+	     * @throw Throws ArgumentException if _coeff_stick not in (0,1]
 		 */
 		void SetCoeffStick(double _coeff_stick) {
-			native_DLA_container_ptr->set_coeff_stick(_coeff_stick);
+			try {
+				native_DLA_container_ptr->set_coeff_stick(_coeff_stick);
+			}
+			catch (const std::invalid_argument& ex) {
+				String^ err_msg = gcnew String(ex.what());
+				throw gcnew ArgumentException(err_msg);
+			}
 		}
 
 		/**

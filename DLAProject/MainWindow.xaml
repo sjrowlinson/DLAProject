@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DLAProject"
         mc:Ignorable="d"
-        Title="MainWindow" Height="768" Width="1366">
+        Title="Diffusion Limited Aggregation" Height="768" Width="1366">
     <Grid>
         <StackPanel HorizontalAlignment="Left" Height="727" VerticalAlignment="Top" Width="681"/>
         <Slider Maximum="5000" TickPlacement="BottomRight" TickFrequency="100" IsSnapToTickEnabled="True" x:Name="particles_slider" HorizontalAlignment="Left" Margin="943,50,0,0" VerticalAlignment="Top" Height="25" Width="337"/>
@@ -14,6 +14,6 @@
         <Label x:Name="AggSticky_Label" Content="Aggregate Stickiness" HorizontalAlignment="Left" Margin="815,116,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="123"/>
         <Slider Maximum="1.0" TickPlacement="BottomRight" TickFrequency="0.01" IsSnapToTickEnabled="True" x:Name="stickiness_slider" HorizontalAlignment="Left" Margin="943,116,0,0" VerticalAlignment="Top" Height="25" Width="337"/>
         <TextBox Text="{Binding Value, ElementName=stickiness_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="sticky_val" HorizontalAlignment="Left" Height="23" Margin="1285,116,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Width="40" RenderTransformOrigin="0.496,3.33"/>
-        <Button x:Name="generate_button" Content="Generate" HorizontalAlignment="Left" Margin="815,200,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="generate_button" Content="Generate" HorizontalAlignment="Left" Margin="815,200,0,0" VerticalAlignment="Top" Width="75" Click="GenerateButtonClick"/>
     </Grid>
 </Window>
