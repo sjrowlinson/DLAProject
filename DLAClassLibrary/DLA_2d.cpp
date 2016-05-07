@@ -32,6 +32,10 @@ size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
 }
 
+const std::unordered_map<std::pair<int, int>, size_t, pair_hash>& DLA_2d::get_aggregate_map() const noexcept {
+	return aggregate_map;
+}
+
 void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();

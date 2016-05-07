@@ -76,6 +76,8 @@ public:
 
 	size_t size() const noexcept override;
 
+	const std::unordered_map<std::pair<int, int>, size_t, pair_hash>& get_aggregate_map() const noexcept;
+
 	/**
 	 * @brief Clears the aggregrate structure
 	 */

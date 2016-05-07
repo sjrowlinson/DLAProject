@@ -7,6 +7,8 @@
 #include "DLA_3d.h"
 
 using namespace System;
+using namespace System::Collections;
+using namespace System::Collections::Generic;
 
 namespace DLAClassLibrary {
 
