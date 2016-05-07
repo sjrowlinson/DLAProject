@@ -42,8 +42,12 @@ namespace DLAProject {
         private void GenerateAggregate() {
             // lock around aggregate generation
             lock (locker) {
-                // generate the 2D aggregate of size given by particles_slider value
-                Dispatcher.Invoke(new Action(() => { dla_2d.Generate((uint)particles_slider.Value); }));
+                // TODO: lock the particle_slider to prevent changes whilst simulating
+                uint particle_slider_val = 0;
+                // dispatch the particles_slider value access code to UI thread
+                Dispatcher.Invoke(() => { particle_slider_val = (uint)particles_slider.Value; });
+                // generate the DLA using value of particle slider
+                dla_2d.Generate(particle_slider_val);
 
                 // TODO: add particles to "canvas" on GUI as they are generated
             }
