@@ -127,6 +127,7 @@ namespace DLAClassLibrary {
 		 * @param _n Size of aggregrate to produce
 		 */
 		void Generate(size_t _n) {
+			// TODO: create a std::queue in unmanaged DLA classes which can then be converted to
 			native_DLA_container_ptr->generate(_n);
 		}
 

@@ -25,18 +25,18 @@ namespace DLAProject {
 
         // lock object for multi-threading tasks
         private static readonly object locker = new object();
-        private Dictionary<KeyValuePair<int, int>, uint> aggregate_map;
         // handles to ManagedDLAContainer objects
         private ManagedDLA2DContainer dla_2d;
         private ManagedDLA3DContainer dla_3d;
+        bool isPaused;
+
 
         public MainWindow() {
             InitializeComponent();
-
             // initalise aggregate containers
-            aggregate_map = new Dictionary<KeyValuePair<int, int>, uint>();
             dla_2d = new ManagedDLA2DContainer();
             dla_3d = new ManagedDLA3DContainer();
+            isPaused = false;
         }
 
         private void GenerateAggregate() {
@@ -49,21 +49,29 @@ namespace DLAProject {
                 // generate the DLA using value of particle slider
                 dla_2d.Generate(particle_slider_val);
 
-                // TODO: add particles to "canvas" on GUI as they are generated
+                // TODO: add particles to "canvas" on GUI as they are generated - will require
+                // using Dispatcher.Invoke to update the GUI
             }
         }
 
         private void GenerateButtonClick(object sender, RoutedEventArgs e) {
             // set the coefficient of stickiness of aggregate
             // to current value of stickiness_slider
-            try {
-                dla_2d.SetCoeffStick(stickiness_slider.Value);
-            }
-            catch (ArgumentException) {
-                
-            }
+            dla_2d.SetCoeffStick(stickiness_slider.Value);
             // start asynchronous task calling GenerateAggregate method
             Task.Factory.StartNew(() => GenerateAggregate());
+        }
+
+        private void PauseButtonClick(object sender, RoutedEventArgs e) {
+            // TODO: implement pause functionality
+            if (!isPaused) {
+                pause_button.Content = "Resume";
+                isPaused = true;
+            }
+            else {
+                pause_button.Content = "Pause";
+                isPaused = false;
+            }
         }
 
     }
