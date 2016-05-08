@@ -18,9 +18,9 @@ namespace DLAClassLibrary {
 	};
 
 	public enum class ManagedAttractorType {
-		_POINT,
-		_LINE,
-		_PLANE,
+		Point,
+		Line,
+		Plane,
 	};
 
 	/**
