@@ -52,6 +52,22 @@ void DLAContainer::set_coeff_stick(const double& _coeff_stick) {
 	coeff_stick = _coeff_stick;
 }
 
+LatticeType DLAContainer::get_lattice_type() const noexcept {
+	return lattice_type;
+}
+
+void DLAContainer::set_lattice_type(LatticeType _lattice_type) noexcept {
+	lattice_type = _lattice_type;
+}
+
+AttractorType DLAContainer::get_attractor_type() const noexcept {
+	return attractor_type;
+}
+
+void DLAContainer::set_attractor_type(AttractorType _attractor_type) noexcept {
+	attractor_type = _attractor_type;
+}
+
 void DLAContainer::set_bound_radii_npoints(size_t _npoints) noexcept {
 	bound_radii_npoints = _npoints;
 }

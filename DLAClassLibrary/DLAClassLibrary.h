@@ -13,8 +13,8 @@ using namespace System::Collections::Generic;
 namespace DLAClassLibrary {
 
 	public enum class ManagedLatticeType {
-		_SQUARE,
-		_TRIANGLE,
+		Square,
+		Triangle,
 	};
 
 	public enum class ManagedAttractorType {
@@ -103,6 +103,14 @@ namespace DLAClassLibrary {
 				String^ err_msg = gcnew String(ex.what());
 				throw gcnew ArgumentException(err_msg);
 			}
+		}
+
+		void SetLatticeType(ManagedLatticeType _lattice_type) {
+			native_DLA_container_ptr->set_lattice_type(static_cast<LatticeType>(_lattice_type));
+		}
+
+		void SetAttractorType(ManagedAttractorType _attractor_type) {
+			native_DLA_container_ptr->set_attractor_type(static_cast<AttractorType>(_attractor_type));
 		}
 
 		/**

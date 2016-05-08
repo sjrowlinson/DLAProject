@@ -28,8 +28,7 @@ namespace DLAProject {
         // handles to ManagedDLAContainer objects
         private ManagedDLA2DContainer dla_2d;
         private ManagedDLA3DContainer dla_3d;
-        bool isPaused;
-
+        private bool isPaused;
 
         public MainWindow() {
             InitializeComponent();
@@ -45,7 +44,9 @@ namespace DLAProject {
                 // TODO: lock the particle_slider to prevent changes whilst simulating
                 uint particle_slider_val = 0;
                 // dispatch the particles_slider value access code to UI thread
-                Dispatcher.Invoke(() => { particle_slider_val = (uint)particles_slider.Value; });
+                Dispatcher.Invoke(() => {
+                    particle_slider_val = (uint)particles_slider.Value;
+                });
                 // generate the DLA using value of particle slider
                 dla_2d.Generate(particle_slider_val);
 
@@ -58,6 +59,18 @@ namespace DLAProject {
             // set the coefficient of stickiness of aggregate
             // to current value of stickiness_slider
             dla_2d.SetCoeffStick(stickiness_slider.Value);
+            // set the lattice type to current selected item
+            // of latticeType_ComboBox ui element
+            ComboBoxItem selected_latticeType = (ComboBoxItem)(latticeType_ComboBox.SelectedValue);
+            string lattice_type_str = (string)(selected_latticeType.Content);
+            ManagedLatticeType lattice_type = (ManagedLatticeType)Enum.Parse(typeof(ManagedLatticeType), lattice_type_str);
+            dla_2d.SetLatticeType(lattice_type);
+            // set the attractor type to current selected item
+            // of attractorType_ComboBox ui element
+            ComboBoxItem selected_AttractorType = (ComboBoxItem)(attractorType_ComboBox.SelectedValue);
+            string attractor_type_str = (string)(selected_AttractorType.Content);
+            ManagedAttractorType attractor_type = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type_str);
+            dla_2d.SetAttractorType(attractor_type);
             // start asynchronous task calling GenerateAggregate method
             Task.Factory.StartNew(() => GenerateAggregate());
         }

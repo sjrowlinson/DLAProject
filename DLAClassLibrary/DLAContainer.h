@@ -80,6 +80,14 @@ public:
 	*/
 	void set_coeff_stick(const double& _coeff_stick);
 
+	LatticeType get_lattice_type() const noexcept;
+
+	AttractorType get_attractor_type() const noexcept;
+
+	void set_lattice_type(LatticeType _lattice_type) noexcept;
+
+	void set_attractor_type(AttractorType _attractor_type) noexcept;
+
 	/**
 	* @brief Sets the number of data points to generate for bounding radii data
 	*
