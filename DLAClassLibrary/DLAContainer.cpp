@@ -46,6 +46,7 @@ double DLAContainer::get_coeff_stick() const noexcept {
 }
 
 void DLAContainer::set_coeff_stick(const double& _coeff_stick) {
+	// if _coeff_stick not in (0,1] => throw std::invalid_argument
 	if (_coeff_stick <= 0.0 || _coeff_stick > 1.0) {
 		throw std::invalid_argument("_coeff_stick must be in interval (0,1]");
 	}
@@ -77,11 +78,13 @@ void DLAContainer::clear() {
 }
 
 std::ostream& DLAContainer::write_bounding_radii_data(std::ostream& _os) const {
+	// write bounding_radii_vec to _os using overloaded operator<< for std::vector
 	_os << bounding_radii_vec;
 	return _os;
 }
 
 void DLAContainer::update_particle_position(int& _x, int& _y, const double& _movement_choice) const noexcept {
+	// perform different translations dependent upon type of lattice
 	switch (lattice_type) {
 	case LatticeType::SQUARE:
 		// translate (+1,0)
@@ -136,6 +139,7 @@ void DLAContainer::update_particle_position(int& _x, int& _y, const double& _mov
 }
 
 void DLAContainer::update_particle_position(int& _x, int& _y, int& _z, const double& _movement_choice) const noexcept {
+	// perform different translations dependent upon type of lattice
 	switch (lattice_type) {
 	case LatticeType::SQUARE:
 		// translate (+1,0,0)

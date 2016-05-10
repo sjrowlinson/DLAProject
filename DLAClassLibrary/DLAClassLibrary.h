@@ -16,7 +16,7 @@ namespace DLAClassLibrary {
 		Square,
 		Triangle,
 	};
-
+	
 	public enum class ManagedAttractorType {
 		Point,
 		Line,
@@ -105,10 +105,20 @@ namespace DLAClassLibrary {
 			}
 		}
 
+		/**
+		 * @brief Sets the type of lattice
+		 *
+		 * @param _lattice_type LatticeType to update to
+		 */
 		void SetLatticeType(ManagedLatticeType _lattice_type) {
 			native_DLA_container_ptr->set_lattice_type(static_cast<LatticeType>(_lattice_type));
 		}
 
+		/**
+		 * @brief Sets the type of attractor
+		 *
+		 * @param _attractor_type AttractorType to update to
+		 */
 		void SetAttractorType(ManagedAttractorType _attractor_type) {
 			native_DLA_container_ptr->set_attractor_type(static_cast<AttractorType>(_attractor_type));
 		}
@@ -122,8 +132,15 @@ namespace DLAClassLibrary {
 			return native_DLA_container_ptr->size();
 		}
 
+		/**
+		 * @brief Gets the most-recently-added particle of the aggregate
+		 *
+		 * @return KeyValuePair containing co-ordinates of mra particle
+		 */
 		KeyValuePair<int,int> GetMRAParticle() {
+			// stores (x,y) co-ordinates of mra particle
 			std::pair<int, int> mra_cache = dynamic_cast<DLA_2d*>(native_DLA_container_ptr)->mra_particle();
+			// initialise a KVP with mra particle co-ordinates and return
 			KeyValuePair<int, int>^ mra_kvp = gcnew KeyValuePair<int, int>(mra_cache.first, mra_cache.second);
 			return *mra_kvp;
 		}
@@ -238,8 +255,15 @@ namespace DLAClassLibrary {
 			return native_DLA_container_ptr->size();
 		}
 
+		/**
+		 * @brief Gets the most-recently-added particle of the aggregate
+		 *
+		 * @return Tuple containing co-ordinates of mra particle
+		 */
 		Tuple<int, int, int>^ GetMRAParticle() {
+			// stores (x,y,z) co-ordinates of mra particle
 			triple<int, int, int> mra_cache = dynamic_cast<DLA_3d*>(native_DLA_container_ptr)->mra_particle();
+			// initialise a Tuple with mra particle co-ordinates and return
 			Tuple<int, int, int>^ mra_tuple = gcnew Tuple<int, int, int>(mra_cache.first, mra_cache.second, mra_cache.third);
 			return mra_tuple;
 		}

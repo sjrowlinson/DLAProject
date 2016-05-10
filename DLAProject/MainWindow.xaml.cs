@@ -28,9 +28,11 @@ namespace DLAProject {
         // handles to ManagedDLAContainer objects
         private readonly ManagedDLA2DContainer dla_2d;
         private readonly ManagedDLA3DContainer dla_3d;
+        // flag for pause state
         private bool isPaused;
+        // pair holding most-recently-added pair to 2D aggregate
         private KeyValuePair<int, int> mra_cache_pair;
-
+        // handle to AggregateSystemManager used for updating simulation render
         private readonly AggregateSystemManager aggregate_manager;
 
         public MainWindow() {
@@ -43,8 +45,15 @@ namespace DLAProject {
             isPaused = false;
         }
 
+        /// <summary>
+        /// Checks for updates to the simulated DLA structure and performs
+        /// rendering of any added particles. Should be called in a separate thread.
+        /// </summary>
+        /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListener(uint _particle_slider_val) {
+            // lock around the listener
             lock (locker) {
+                // continue execution until aggregate is completely generated
                 while (dla_2d.Size() < _particle_slider_val-1) {
                     // get the Most-Recently-Added aggregate particle
                     KeyValuePair<int, int> agg_kvp = dla_2d.GetMRAParticle();
@@ -61,6 +70,11 @@ namespace DLAProject {
             }
         }
 
+        /// <summary>
+        /// Generates a Diffusion Limited Aggregate with properties initialised by
+        /// current values of sliders and combo-boxes in the UI. Should be called
+        /// in a separate thread.
+        /// </summary>
         private void GenerateAggregate() {
             // lock around aggregate generation
             lock (locker) {
@@ -70,15 +84,18 @@ namespace DLAProject {
                 Dispatcher.Invoke(() => {
                     particle_slider_val = (uint)particles_slider.Value;
                 });
+                // start asynchronous task calling AggregateUpdateListener to perform rendering
                 Task.Factory.StartNew(() => AggregateUpdateListener(particle_slider_val));
                 // generate the DLA using value of particle slider
                 dla_2d.Generate(particle_slider_val);
-                
-                // TODO: add particles to "canvas" on GUI as they are generated - will require
-                // using Dispatcher.Invoke to update the GUI
             }
         }
 
+        /// <summary>
+        /// Handler for generate_button click event. Calls GenerateAggregate() in a separate task factory.
+        /// </summary>
+        /// <param name="sender">Sender identification</param>
+        /// <param name="e">Variable containing state information associated with event</param>
         private void GenerateButtonClick(object sender, RoutedEventArgs e) {
             // set the coefficient of stickiness of aggregate
             // to current value of stickiness_slider
@@ -102,6 +119,11 @@ namespace DLAProject {
             Task.Factory.StartNew(() => GenerateAggregate());
         }
 
+        /// <summary>
+        /// Handler for pause_button click event. Pauses simulation if running, resumes if paused.
+        /// </summary>
+        /// <param name="sender">Sender identification</param>
+        /// <param name="e">Variable containing state information associated with event</param>
         private void PauseButtonClick(object sender, RoutedEventArgs e) {
             // TODO: implement pause functionality
             if (!isPaused) {
@@ -114,6 +136,11 @@ namespace DLAProject {
             }
         }
 
+        /// <summary>
+        /// Handler for clear_button click event. Clears the current aggregate data and simulation view.
+        /// </summary>
+        /// <param name="sender">Sender identification</param>
+        /// <param name="e">Variable containing state information associated with event</param>
         private void ClearButtonClick(object sender, RoutedEventArgs e) {
             dla_2d.Clear();
             dla_3d.Clear();

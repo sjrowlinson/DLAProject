@@ -34,18 +34,44 @@ class DLA_3d : public DLAContainer {
 
 public:
 
+	/**
+	 * @brief Default constructor, initialises empty 3d aggregate with given sticky coefficient.
+	 *
+	 * @param _coeff_stick [= 1.0] Coefficient of stickiness
+	 * @throw Throws std::invalid_argument exception if _coeff_stick not in (0,1]
+	 */
 	DLA_3d(const double& _coeff_stick = 1.0);
-
+	/**
+	 * @brief Initialises empty 3d aggregate with specified lattice and attractor types.
+	 *
+	 * @param _lattice_type Type of lattice for construction
+	 * @param _attractor_type Type of attractor of initial aggregate
+	 * @param _coeff_stick [= 1.0] Coefficient of stickiness
+	 */
 	DLA_3d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
-
+	/**
+	 * @brief Copy constructor
+	 *
+	 * @param _other const reference to DLA_3d instance
+	 */
 	DLA_3d(const DLA_3d& _other);
-
+	/**
+	 * @brief Move constructor
+	 *
+	 * @param _other rvalue reference to DLA_2d instance
+	 */
 	DLA_3d(DLA_3d&& _other);
 
 	~DLA_3d();
 
 	size_t size() const noexcept override;
 
+	/**
+	 * @brief Gets the most-recently-added particle of aggregate
+	 *
+	 * @return const reference to triple struct instance containing
+	 *         co-ordinates of MRA particle
+	 */
 	const triple<int, int, int>& mra_particle() const noexcept;
 
 	void clear() override;
@@ -63,6 +89,7 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	std::priority_queue<triple<int, int, int>, std::vector<triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
+	// stores the most-recently-added particle of the aggregate system
 	triple<int, int, int> mra_agg_particle;
 
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;

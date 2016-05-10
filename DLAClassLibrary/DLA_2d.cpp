@@ -196,6 +196,7 @@ bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		aggregate_map.insert(std::make_pair(added_particle, ++_count));
 		aggregate_pq.push(added_particle);
+		// update the most-recently-added particle
 		mra_agg_particle = added_particle;
 		return true;
 	}

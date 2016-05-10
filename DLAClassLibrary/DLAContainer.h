@@ -80,32 +80,52 @@ public:
 	*/
 	void set_coeff_stick(const double& _coeff_stick);
 
+	/**
+	 * @brief Gets the type of lattice
+	 *
+	 * @return lattice_type of this instance
+	 */
 	LatticeType get_lattice_type() const noexcept;
 
+	/**
+	 * @brief Gets the type of attractor
+	 *
+	 * @return attractor_type of this instance
+	 */
 	AttractorType get_attractor_type() const noexcept;
 
+	/**
+	 * @brief Sets the type of lattice
+	 *
+	 * @param _lattice_type LatticeType to update to
+	 */
 	void set_lattice_type(LatticeType _lattice_type) noexcept;
 
+	/**
+	 * @brief Sets the type of attractor
+	 *
+	 * @param _attractor_type AttractorType to update to
+	 */
 	void set_attractor_type(AttractorType _attractor_type) noexcept;
 
 	/**
-	* @brief Sets the number of data points to generate for bounding radii data
-	*
-	* @param _npoints Number of data points to generate
-	*/
+	 * @brief Sets the number of data points to generate for bounding radii data
+	 *
+	 * @param _npoints Number of data points to generate
+	 */
 	void set_bound_radii_npoints(size_t _npoints) noexcept;
 
 	/**
-	* @brief Clears the aggregrate structure
-	*/
+	 * @brief Clears the aggregrate structure
+	 */
 	virtual void clear();
 
 	/**
-	* @brief Generates a diffusion limited aggregate consisting of the parameterised
-	*        number of particles using a stickiness coefficient given.
-	*
-	* @param _n Number of particles to generate in the DLA
-	*/
+	 * @brief Generates a diffusion limited aggregate consisting of the parameterised
+	 *        number of particles using a stickiness coefficient given.
+	 *
+	 * @param _n Number of particles to generate in the DLA
+	 */
 	virtual void generate(size_t n) = 0;
 
 	/**
