@@ -37,5 +37,6 @@
         
         <Button x:Name="generate_button" Content="Generate" HorizontalAlignment="Left" Margin="815,200,0,0" VerticalAlignment="Top" Width="75" Click="GenerateButtonClick"/>
         <Button x:Name="pause_button" Content="Pause" HorizontalAlignment="Left" Margin="911,200,0,0" VerticalAlignment="Top" Width="75" Click="PauseButtonClick"/>
+        <Button x:Name="clear_button" Content="Clear" HorizontalAlignment="Left" Margin="1007,200,0,0" VerticalAlignment="Top" Width="75" Click="ClearButtonClick"/>
     </Grid>
 </Window>

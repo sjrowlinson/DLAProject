@@ -154,7 +154,7 @@ protected:
 	AttractorType attractor_type;
 	double coeff_stick;
 	std::mt19937 mt_eng;
-
+	
 	std::vector<std::pair<size_t, double>> bounding_radii_vec;
 	size_t bound_radii_npoints = 50;
 

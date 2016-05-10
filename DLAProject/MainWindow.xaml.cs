@@ -49,7 +49,7 @@ namespace DLAProject {
                 });
                 // generate the DLA using value of particle slider
                 dla_2d.Generate(particle_slider_val);
-
+                
                 // TODO: add particles to "canvas" on GUI as they are generated - will require
                 // using Dispatcher.Invoke to update the GUI
             }
@@ -85,6 +85,12 @@ namespace DLAProject {
                 pause_button.Content = "Pause";
                 isPaused = false;
             }
+        }
+
+        private void ClearButtonClick(object sender, RoutedEventArgs e) {
+            dla_2d.Clear();
+            dla_3d.Clear();
+            // TODO: clear aggregate from GUI
         }
 
     }

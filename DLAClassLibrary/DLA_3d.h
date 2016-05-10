@@ -46,6 +46,8 @@ public:
 
 	size_t size() const noexcept override;
 
+	const triple<int, int, int>& mra_particle() const noexcept;
+
 	void clear() override;
 
 	void generate(size_t _n) override;
@@ -61,6 +63,7 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	std::priority_queue<triple<int, int, int>, std::vector<triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
+	triple<int, int, int> mra_agg_particle;
 
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;
 	void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;

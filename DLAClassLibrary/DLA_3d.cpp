@@ -32,6 +32,10 @@ size_t DLA_3d::size() const noexcept {
 	return aggregate_map.size();
 }
 
+const triple<int, int, int>& DLA_3d::mra_particle() const noexcept {
+	return mra_agg_particle;
+}
+
 void DLA_3d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
@@ -209,9 +213,11 @@ bool DLA_3d::aggregate_collision(const int& _x, const int& _y, const int& _z, co
 	auto search = aggregate_map.find(make_triple(_x, _y, _z));
 	// co-ordinates _x, _y, _z occur in the aggregate, collision occurred
 	if (search != aggregate_map.end() && _sticky_pr <= coeff_stick) {
+		triple<int, int, int> added_particle = make_triple(_prev_x, _prev_y, _prev_z);
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
-		aggregate_map.insert(std::make_pair(make_triple(_prev_x, _prev_y, _prev_z), ++_count));
-		aggregate_pq.push(make_triple(_prev_x, _prev_y, _prev_z));
+		aggregate_map.insert(std::make_pair(added_particle, ++_count));
+		aggregate_pq.push(added_particle);
+		mra_agg_particle = added_particle;
 		return true;
 	}
 	return false;

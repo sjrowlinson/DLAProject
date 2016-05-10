@@ -32,8 +32,8 @@ size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-const std::unordered_map<std::pair<int, int>, size_t, pair_hash>& DLA_2d::get_aggregate_map() const noexcept {
-	return aggregate_map;
+const std::pair<int, int>& DLA_2d::mra_particle() const noexcept {
+	return mra_agg_particle;
 }
 
 void DLA_2d::clear() {
@@ -192,9 +192,11 @@ bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_
 	auto search = aggregate_map.find(std::make_pair(_x, _y));
 	// co-ordinates _x, _y occur in the aggregate, collision occurred
 	if (search != aggregate_map.end() && _sticky_pr <= coeff_stick) {
+		std::pair<int, int> added_particle = std::make_pair(_prev_x, _prev_y);
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
-		aggregate_map.insert(std::make_pair(std::make_pair(_prev_x, _prev_y), ++_count));
-		aggregate_pq.push(std::make_pair(_prev_x, _prev_y));
+		aggregate_map.insert(std::make_pair(added_particle, ++_count));
+		aggregate_pq.push(added_particle);
+		mra_agg_particle = added_particle;
 		return true;
 	}
 	return false;

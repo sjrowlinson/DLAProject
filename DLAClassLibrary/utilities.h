@@ -18,6 +18,17 @@ template<typename _Ty1, typename _Ty2, typename _Ty3> struct triple {
 	_Ty1 first;
 	_Ty2 second;
 	_Ty3 third;
+	
+	/**
+	 * @brief Default constructor
+	 */
+	template<class _Uty1 = _Ty1,
+		class _Uty2 = _Ty2,
+		class _Uty3 = _Ty3,
+		class = std::enable_if_t<std::is_default_constructible<_Uty1>::value
+		&& std::is_default_constructible<_Uty2>::value 
+	    && std::is_default_constructible<_Uty3>::value> >
+		constexpr triple() : first(), second(), third() {}
 
 	/**
 	* @brief Construct a triple object

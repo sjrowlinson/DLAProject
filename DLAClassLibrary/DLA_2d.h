@@ -76,7 +76,7 @@ public:
 
 	size_t size() const noexcept override;
 
-	const std::unordered_map<std::pair<int, int>, size_t, pair_hash>& get_aggregate_map() const noexcept;
+	const std::pair<int, int>& mra_particle() const noexcept;
 
 	/**
 	 * @brief Clears the aggregrate structure
@@ -102,6 +102,7 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
+	std::pair<int, int> mra_agg_particle;
 
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;
 	void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;

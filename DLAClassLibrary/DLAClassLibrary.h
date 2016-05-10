@@ -122,6 +122,12 @@ namespace DLAClassLibrary {
 			return native_DLA_container_ptr->size();
 		}
 
+		KeyValuePair<int,int> GetMRAParticle() {
+			std::pair<int, int> mra_cache = dynamic_cast<DLA_2d*>(native_DLA_container_ptr)->mra_particle();
+			KeyValuePair<int, int>^ mra_kvp = gcnew KeyValuePair<int, int>(mra_cache.first, mra_cache.second);
+			return *mra_kvp;
+		}
+
 		/**
 		 * @brief Clears the aggregrate of all particles
 		 */
@@ -230,6 +236,12 @@ namespace DLAClassLibrary {
 		*/
 		size_t Size() {
 			return native_DLA_container_ptr->size();
+		}
+
+		Tuple<int, int, int>^ GetMRAParticle() {
+			triple<int, int, int> mra_cache = dynamic_cast<DLA_3d*>(native_DLA_container_ptr)->mra_particle();
+			Tuple<int, int, int>^ mra_tuple = gcnew Tuple<int, int, int>(mra_cache.first, mra_cache.second, mra_cache.third);
+			return mra_tuple;
 		}
 
 		/**
