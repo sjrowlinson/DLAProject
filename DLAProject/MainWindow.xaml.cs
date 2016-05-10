@@ -66,7 +66,7 @@ namespace DLAProject {
                     else {
                         Point3D position = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
                         // dispatch particle addition code to UI thread
-                        Dispatcher.Invoke(() => { aggregate_manager.AddParticle(position, Colors.Red, 0.5); });
+                        Dispatcher.Invoke(() => { aggregate_manager.AddParticle(position, Colors.Red, 1.0); });
                     }
                 }
             }

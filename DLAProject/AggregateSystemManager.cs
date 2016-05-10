@@ -15,6 +15,9 @@ namespace DLAProject {
 
         private readonly AggregateSystem agg_sys;
 
+        /// <summary>
+        /// Initialises a new instance of the AggregateSystemManager class.
+        /// </summary>
         public AggregateSystemManager() {
             agg_sys = new AggregateSystem();
         }
@@ -29,6 +32,10 @@ namespace DLAProject {
             agg_sys.SpawnParticle(position, colour, size);    
         }
 
+        /// <summary>
+        /// Gets the Model3D object associated with the aggregate system.
+        /// </summary>
+        /// <returns>The Model3D instance of the associated aggregate system.</returns>
         public Model3D AggregateSystemModel() {
             return agg_sys.AggregateModel;
         }

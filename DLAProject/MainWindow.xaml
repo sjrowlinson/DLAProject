@@ -8,7 +8,7 @@
         Title="Diffusion Limited Aggregation" Height="768" Width="1366">
     <Grid>
         <StackPanel HorizontalAlignment="Left" Height="727" VerticalAlignment="Top" Width="681">
-            <Grid Background="Black">
+            <Grid Background="Black" Visibility="Visible" Height="724">
                 <Viewport3D Name="World">
                     <Viewport3D.Camera>
                         <OrthographicCamera Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="128" />
