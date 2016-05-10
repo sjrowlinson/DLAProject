@@ -13,8 +13,10 @@ namespace DLAProject {
     /// </summary>
     public class AggregateSystemManager {
 
-        public AggregateSystemManager() {
+        private readonly AggregateSystem agg_sys;
 
+        public AggregateSystemManager() {
+            agg_sys = new AggregateSystem();
         }
 
         /// <summary>
@@ -24,7 +26,11 @@ namespace DLAProject {
         /// <param name="colour">Colour of particle in terms of alpha, RGB channels</param>
         /// <param name="size">Size of particle</param>
         public void AddParticle(Point3D position, Color colour, double size) {
+            agg_sys.SpawnParticle(position, colour, size);    
+        }
 
+        public Model3D AggregateSystemModel() {
+            return agg_sys.AggregateModel;
         }
 
     }

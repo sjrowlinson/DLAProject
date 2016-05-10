@@ -43,6 +43,8 @@ namespace DLAProject {
             mra_cache_pair = new KeyValuePair<int, int>();
             aggregate_manager = new AggregateSystemManager();
             isPaused = false;
+
+            WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
         }
 
         /// <summary>
@@ -54,7 +56,6 @@ namespace DLAProject {
             // lock around the listener
             lock (locker) {
                 // continue execution until aggregate is completely generated
-                // BUG: loop does not exit if sticky coeff < 1
                 while (dla_2d.Size() < _particle_slider_val) {
                     // get the Most-Recently-Added aggregate particle
                     KeyValuePair<int, int> agg_kvp = dla_2d.GetMRAParticle();

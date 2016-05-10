@@ -18,6 +18,17 @@ namespace DLAProject {
             particle_model = new GeometryModel3D { Geometry = new MeshGeometry3D() };
         }
 
+        public Model3D AggregateModel => particle_model;
+
+        public void SpawnParticle(Point3D _position, Color _colour, double _size) {
+            AggregateParticle agg_particle = new AggregateParticle {
+                position = _position, colour = _colour, size = _size
+            };
+            particle_list.Add(agg_particle);
+        }
+
     }
 
 }
+
+
