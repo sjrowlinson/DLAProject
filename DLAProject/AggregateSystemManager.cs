@@ -14,6 +14,10 @@ namespace DLAProject {
 
         }
 
+        public void AddParticle(Point3D position, Color colour, double size) {
+
+        }
+
     }
 
 }
