@@ -1,6 +1,7 @@
 // DLAClassLibrary.h
 
 #pragma once
+#include <fstream>
 
 #include "DLAContainer.h"
 #include "DLA_2d.h"
@@ -158,8 +159,11 @@ namespace DLAClassLibrary {
 		 * @param _n Size of aggregrate to produce
 		 */
 		void Generate(size_t _n) {
-			// TODO: create a std::queue in unmanaged DLA classes which can then be converted to
 			native_DLA_container_ptr->generate(_n);
+			//std::string file_path = "C:/Users/Sam/Documents/MATLAB/NMProject/DLASquare2D.txt";
+			//std::ofstream of(file_path);
+			//native_DLA_container_ptr->write(of, true);
+			//of.close();
 		}
 
 		/**

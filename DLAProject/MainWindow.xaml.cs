@@ -54,7 +54,8 @@ namespace DLAProject {
             // lock around the listener
             lock (locker) {
                 // continue execution until aggregate is completely generated
-                while (dla_2d.Size() < _particle_slider_val-1) {
+                // BUG: loop does not exit if sticky coeff < 1
+                while (dla_2d.Size() < _particle_slider_val) {
                     // get the Most-Recently-Added aggregate particle
                     KeyValuePair<int, int> agg_kvp = dla_2d.GetMRAParticle();
                     if (agg_kvp.Equals(mra_cache_pair)) {
