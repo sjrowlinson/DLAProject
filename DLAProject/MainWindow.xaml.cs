@@ -26,8 +26,8 @@ namespace DLAProject {
         // lock object for multi-threading tasks
         private static readonly object locker = new object();
         // handles to ManagedDLAContainer objects
-        private ManagedDLA2DContainer dla_2d;
-        private ManagedDLA3DContainer dla_3d;
+        private readonly ManagedDLA2DContainer dla_2d;
+        private readonly ManagedDLA3DContainer dla_3d;
         private bool isPaused;
 
         public MainWindow() {

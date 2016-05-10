@@ -7,7 +7,9 @@
         mc:Ignorable="d"
         Title="Diffusion Limited Aggregation" Height="768" Width="1366">
     <Grid>
-        <StackPanel HorizontalAlignment="Left" Height="727" VerticalAlignment="Top" Width="681"/>
+        <StackPanel HorizontalAlignment="Left" Height="727" VerticalAlignment="Top" Width="681">
+            
+        </StackPanel>
         <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" HorizontalAlignment="Left" Margin="874,19,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="135"/>
         <ComboBox x:Name="dimension_ComboBox" HorizontalAlignment="Left" Margin="1041,21,0,0" VerticalAlignment="Top" Width="120">
             <ComboBoxItem IsSelected="True" Content="2D"/>
