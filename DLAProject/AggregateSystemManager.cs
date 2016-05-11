@@ -22,6 +22,9 @@ namespace DLAProject {
             agg_sys = new AggregateSystem();
         }
 
+        /// <summary>
+        /// Updates the aggregate system. 
+        /// </summary>
         public void Update() {
             agg_sys.Update();
         }
@@ -34,6 +37,10 @@ namespace DLAProject {
         /// <param name="size">Size of particle</param>
         public void AddParticle(Point3D position, Color colour, double size) {
             agg_sys.SpawnParticle(position, colour, size);    
+        }
+
+        public void ClearAggregate() {
+            agg_sys.Clear();
         }
 
         /// <summary>

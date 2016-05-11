@@ -43,7 +43,6 @@ namespace DLAProject {
             mra_cache_pair = new KeyValuePair<int, int>();
             aggregate_manager = new AggregateSystemManager();
             isPaused = false;
-
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
         }
 
@@ -65,7 +64,7 @@ namespace DLAProject {
                     // aggregate has updated, add new particle to simulation view
                     else {
                         Point3D position = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
-                        aggregate_manager.AddParticle(position, Colors.White, 1.0);
+                        aggregate_manager.AddParticle(position, Colors.Red, 1.0);
                         // dispatch particle addition code to UI thread
                         Dispatcher.Invoke(() => { aggregate_manager.Update(); });
                     }
@@ -99,7 +98,9 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
-        private void GenerateButtonClick(object sender, RoutedEventArgs e) {
+        private void GenerateButtonHandler(object sender, RoutedEventArgs e) {
+            // clear any existing aggregate
+            ClearButtonHandler(null, null);
             // set the coefficient of stickiness of aggregate
             // to current value of stickiness_slider
             dla_2d.SetCoeffStick(stickiness_slider.Value);
@@ -127,7 +128,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
-        private void PauseButtonClick(object sender, RoutedEventArgs e) {
+        private void PauseButtonHandler(object sender, RoutedEventArgs e) {
             // TODO: implement pause functionality
             if (!isPaused) {
                 pause_button.Content = "Resume";
@@ -144,10 +145,11 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
-        private void ClearButtonClick(object sender, RoutedEventArgs e) {
+        private void ClearButtonHandler(object sender, RoutedEventArgs e) {
             dla_2d.Clear();
             dla_3d.Clear();
-            // TODO: clear aggregate from GUI
+            // clear aggregate from user interface
+            aggregate_manager.ClearAggregate();
         }
 
     }

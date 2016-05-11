@@ -23,68 +23,78 @@ namespace DLAProject {
         public AggregateSystem() {
             particle_list = new List<AggregateParticle>();
             particle_model = new GeometryModel3D { Geometry = new MeshGeometry3D() };
-
+            // initialise ellipse with specified Width and Height
             Ellipse e = new Ellipse {
                 Width = 32.0,
                 Height = 32.0
             };
-           // Color colour = new Color();
-            
-            RadialGradientBrush b = new RadialGradientBrush();
-            b.GradientStops.Add(new GradientStop(Color.FromArgb(0xFF,Colors.White.R, Colors.White.B, Colors.White.G), 0.25));
-            b.GradientStops.Add(new GradientStop(Color.FromArgb(0x00,Colors.White.R, Colors.White.B, Colors.White.G), 1.0));
-            e.Fill = b;
+
+            RadialGradientBrush radial_grad_brush = new RadialGradientBrush();
+            // set new GradientStops of radial_grad_brush
+            radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0xFF,Colors.White.R, Colors.White.B, Colors.White.G), 0.25));
+           // radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0x00,Colors.White.R, Colors.White.B, Colors.White.G), 1.0));
+            // fill ellipse interior using radial_grad_brush
+            e.Fill = radial_grad_brush;
             e.Measure(new Size(32, 32));
             e.Arrange(new Rect(0, 0, 32, 32));
-
+            // initialise render target bitmap
             RenderTargetBitmap render_target = new RenderTargetBitmap(32, 32, 96, 96, PixelFormats.Pbgra32);
+            // render ellipse to render_target
             render_target.Render(e);
+            // set render_target to unmodifiable
             render_target.Freeze();
             Brush brush = new ImageBrush(render_target);
 
-
             DiffuseMaterial material = new DiffuseMaterial(brush);
-
             particle_model.Material = material;
-
         }
 
         public Model3D AggregateModel => particle_model;
 
+        /// <summary>
+        /// Updates the aggregate system - applying all simulation view updates.
+        /// </summary>
         public void Update() {
             UpdateSimulationView();
         }
-
+        
+        /// <summary>
+        /// Updates the simulation geometry, adds any new aggregate particles to view.
+        /// </summary>
         private void UpdateSimulationView() {
+            // positions collection to store particle positions
             Point3DCollection positions = new Point3DCollection();
+            // indices collection to store TriangleIndices
             Int32Collection indices = new Int32Collection();
+            // point collection to store texture co-ordinates
             PointCollection texcoords = new PointCollection();
-
+            // TODO: change particle_list to a Stack and get the most recent element
+            // instead of looping over entire list
             for (int i = 0; i < particle_list.Count; ++i) {
                 int position_index = i * 4;
-                int index = i * 6;
+                // get particle instance at current index of list
                 AggregateParticle p = particle_list[i];
-
+                // create points according to particle co-ords
                 Point3D p1 = new Point3D(p.position.X, p.position.Y, p.position.Z);
                 Point3D p2 = new Point3D(p.position.X, p.position.Y + p.size, p.position.Z);
                 Point3D p3 = new Point3D(p.position.X + p.size, p.position.Y + p.size, p.position.Z);
                 Point3D p4 = new Point3D(p.position.X + p.size, p.position.Y, p.position.Z);
-
+                // add points to particle positions collection
                 positions.Add(p1);
                 positions.Add(p2);
                 positions.Add(p3);
                 positions.Add(p4);
-
+                // create points for texture co-ords
                 Point t1 = new Point(0.0, 0.0);
                 Point t2 = new Point(0.0, 1.0);
                 Point t3 = new Point(1.0, 1.0);
                 Point t4 = new Point(1.0, 0.0);
-
+                // add texture co-ords points to texcoords collection
                 texcoords.Add(t1);
                 texcoords.Add(t2);
                 texcoords.Add(t3);
                 texcoords.Add(t4);
-
+                // add position indices to indices collection
                 indices.Add(position_index);
                 indices.Add(position_index + 2);
                 indices.Add(position_index + 1);
@@ -92,9 +102,18 @@ namespace DLAProject {
                 indices.Add(position_index + 3);
                 indices.Add(position_index + 2);
             }
+            // set particle_model Geometry model properties 
             ((MeshGeometry3D)particle_model.Geometry).Positions = positions;
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = indices;
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = texcoords;
+        }
+
+        public void Clear() {
+            particle_list.Clear();
+            ((MeshGeometry3D)particle_model.Geometry).Positions.Clear();
+            ((MeshGeometry3D)particle_model.Geometry).TriangleIndices.Clear();
+            ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates.Clear();
+            // TODO: fix bug where last (?) particle added on previous aggregate is rendered at start of next generation
         }
 
         /// <summary>
