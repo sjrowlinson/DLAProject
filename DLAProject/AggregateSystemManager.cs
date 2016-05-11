@@ -22,6 +22,10 @@ namespace DLAProject {
             agg_sys = new AggregateSystem();
         }
 
+        public void Update() {
+            agg_sys.Update();
+        }
+
         /// <summary>
         /// Adds a particle to the aggregate simulation view with specified properties.
         /// </summary>

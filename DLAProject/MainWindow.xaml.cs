@@ -54,7 +54,7 @@ namespace DLAProject {
         /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListener(uint _particle_slider_val) {
             // lock around the listener
-            lock (locker) {
+            //lock (locker) {
                 // continue execution until aggregate is completely generated
                 while (dla_2d.Size() < _particle_slider_val) {
                     // get the Most-Recently-Added aggregate particle
@@ -65,11 +65,12 @@ namespace DLAProject {
                     // aggregate has updated, add new particle to simulation view
                     else {
                         Point3D position = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
+                        aggregate_manager.AddParticle(position, Colors.White, 1.0);
                         // dispatch particle addition code to UI thread
-                        Dispatcher.Invoke(() => { aggregate_manager.AddParticle(position, Colors.Red, 1.0); });
+                        Dispatcher.Invoke(() => { aggregate_manager.Update(); });
                     }
                 }
-            }
+           // }
         }
 
         /// <summary>
