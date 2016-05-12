@@ -43,8 +43,6 @@ void DLA_3d::clear() {
 }
 
 void DLA_3d::generate(size_t _n) {
-	// clear any existing aggregate data
-	clear();
 	// push original sticky point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (3D)
 	size_t count = 0;

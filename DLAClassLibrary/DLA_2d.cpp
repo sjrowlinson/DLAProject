@@ -43,8 +43,6 @@ void DLA_2d::clear() {
 }
 
 void DLA_2d::generate(size_t _n) {
-	// clear any existing aggregrate data
-	clear();
 	// push original aggregate point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (2D)
 	size_t count = 0;
