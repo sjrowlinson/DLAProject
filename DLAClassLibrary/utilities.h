@@ -31,13 +31,12 @@ template<typename _Ty1, typename _Ty2, typename _Ty3> struct triple {
 		constexpr triple() : first(), second(), third() {}
 
 	/**
-	* @brief Construct a triple object
+	* @brief Construct a triple object from specified values
 	*/
-	triple(const _Ty1& _first, const _Ty2& _second, const _Ty3& _third) {
-		first = _first;
-		second = _second;
-		third = _third;
+	triple(const _Ty1& _first, const _Ty2& _second, const _Ty3& _third) : first(_first), second(_second), third(_third) {
+
 	}
+
 };
 
 /**
