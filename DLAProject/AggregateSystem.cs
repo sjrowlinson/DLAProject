@@ -40,7 +40,7 @@ namespace DLAProject {
             RadialGradientBrush radial_grad_brush = new RadialGradientBrush();
             // set new GradientStops of radial_grad_brush
             radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0xFF,Colors.White.R, Colors.White.B, Colors.White.G), 0.25));
-           // radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0x00,Colors.White.R, Colors.White.B, Colors.White.G), 1.0));
+            radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0x00,Colors.White.R, Colors.White.B, Colors.White.G), 1.0));
             // fill ellipse interior using radial_grad_brush
             e.Fill = radial_grad_brush;
             e.Measure(new Size(32, 32));
@@ -109,7 +109,7 @@ namespace DLAProject {
             ((MeshGeometry3D)particle_model.Geometry).Positions = particle_positions;
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = triangle_indices;
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = tex_coords;
-
+            
         }
 
         public void Clear() {

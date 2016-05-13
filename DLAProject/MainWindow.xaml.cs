@@ -52,24 +52,22 @@ namespace DLAProject {
         /// </summary>
         /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListener(uint _particle_slider_val) {
-            //lock (locker) {
-                // continue execution until aggregate is completely generated
-                while (dla_2d.Size() < _particle_slider_val) {
-                    // get the Most-Recently-Added aggregate particle
-                    KeyValuePair<int, int> agg_kvp = dla_2d.GetMRAParticle();
-                    if (agg_kvp.Equals(mra_cache_pair)) {
-                        // no updates to aggregate
-                    }
-                    // aggregate has updated, add new particle to simulation view 
-                    else {
-                        mra_cache_pair = agg_kvp;
-                        Point3D position = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
-                        aggregate_manager.AddParticle(position, Colors.Red, 1.0);
-                        // dispatch particle rendering code to UI thread
-                        Dispatcher.Invoke(() => { aggregate_manager.Update(); });
-                    }
+            // continue execution until aggregate is completely generated
+            while (dla_2d.Size() < _particle_slider_val) {
+                // get the Most-Recently-Added aggregate particle
+                KeyValuePair<int, int> agg_kvp = dla_2d.GetMRAParticle();
+                if (agg_kvp.Equals(mra_cache_pair)) {
+                    // no updates to aggregate
                 }
-            //} 
+                // aggregate has updated, add new particle to simulation view 
+                else {
+                    mra_cache_pair = agg_kvp;
+                    Point3D position = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
+                    aggregate_manager.AddParticle(position, Colors.Red, 1.0);
+                    // dispatch particle rendering code to UI thread
+                    Dispatcher.Invoke(() => { aggregate_manager.Update(); });
+                }
+            }             
         }
 
         /// <summary>
