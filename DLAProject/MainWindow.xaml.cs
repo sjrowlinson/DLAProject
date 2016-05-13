@@ -52,21 +52,24 @@ namespace DLAProject {
         /// </summary>
         /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListener(uint _particle_slider_val) {
-            // continue execution until aggregate is completely generated
-            while (dla_2d.Size() < _particle_slider_val) {
-                // get the Most-Recently-Added aggregate particle
-                KeyValuePair<int, int> agg_kvp = dla_2d.GetMRAParticle();
-                if (agg_kvp.Equals(mra_cache_pair)) {
-                    // no updates to aggregate
+            //lock (locker) {
+                // continue execution until aggregate is completely generated
+                while (dla_2d.Size() < _particle_slider_val) {
+                    // get the Most-Recently-Added aggregate particle
+                    KeyValuePair<int, int> agg_kvp = dla_2d.GetMRAParticle();
+                    if (agg_kvp.Equals(mra_cache_pair)) {
+                        // no updates to aggregate
+                    }
+                    // aggregate has updated, add new particle to simulation view 
+                    else {
+                        mra_cache_pair = agg_kvp;
+                        Point3D position = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
+                        aggregate_manager.AddParticle(position, Colors.Red, 1.0);
+                        // dispatch particle rendering code to UI thread
+                        Dispatcher.Invoke(() => { aggregate_manager.Update(); });
+                    }
                 }
-                // aggregate has updated, add new particle to simulation view 
-                else {
-                    Point3D position = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
-                    aggregate_manager.AddParticle(position, Colors.Red, 1.0);
-                    // dispatch particle rendering code to UI thread
-                    Dispatcher.Invoke(() => { aggregate_manager.Update(); });
-                }
-            }   
+            //} 
         }
 
         /// <summary>
@@ -76,7 +79,7 @@ namespace DLAProject {
         /// </summary>
         private void GenerateAggregate() {
             // lock around aggregate generation
-            //lock (locker) {
+            lock (locker) {
                 // TODO: lock the particle_slider to prevent changes whilst simulating
                 uint particle_slider_val = 0;
                 // dispatch the particles_slider value access code to UI thread
@@ -87,7 +90,7 @@ namespace DLAProject {
                 Task.Factory.StartNew(() => AggregateUpdateListener(particle_slider_val));
                 // generate the DLA using value of particle slider
                 dla_2d.Generate(particle_slider_val);
-            //}
+            }
         }
 
         /// <summary>

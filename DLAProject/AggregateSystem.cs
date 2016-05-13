@@ -72,15 +72,7 @@ namespace DLAProject {
         /// Updates the simulation geometry, adds any new aggregate particles to view.
         /// </summary>
         private void UpdateSimulationView() {
-            // positions collection to store particle positions
-            Point3DCollection positions = new Point3DCollection();
-            // indices collection to store TriangleIndices
-            Int32Collection indices = new Int32Collection();
-            // point collection to store texture co-ordinates
-            PointCollection texcoords = new PointCollection();
-
-            // TODO: uncomment following section and remove for loop when synchronisation of threads is working
-            /*AggregateParticle p = particle_stack.Peek();
+            AggregateParticle p = particle_stack.Peek();
             int position_index = particle_stack.Count * 4;
             // create points according to particle co-ords
             Point3D p1 = new Point3D(p.position.X, p.position.Y, p.position.Z);
@@ -108,48 +100,13 @@ namespace DLAProject {
             triangle_indices.Add(position_index + 1);
             triangle_indices.Add(position_index);
             triangle_indices.Add(position_index + 3);
-            triangle_indices.Add(position_index + 2);*/
-
-            for (int i = 0; i < particle_list.Count; ++i) {
-                int position_index = i * 4;
-                // get particle instance at current index of list
-                AggregateParticle p = particle_list[i];
-                // create points according to particle co-ords
-                Point3D p1 = new Point3D(p.position.X, p.position.Y, p.position.Z);
-                Point3D p2 = new Point3D(p.position.X, p.position.Y + p.size, p.position.Z);
-                Point3D p3 = new Point3D(p.position.X + p.size, p.position.Y + p.size, p.position.Z);
-                Point3D p4 = new Point3D(p.position.X + p.size, p.position.Y, p.position.Z);
-                // add points to particle positions collection
-                positions.Add(p1);
-                positions.Add(p2);
-                positions.Add(p3);
-                positions.Add(p4);
-                // create points for texture co-ords
-                Point t1 = new Point(0.0, 0.0);
-                Point t2 = new Point(0.0, 1.0);
-                Point t3 = new Point(1.0, 1.0);
-                Point t4 = new Point(1.0, 0.0);
-                // add texture co-ords points to texcoords collection
-                texcoords.Add(t1);
-                texcoords.Add(t2);
-                texcoords.Add(t3);
-                texcoords.Add(t4);
-                // add position indices to indices collection
-                indices.Add(position_index);
-                indices.Add(position_index + 2);
-                indices.Add(position_index + 1);
-                indices.Add(position_index);
-                indices.Add(position_index + 3);
-                indices.Add(position_index + 2);
-            }
+            triangle_indices.Add(position_index + 2);
 
             // set particle_model Geometry model properties 
-            //((MeshGeometry3D)particle_model.Geometry).Positions = particle_positions;
-            //((MeshGeometry3D)particle_model.Geometry).TriangleIndices = triangle_indices;
-            //((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = tex_coords;
-            ((MeshGeometry3D)particle_model.Geometry).Positions = positions;
-            ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = indices;
-            ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = texcoords;
+            ((MeshGeometry3D)particle_model.Geometry).Positions = particle_positions;
+            ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = triangle_indices;
+            ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = tex_coords;
+
         }
 
         public void Clear() {
