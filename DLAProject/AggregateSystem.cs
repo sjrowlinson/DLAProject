@@ -14,10 +14,13 @@ namespace DLAProject {
     /// </summary>
     public class AggregateSystem {
         
-        private readonly List<AggregateParticle> particle_list;
+        // stack to store particles such that most recently
+        // added is accessed in constant time
         private readonly Stack<AggregateParticle> particle_stack;
         private readonly GeometryModel3D particle_model;
 
+        // collections to store graphics related quantities for
+        // particle_model MeshGeometry3D Model
         private readonly Point3DCollection particle_positions;
         private readonly Int32Collection triangle_indices;
         private readonly PointCollection tex_coords;
@@ -26,7 +29,6 @@ namespace DLAProject {
         /// Initialises a new instance of the AggregateSystem class.
         /// </summary>
         public AggregateSystem() {
-            particle_list = new List<AggregateParticle>();
             particle_stack = new Stack<AggregateParticle>();
             particle_model = new GeometryModel3D { Geometry = new MeshGeometry3D() };
             // initialise ellipse with specified Width and Height
@@ -72,6 +74,7 @@ namespace DLAProject {
         /// Updates the simulation geometry, adds any new aggregate particles to view.
         /// </summary>
         private void UpdateSimulationView() {
+            // get the most recently added particle
             AggregateParticle p = particle_stack.Peek();
             int position_index = particle_stack.Count * 4;
             // create points according to particle co-ords
@@ -110,12 +113,11 @@ namespace DLAProject {
         }
 
         public void Clear() {
-            particle_list.Clear();
+            // clear all collections
             particle_stack.Clear();
             ((MeshGeometry3D)particle_model.Geometry).Positions.Clear();
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices.Clear();
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates.Clear();
-            // TODO: fix bug where last (?) particle added on previous aggregate is rendered at start of next generation
         }
 
         /// <summary>
@@ -128,8 +130,7 @@ namespace DLAProject {
             AggregateParticle agg_particle = new AggregateParticle {
                 position = _position, colour = _colour, size = _size
             };
-            // add agg_particle to particle_list container
-            particle_list.Add(agg_particle);
+            // add agg_particle to particle_stack container
             particle_stack.Push(agg_particle);
         }
 
