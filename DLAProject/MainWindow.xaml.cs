@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -52,6 +53,9 @@ namespace DLAProject {
         /// </summary>
         /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListener(uint _particle_slider_val) {
+            //System.Timers.Timer timer = new System.Timers.Timer();
+            //timer.Start();
+            //timer.Interval = 100;
             // continue execution until aggregate is completely generated
             while (dla_2d.Size() < _particle_slider_val) {
                 // get the Most-Recently-Added aggregate particle
