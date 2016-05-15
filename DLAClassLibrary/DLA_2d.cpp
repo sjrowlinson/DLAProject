@@ -36,10 +36,15 @@ const std::pair<int, int>& DLA_2d::mra_particle() const noexcept {
 	return mra_agg_particle;
 }
 
+std::queue<std::pair<int, int>>& DLA_2d::get_batch_queue() noexcept {
+	return batch_queue;
+}
+
 void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
 	aggregate_pq = std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator>();
+	batch_queue = std::queue<std::pair<int, int>>();
 }
 
 void DLA_2d::generate(size_t _n) {
@@ -189,6 +194,7 @@ bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		aggregate_map.insert(std::make_pair(added_particle, ++_count));
 		aggregate_pq.push(added_particle);
+		batch_queue.push(added_particle);
 		// update the most-recently-added particle
 		mra_agg_particle = added_particle;
 		return true;

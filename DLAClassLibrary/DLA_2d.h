@@ -83,6 +83,8 @@ public:
 	 */
 	const std::pair<int, int>& mra_particle() const noexcept;
 
+	std::queue<std::pair<int, int>>& get_batch_queue() noexcept;
+
 	/**
 	 * @brief Clears the aggregrate structure
 	 */
@@ -109,6 +111,9 @@ private:
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
 	// stores the most-recently-added particle of the aggregate system
 	std::pair<int, int> mra_agg_particle;
+
+	std::queue<std::pair<int, int>> batch_queue;
+
 
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;
 	void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;

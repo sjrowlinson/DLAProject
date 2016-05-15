@@ -9,6 +9,7 @@
 
 using namespace System;
 using namespace System::Collections;
+using namespace System::Collections::Concurrent;
 using namespace System::Collections::Generic;
 
 namespace DLAClassLibrary {
@@ -37,7 +38,7 @@ namespace DLAClassLibrary {
 		// TODO: consider changing this to DLA_2d* instead => does it need to be DLAContainer?
 
 		// handle to DLAContainer abstract class
-		DLAContainer* native_DLA_container_ptr;
+		DLA_2d* native_DLA_container_ptr;
 
 	public:
 
@@ -72,7 +73,7 @@ namespace DLAClassLibrary {
 		ManagedDLA2DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type, double _coeff_stick) : 
 			native_DLA_container_ptr(new DLA_2d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type), _coeff_stick)) {}
 
-		ManagedDLA2DContainer(ManagedDLA2DContainer^ _other) : native_DLA_container_ptr(new DLA_2d(*dynamic_cast<DLA_2d*>(_other->native_DLA_container_ptr))) {}
+		ManagedDLA2DContainer(ManagedDLA2DContainer^ _other) : native_DLA_container_ptr(new DLA_2d(*_other->native_DLA_container_ptr)) {}
 
 		/**
 		 * @brief Destructor, deletes native DLA class handle
@@ -140,10 +141,23 @@ namespace DLAClassLibrary {
 		 */
 		KeyValuePair<int,int> GetMRAParticle() {
 			// stores (x,y) co-ordinates of mra particle
-			std::pair<int, int> mra_cache = dynamic_cast<DLA_2d*>(native_DLA_container_ptr)->mra_particle();
+			std::pair<int, int> mra_cache = native_DLA_container_ptr->mra_particle();
 			// initialise a KVP with mra particle co-ordinates and return
 			KeyValuePair<int, int>^ mra_kvp = gcnew KeyValuePair<int, int>(mra_cache.first, mra_cache.second);
 			return *mra_kvp;
+		}
+
+		BlockingCollection<KeyValuePair<int, int>>^ GetBatchQueue() {
+			// stores particles in a BlockingQueue configuration
+			BlockingCollection<KeyValuePair<int, int>>^ blocking_queue = gcnew BlockingCollection<KeyValuePair<int, int>>();
+			// get reference to batch_queue of DLA_2d
+			std::queue<std::pair<int, int>>& batch_queue_ref = native_DLA_container_ptr->get_batch_queue();
+			// loop over batch_queue transferring particles to blocking_queue
+			while (!batch_queue_ref.empty()) {
+				blocking_queue->Add(KeyValuePair<int, int>(batch_queue_ref.front().first, batch_queue_ref.front().second));
+				batch_queue_ref.pop();
+			}
+			return blocking_queue;
 		}
 
 		/**
@@ -160,10 +174,10 @@ namespace DLAClassLibrary {
 		 */
 		void Generate(size_t _n) {
 			native_DLA_container_ptr->generate(_n);
-			std::string file_path = "C:/Users/Sam/Documents/MATLAB/NMProject/DLASquare2D.txt";
-			std::ofstream of(file_path);
-			native_DLA_container_ptr->write(of, true);
-			of.close();
+			//std::string file_path = "C:/Users/Sam/Documents/MATLAB/NMProject/DLASquare2D.txt";
+			//std::ofstream of(file_path);
+			//native_DLA_container_ptr->write(of, true);
+			//of.close();
 		}
 
 		/**
