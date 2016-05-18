@@ -36,7 +36,7 @@ const std::pair<int, int>& DLA_2d::mra_particle() const noexcept {
 	return mra_agg_particle;
 }
 
-std::queue<std::pair<int, int>>& DLA_2d::get_batch_queue() noexcept {
+std::queue<std::pair<int,int>>& DLA_2d::get_batch_queue() noexcept {
 	return batch_queue;
 }
 

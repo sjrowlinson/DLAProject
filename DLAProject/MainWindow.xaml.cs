@@ -77,15 +77,18 @@ namespace DLAProject {
         /// <param name="source"></param>
         /// <param name="e"></param>
         private void AggregateUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
-            // get and process the batch_queue from the DLA handle
-            BlockingCollection<KeyValuePair<int,int>> blocking_queue = dla_2d.ProcessBatchQueue();
-            // loop over blocking_queue adding contents to interface and dequeueing on each iteration
-            while (blocking_queue.Count != 0) {
-                KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
-                Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
-                aggregate_manager.AddParticle(pos, Colors.Red, 1.0);
-                // dispatch GUI updates to UI thread
-                Dispatcher.Invoke(() => { aggregate_manager.Update(); });
+            // TODO: find a way around having to use lock here, as it delays simulations
+            lock (locker) {
+                // get and process the batch_queue from the DLA handle
+                BlockingCollection<KeyValuePair<int, int>>  blocking_queue = dla_2d.ProcessBatchQueue();
+                // loop over blocking_queue adding contents to interface and dequeueing on each iteration
+                while (blocking_queue.Count != 0) {
+                    KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
+                    Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
+                    aggregate_manager.AddParticle(pos, Colors.Red, 1.0);
+                    // dispatch GUI updates to UI thread
+                    Dispatcher.Invoke(() => { aggregate_manager.Update(); });
+                }
             }
         }
 

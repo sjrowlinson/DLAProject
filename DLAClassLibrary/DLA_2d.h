@@ -83,7 +83,7 @@ public:
 	 */
 	const std::pair<int, int>& mra_particle() const noexcept;
 
-	std::queue<std::pair<int, int>>& get_batch_queue() noexcept;
+	std::queue<std::pair<int,int>>& get_batch_queue() noexcept;
 
 	/**
 	 * @brief Clears the aggregrate structure

@@ -160,7 +160,7 @@ namespace DLAClassLibrary {
 			// stores particles in a BlockingQueue configuration
 			BlockingCollection<KeyValuePair<int, int>>^ blocking_queue = gcnew BlockingCollection<KeyValuePair<int, int>>();
 			// get reference to batch_queue of DLA_2d
-			std::queue<std::pair<int, int>>& batch_queue_ref = native_DLA_container_ptr->get_batch_queue();
+			std::queue<std::pair<int,int>>& batch_queue_ref = native_DLA_container_ptr->get_batch_queue();
 			// loop over batch_queue transferring particles to blocking_queue
 			while (!batch_queue_ref.empty()) {
 				blocking_queue->Add(KeyValuePair<int, int>(batch_queue_ref.front().first, batch_queue_ref.front().second));
