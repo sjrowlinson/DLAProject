@@ -183,10 +183,10 @@ namespace DLAClassLibrary {
 		 */
 		void Generate(size_t _n) {
 			native_DLA_container_ptr->generate(_n);
-			std::string file_path = "C:/Users/Sam/Documents/MATLAB/NMProject/DLASquare2D.txt";
-			std::ofstream of(file_path);
-			native_DLA_container_ptr->write(of, true);
-			of.close();
+			//std::string file_path = "C:/Users/Sam/Documents/MATLAB/NMProject/DLASquare2D.txt";
+			//std::ofstream of(file_path);
+			//native_DLA_container_ptr->write(of, true);
+			//of.close();
 		}
 
 		/**

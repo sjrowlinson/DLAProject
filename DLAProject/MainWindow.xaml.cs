@@ -54,7 +54,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListenerAlt(uint _particle_slider_val) {
-            const double interval = 5.0;
+            const double interval = 10.0;
             // initialise a Timer with a 5ms interval
             System.Timers.Timer timer = new System.Timers.Timer(interval);
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
