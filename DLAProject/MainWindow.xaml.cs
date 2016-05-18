@@ -77,7 +77,8 @@ namespace DLAProject {
         /// <param name="source"></param>
         /// <param name="e"></param>
         private void AggregateUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
-            // TODO: find a way around having to use lock here, as it delays simulations
+            // lock around aggregate updating and batch queue processing to prevent 
+            // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
                 // get and process the batch_queue from the DLA handle
                 BlockingCollection<KeyValuePair<int, int>>  blocking_queue = dla_2d.ProcessBatchQueue();
@@ -122,19 +123,15 @@ namespace DLAProject {
         /// in a separate thread.
         /// </summary>
         private void GenerateAggregate() {
-            // lock around aggregate generation
-            lock (locker) {
-                // TODO: lock the particle_slider to prevent changes whilst simulating
-                uint particle_slider_val = 0;
-                // dispatch the particles_slider value access code to UI thread
-                Dispatcher.Invoke(() => {
-                    particle_slider_val = (uint)particles_slider.Value;
-                });
-                // start asynchronous task calling AggregateUpdateListener to perform rendering
-                Task.Factory.StartNew(() => AggregateUpdateListenerAlt(particle_slider_val));
-                // generate the DLA using value of particle slider
-                dla_2d.Generate(particle_slider_val);
-            }
+            uint particle_slider_val = 0;
+            // dispatch the particles_slider value access code to UI thread
+            Dispatcher.Invoke(() => {
+                particle_slider_val = (uint)particles_slider.Value;
+            });
+            // start asynchronous task calling AggregateUpdateListener to perform rendering
+            Task.Factory.StartNew(() => AggregateUpdateListenerAlt(particle_slider_val));
+            // generate the DLA using value of particle slider
+            dla_2d.Generate(particle_slider_val);
         }
 
         /// <summary>
