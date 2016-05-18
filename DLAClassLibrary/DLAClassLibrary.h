@@ -11,6 +11,7 @@ using namespace System;
 using namespace System::Collections;
 using namespace System::Collections::Concurrent;
 using namespace System::Collections::Generic;
+using namespace System::Threading;
 
 namespace DLAClassLibrary {
 
@@ -147,6 +148,14 @@ namespace DLAClassLibrary {
 			return *mra_kvp;
 		}
 
+		/**
+		 * @brief Gets the batch_queue from the DLA_2d pointer and processes the data, saving
+		 *        each co-ordinate point to a BlockingCollection and dequeuing the batch_queue
+		 *        ready to receive next block of aggregate data.
+		 *
+		 * @return BlockingCollection containing co-ordinates held in current state of batch_queue.
+		 * @bug Clearing then re-running the simulation results in "deque iterator not dereferencable" run-time error
+		 */
 		BlockingCollection<KeyValuePair<int, int>>^ ProcessBatchQueue() {
 			// stores particles in a BlockingQueue configuration
 			BlockingCollection<KeyValuePair<int, int>>^ blocking_queue = gcnew BlockingCollection<KeyValuePair<int, int>>();

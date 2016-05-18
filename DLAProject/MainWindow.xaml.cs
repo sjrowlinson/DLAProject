@@ -48,26 +48,43 @@ namespace DLAProject {
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
         }
 
+        /// <summary>
+        /// Updates the aggregate using a timer with short interval, calling 
+        /// AggregateUpdateOnTimeEvent periodically.
+        /// </summary>
+        /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListenerAlt(uint _particle_slider_val) {
-            System.Timers.Timer timer = new System.Timers.Timer(5);
-            timer.Start();
+            const double interval = 5.0;
+            // initialise a Timer with a 5ms interval
+            System.Timers.Timer timer = new System.Timers.Timer(interval);
+            // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
             if (dla_2d.Size() < _particle_slider_val) {
                 timer.Elapsed += AggregateUpdateOnTimedEvent;
                 timer.AutoReset = true;
                 timer.Enabled = true;
             }
+            // stop timer and dispose all attached resources
             else {
                 timer.Stop();
                 timer.Dispose();
             }
         }
 
+        /// <summary>
+        /// Updates the aggregate based on current contents of DLA batch_queue - processes this
+        /// batch_queue and adds its contents to the simulation view.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
         private void AggregateUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
+            // get and process the batch_queue from the DLA handle
             BlockingCollection<KeyValuePair<int,int>> blocking_queue = dla_2d.ProcessBatchQueue();
+            // loop over blocking_queue adding contents to interface and dequeueing on each iteration
             while (blocking_queue.Count != 0) {
                 KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
                 Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
                 aggregate_manager.AddParticle(pos, Colors.Red, 1.0);
+                // dispatch GUI updates to UI thread
                 Dispatcher.Invoke(() => { aggregate_manager.Update(); });
             }
         }
