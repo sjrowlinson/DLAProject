@@ -36,8 +36,6 @@ namespace DLAClassLibrary {
 	 */
 	public ref class ManagedDLA2DContainer {
 
-		// TODO: consider changing this to DLA_2d* instead => does it need to be DLAContainer?
-
 		// handle to DLAContainer abstract class
 		DLA_2d* native_DLA_container_ptr;
 

@@ -83,6 +83,12 @@ public:
 	 */
 	const std::pair<int, int>& mra_particle() const noexcept;
 
+	/**
+	 * @brief Gets a non-const reference to the batch_queue of the aggregate, used
+	 *        in C++/CLI ManagedDLA2DContainer::ProcessBatchQueue for GUI updates
+	 *
+	 * @return reference to batch_queue of 2d aggregate
+	 */
 	std::queue<std::pair<int,int>>& get_batch_queue() noexcept;
 
 	/**
