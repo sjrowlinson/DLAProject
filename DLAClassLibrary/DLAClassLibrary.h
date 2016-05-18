@@ -147,7 +147,7 @@ namespace DLAClassLibrary {
 			return *mra_kvp;
 		}
 
-		BlockingCollection<KeyValuePair<int, int>>^ GetBatchQueue() {
+		BlockingCollection<KeyValuePair<int, int>>^ ProcessBatchQueue() {
 			// stores particles in a BlockingQueue configuration
 			BlockingCollection<KeyValuePair<int, int>>^ blocking_queue = gcnew BlockingCollection<KeyValuePair<int, int>>();
 			// get reference to batch_queue of DLA_2d
@@ -174,10 +174,10 @@ namespace DLAClassLibrary {
 		 */
 		void Generate(size_t _n) {
 			native_DLA_container_ptr->generate(_n);
-			//std::string file_path = "C:/Users/Sam/Documents/MATLAB/NMProject/DLASquare2D.txt";
-			//std::ofstream of(file_path);
-			//native_DLA_container_ptr->write(of, true);
-			//of.close();
+			std::string file_path = "C:/Users/Sam/Documents/MATLAB/NMProject/DLASquare2D.txt";
+			std::ofstream of(file_path);
+			native_DLA_container_ptr->write(of, true);
+			of.close();
 		}
 
 		/**

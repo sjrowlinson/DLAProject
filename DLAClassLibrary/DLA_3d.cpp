@@ -132,7 +132,7 @@ std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		// lambda for sorting aggregate via order in which particles were generated
 		auto sort_agg = [](const std::pair<size_t, triple<int, int, int>>& _lhs, const std::pair<size_t, triple<int, int, int>>& _rhs) {return _lhs.first < _rhs.first; };
 
-		// sort agg_vec using the custom function object sort_aggregate
+		// sort agg_vec using lambda sort_agg
 		std::sort(agg_vec.begin(), agg_vec.end(), sort_agg);
 
 		for (auto it = agg_vec.cbegin(); it < agg_vec.cend(); ++it) {

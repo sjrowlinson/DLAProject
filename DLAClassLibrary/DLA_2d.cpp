@@ -54,6 +54,7 @@ void DLA_2d::generate(size_t _n) {
 	std::pair<int, int> origin_sticky = std::make_pair(0, 0);
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
+	batch_queue.push(origin_sticky);
 
 	// initialise variables for particle position, altered immediately in generation loop
 	int x = 0;
@@ -136,7 +137,7 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		// lambda for sorting aggregate via order in which particles were generated
 		auto sort_agg = [](const std::pair<size_t, std::pair<int, int>>& _lhs, const std::pair<size_t, std::pair<int, int>>& _rhs) {return _lhs.first < _rhs.first; };
 
-		// sort agg_vec using the custom function object sort_aggregate
+		// sort agg_vec using the lambda sort_agg
 		std::sort(agg_vec.begin(), agg_vec.end(), sort_agg);
 
 		for (auto it = agg_vec.cbegin(); it < agg_vec.cend(); ++it) {

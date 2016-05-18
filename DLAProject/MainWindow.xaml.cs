@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Timers;
@@ -47,15 +48,36 @@ namespace DLAProject {
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
         }
 
+        private void AggregateUpdateListenerAlt(uint _particle_slider_val) {
+            System.Timers.Timer timer = new System.Timers.Timer(5);
+            timer.Start();
+            if (dla_2d.Size() < _particle_slider_val) {
+                timer.Elapsed += AggregateUpdateOnTimedEvent;
+                timer.AutoReset = true;
+                timer.Enabled = true;
+            }
+            else {
+                timer.Stop();
+                timer.Dispose();
+            }
+        }
+
+        private void AggregateUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
+            BlockingCollection<KeyValuePair<int,int>> blocking_queue = dla_2d.ProcessBatchQueue();
+            while (blocking_queue.Count != 0) {
+                KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
+                Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
+                aggregate_manager.AddParticle(pos, Colors.Red, 1.0);
+                Dispatcher.Invoke(() => { aggregate_manager.Update(); });
+            }
+        }
+
         /// <summary>
         /// Checks for updates to the simulated DLA structure and performs
         /// rendering of any added particles. Should be called in a separate thread.
         /// </summary>
         /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListener(uint _particle_slider_val) {
-            //System.Timers.Timer timer = new System.Timers.Timer();
-            //timer.Start();
-            //timer.Interval = 100;
             // continue execution until aggregate is completely generated
             while (dla_2d.Size() < _particle_slider_val) {
                 // get the Most-Recently-Added aggregate particle
@@ -89,7 +111,7 @@ namespace DLAProject {
                     particle_slider_val = (uint)particles_slider.Value;
                 });
                 // start asynchronous task calling AggregateUpdateListener to perform rendering
-                Task.Factory.StartNew(() => AggregateUpdateListener(particle_slider_val));
+                Task.Factory.StartNew(() => AggregateUpdateListenerAlt(particle_slider_val));
                 // generate the DLA using value of particle slider
                 dla_2d.Generate(particle_slider_val);
             }

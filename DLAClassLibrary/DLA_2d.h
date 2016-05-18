@@ -114,7 +114,6 @@ private:
 
 	std::queue<std::pair<int, int>> batch_queue;
 
-
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;
 	void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;
 
