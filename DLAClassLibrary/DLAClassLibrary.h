@@ -134,19 +134,6 @@ namespace DLAClassLibrary {
 		}
 
 		/**
-		 * @brief Gets the most-recently-added particle of the aggregate
-		 *
-		 * @return KeyValuePair containing co-ordinates of mra particle
-		 */
-		KeyValuePair<int,int> GetMRAParticle() {
-			// stores (x,y) co-ordinates of mra particle
-			std::pair<int, int> mra_cache = native_DLA_container_ptr->mra_particle();
-			// initialise a KVP with mra particle co-ordinates and return
-			KeyValuePair<int, int>^ mra_kvp = gcnew KeyValuePair<int, int>(mra_cache.first, mra_cache.second);
-			return *mra_kvp;
-		}
-
-		/**
 		 * @brief Gets the batch_queue from the DLA_2d pointer and processes the data, saving
 		 *        each co-ordinate point to a BlockingCollection and dequeuing the batch_queue
 		 *        ready to receive next block of aggregate data.
@@ -208,10 +195,8 @@ namespace DLAClassLibrary {
 	 */
 	public ref class ManagedDLA3DContainer {
 
-		// TODO: consider changing this to DLA_3d* instead => does it need to be DLAContainer?
-
 		// handle to DLAContainer abstract class
-		DLAContainer* native_DLA_container_ptr;
+		DLA_3d* native_DLA_container_ptr;
 
 	public:
 
@@ -246,7 +231,7 @@ namespace DLAClassLibrary {
 		ManagedDLA3DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type, double _coeff_stick) : 
 			native_DLA_container_ptr(new DLA_3d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type), _coeff_stick)) {}
 
-		ManagedDLA3DContainer(ManagedDLA3DContainer^ _other) : native_DLA_container_ptr(new DLA_3d(*dynamic_cast<DLA_3d*>(_other->native_DLA_container_ptr))) {}
+		ManagedDLA3DContainer(ManagedDLA3DContainer^ _other) : native_DLA_container_ptr(new DLA_3d(*_other->native_DLA_container_ptr)) {}
 
 		~ManagedDLA3DContainer() {
 			delete native_DLA_container_ptr;
@@ -268,7 +253,31 @@ namespace DLAClassLibrary {
 		* @throw Throws std::invalid_argument exception if _coeff_stick not in (0,1]
 		*/
 		void SetCoeffStick(double _coeff_stick) {
-			native_DLA_container_ptr->set_coeff_stick(_coeff_stick);
+			try {
+				native_DLA_container_ptr->set_coeff_stick(_coeff_stick);
+			}
+			catch (const std::invalid_argument& ex) {
+				String^ err_msg = gcnew String(ex.what());
+				throw gcnew ArgumentException(err_msg);
+			}
+		}
+
+		/**
+		* @brief Sets the type of lattice
+		*
+		* @param _lattice_type LatticeType to update to
+		*/
+		void SetLatticeType(ManagedLatticeType _lattice_type) {
+			native_DLA_container_ptr->set_lattice_type(static_cast<LatticeType>(_lattice_type));
+		}
+
+		/**
+		* @brief Sets the type of attractor
+		*
+		* @param _attractor_type AttractorType to update to
+		*/
+		void SetAttractorType(ManagedAttractorType _attractor_type) {
+			native_DLA_container_ptr->set_attractor_type(static_cast<AttractorType>(_attractor_type));
 		}
 
 		/**
@@ -281,23 +290,31 @@ namespace DLAClassLibrary {
 		}
 
 		/**
-		 * @brief Gets the most-recently-added particle of the aggregate
-		 *
-		 * @return Tuple containing co-ordinates of mra particle
-		 */
-		Tuple<int, int, int>^ GetMRAParticle() {
-			// stores (x,y,z) co-ordinates of mra particle
-			triple<int, int, int> mra_cache = dynamic_cast<DLA_3d*>(native_DLA_container_ptr)->mra_particle();
-			// initialise a Tuple with mra particle co-ordinates and return
-			Tuple<int, int, int>^ mra_tuple = gcnew Tuple<int, int, int>(mra_cache.first, mra_cache.second, mra_cache.third);
-			return mra_tuple;
-		}
-
-		/**
 		* @brief Clears the aggregrate of all particles
 		*/
 		void Clear() {
 			native_DLA_container_ptr->clear();
+		}
+
+		/**
+		 * @brief Gets the batch_queue from the DLA_2d pointer and processes the data, saving
+		 *        each co-ordinate point to a BlockingCollection and dequeuing the batch_queue
+		 *        ready to receive next block of aggregate data.
+		 *
+		 * @return BlockingCollection containing co-ordinates held in current state of batch_queue.
+		 * @bug Clearing then re-running the simulation results in "deque iterator not dereferencable" run-time error
+		 */
+		BlockingCollection<Tuple<int,int,int>^>^ ProcessBatchQueue() {
+			// stores particles in a BlockingQueue configuration
+			BlockingCollection<Tuple<int,int,int>^>^ blocking_queue = gcnew BlockingCollection<Tuple<int,int,int>^>();
+			// get reference to batch_queue of DLA_2d
+			std::queue<triple<int,int,int>>& batch_queue_ref = native_DLA_container_ptr->get_batch_queue();
+			// loop over batch_queue transferring particles to blocking_queue
+			while (!batch_queue_ref.empty()) {
+				blocking_queue->Add(gcnew Tuple<int,int,int>(batch_queue_ref.front().first, batch_queue_ref.front().second, batch_queue_ref.front().third));
+				batch_queue_ref.pop();
+			}
+			return blocking_queue;
 		}
 
 		/**

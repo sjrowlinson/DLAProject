@@ -66,13 +66,7 @@ public:
 
 	size_t size() const noexcept override;
 
-	/**
-	 * @brief Gets the most-recently-added particle of aggregate
-	 *
-	 * @return const reference to triple struct instance containing
-	 *         co-ordinates of MRA particle
-	 */
-	const triple<int, int, int>& mra_particle() const noexcept;
+	std::queue<triple<int, int, int>>& get_batch_queue() noexcept;
 
 	void clear() override;
 
@@ -89,8 +83,7 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	std::priority_queue<triple<int, int, int>, std::vector<triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
-	// stores the most-recently-added particle of the aggregate system
-	triple<int, int, int> mra_agg_particle;
+	std::queue<triple<int, int, int>> batch_queue;
 
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;
 	void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;

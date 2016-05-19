@@ -77,13 +77,6 @@ public:
 	size_t size() const noexcept override;
 
 	/**
-	 * @brief Gets the most-recently-added particle of aggregate
-	 *
-	 * @return const-reference to std::pair giving co-ordinates of MRA particle
-	 */
-	const std::pair<int, int>& mra_particle() const noexcept;
-
-	/**
 	 * @brief Gets a non-const reference to the batch_queue of the aggregate, used
 	 *        in C++/CLI ManagedDLA2DContainer::ProcessBatchQueue for GUI updates
 	 *
@@ -115,9 +108,6 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
-	// stores the most-recently-added particle of the aggregate system
-	std::pair<int, int> mra_agg_particle;
-
 	std::queue<std::pair<int, int>> batch_queue;
 
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;

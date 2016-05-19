@@ -32,14 +32,15 @@ size_t DLA_3d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-const triple<int, int, int>& DLA_3d::mra_particle() const noexcept {
-	return mra_agg_particle;
+std::queue<triple<int, int, int>>& DLA_3d::get_batch_queue() noexcept {
+	return batch_queue;
 }
 
 void DLA_3d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
 	aggregate_pq = std::priority_queue<triple<int, int, int>, std::vector<triple<int, int, int>>, distance_comparator_3d>();
+	batch_queue = std::queue<triple<int, int, int>>();
 }
 
 void DLA_3d::generate(size_t _n) {
@@ -49,6 +50,7 @@ void DLA_3d::generate(size_t _n) {
 	triple<int, int, int> origin_sticky = make_triple(0, 0, 0);
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
+	batch_queue.push(origin_sticky);
     // initialise variable for particle position, altered immediately in generation loop
 	int x = 0;
 	int y = 0;
@@ -211,8 +213,7 @@ bool DLA_3d::aggregate_collision(const int& _x, const int& _y, const int& _z, co
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		aggregate_map.insert(std::make_pair(added_particle, ++_count));
 		aggregate_pq.push(added_particle);
-		// update the most-recently-added particle
-		mra_agg_particle = added_particle;
+		batch_queue.push(added_particle);
 		return true;
 	}
 	return false;

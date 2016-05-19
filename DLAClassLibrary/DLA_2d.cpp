@@ -32,10 +32,6 @@ size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-const std::pair<int, int>& DLA_2d::mra_particle() const noexcept {
-	return mra_agg_particle;
-}
-
 std::queue<std::pair<int,int>>& DLA_2d::get_batch_queue() noexcept {
 	return batch_queue;
 }
@@ -196,8 +192,6 @@ bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_
 		aggregate_map.insert(std::make_pair(added_particle, ++_count));
 		aggregate_pq.push(added_particle);
 		batch_queue.push(added_particle);
-		// update the most-recently-added particle
-		mra_agg_particle = added_particle;
 		return true;
 	}
 	return false;
