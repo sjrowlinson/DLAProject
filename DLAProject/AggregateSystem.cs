@@ -52,7 +52,7 @@ namespace DLAProject {
             // set render_target to unmodifiable
             render_target.Freeze();
             Brush brush = new ImageBrush(render_target);
-
+            
             DiffuseMaterial material = new DiffuseMaterial(brush);
             particle_model.Material = material;
 
@@ -104,12 +104,12 @@ namespace DLAProject {
             triangle_indices.Add(position_index);
             triangle_indices.Add(position_index + 3);
             triangle_indices.Add(position_index + 2);
-
+            //DiffuseMaterial mat = new DiffuseMaterial(new SolidColorBrush(p.colour));
             // set particle_model Geometry model properties 
             ((MeshGeometry3D)particle_model.Geometry).Positions = particle_positions;
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = triangle_indices;
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = tex_coords;
-            
+            //particle_model.Material = mat;
         }
 
         public void Clear() {

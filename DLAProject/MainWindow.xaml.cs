@@ -34,6 +34,7 @@ namespace DLAProject {
         private bool isPaused;
         // handle to AggregateSystemManager used for updating simulation render
         private readonly AggregateSystemManager aggregate_manager;
+        private uint current_particles;
 
         public MainWindow() {
             InitializeComponent();
@@ -42,6 +43,7 @@ namespace DLAProject {
             dla_3d = new ManagedDLA3DContainer();
             aggregate_manager = new AggregateSystemManager();
             isPaused = false;
+            current_particles = 0;
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
         }
 
@@ -56,7 +58,7 @@ namespace DLAProject {
             System.Timers.Timer timer = new System.Timers.Timer(interval);
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
             if (dla_2d.Size() < _particle_slider_val) {
-                timer.Elapsed += AggregateUpdateOnTimedEvent;
+                timer.Elapsed += (sender, e) => AggregateUpdateOnTimedEvent(sender, e, _particle_slider_val);
                 timer.AutoReset = true;
                 timer.Enabled = true;
             }
@@ -73,7 +75,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        private void AggregateUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
+        private void AggregateUpdateOnTimedEvent(object source, ElapsedEventArgs e, uint _total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
@@ -83,13 +85,34 @@ namespace DLAProject {
                 while (blocking_queue.Count != 0) {
                     KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
                     Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
-                    aggregate_manager.AddParticle(pos, Colors.Red, 1.0);
+                    // TODO: compute particle_colour based on current_particle using formula for a cold-hot temp gradient
+                    aggregate_manager.AddParticle(pos, ComputeColor(_total_particles), 1.0);
+                    ++current_particles;
                     // dispatch GUI updates to UI thread
                     Dispatcher.Invoke(() => { aggregate_manager.Update(); });
                 }
             }
         }
 
+        /// <summary>
+        /// Calculates the colour for a particle based on its generation number.
+        /// </summary>
+        /// <param name="_total_particles">Total number of particles to generate in aggregate.</param>
+        /// <returns>Color object of generated particle.</returns>
+        private Color ComputeColor(uint _total_particles) {
+            Color colour = new Color();
+            colour.ScA = 1;
+            colour.ScR = (float)current_particles / _total_particles;
+            colour.ScB = 1 - (float)current_particles / _total_particles;
+            if (current_particles < _total_particles/2) {
+                colour.ScG = (float)current_particles / _total_particles;
+            }
+            else {
+                colour.ScG = 1 - (float)current_particles / _total_particles;
+            }
+            return colour;
+        }
+             
         /// <summary>
         /// Generates a Diffusion Limited Aggregate with properties initialised by
         /// current values of sliders and combo-boxes in the UI. Should be called
@@ -164,6 +187,7 @@ namespace DLAProject {
             dla_3d.Clear();
             // clear aggregate from user interface
             aggregate_manager.ClearAggregate();
+            current_particles = 0;
         }
 
     }
