@@ -104,7 +104,7 @@ namespace DLAProject {
             triangle_indices.Add(position_index);
             triangle_indices.Add(position_index + 3);
             triangle_indices.Add(position_index + 2);
-            //DiffuseMaterial mat = new DiffuseMaterial(new SolidColorBrush(p.colour));
+            //DiffuseMaterial mat = new DiffuseMaterial();
             // set particle_model Geometry model properties 
             ((MeshGeometry3D)particle_model.Geometry).Positions = particle_positions;
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = triangle_indices;
