@@ -11,7 +11,7 @@
             <Grid Background="Black" Visibility="Visible" Height="724">
                 <Viewport3D Name="World">
                     <Viewport3D.Camera>
-                        <OrthographicCamera Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="128" />
+                        <OrthographicCamera Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="192" />
                     </Viewport3D.Camera>
 
                     <Viewport3D.Children>
@@ -46,7 +46,7 @@
             <ComboBoxItem>Plane</ComboBoxItem>
         </ComboBox>
 
-        <Slider Maximum="5000" TickPlacement="BottomRight" TickFrequency="100" IsSnapToTickEnabled="True" x:Name="particles_slider" HorizontalAlignment="Left" Margin="943,116,0,0" VerticalAlignment="Top" Height="25" Width="337"/>
+        <Slider Maximum="10000" TickPlacement="BottomRight" TickFrequency="200" IsSnapToTickEnabled="True" x:Name="particles_slider" HorizontalAlignment="Left" Margin="943,116,0,0" VerticalAlignment="Top" Height="25" Width="337"/>
         <Label x:Name="NParticles_Label" Content="Number of Particles" HorizontalAlignment="Left" Margin="815,116,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="123"/>
         <TextBox Text="{Binding ElementName=particles_slider, Path=Value, UpdateSourceTrigger=PropertyChanged}" x:Name="particle_val" HorizontalAlignment="Left" Height="23" Margin="1285,116,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Width="40"/>
 

@@ -38,9 +38,18 @@ namespace DLAProject {
             };
 
             RadialGradientBrush radial_grad_brush = new RadialGradientBrush();
+            radial_grad_brush.GradientOrigin = new Point(0, 0);
+            radial_grad_brush.Center = new Point(0, 0);
+            radial_grad_brush.RadiusX = 1;
+            radial_grad_brush.RadiusY = 1;
             // set new GradientStops of radial_grad_brush
-            radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0xFF,Colors.White.R, Colors.White.B, Colors.White.G), 0.25));
-            radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0x00,Colors.White.R, Colors.White.B, Colors.White.G), 1.0));
+            //radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0xFF,Colors.White.R, Colors.White.B, Colors.White.G), 0.25));
+            //radial_grad_brush.GradientStops.Add(new GradientStop(Color.FromArgb(0x00,Colors.White.R, Colors.White.B, Colors.White.G), 1.0));
+            radial_grad_brush.GradientStops.Add(new GradientStop(Colors.Blue, 0.0));
+            radial_grad_brush.GradientStops.Add(new GradientStop(Colors.Green, 0.25));
+            radial_grad_brush.GradientStops.Add(new GradientStop(Colors.Yellow, 0.75));
+            radial_grad_brush.GradientStops.Add(new GradientStop(Colors.Red, 1.0));
+            radial_grad_brush.Freeze();
             // fill ellipse interior using radial_grad_brush
             e.Fill = radial_grad_brush;
             e.Measure(new Size(32, 32));
@@ -104,12 +113,10 @@ namespace DLAProject {
             triangle_indices.Add(position_index);
             triangle_indices.Add(position_index + 3);
             triangle_indices.Add(position_index + 2);
-            //DiffuseMaterial mat = new DiffuseMaterial();
             // set particle_model Geometry model properties 
             ((MeshGeometry3D)particle_model.Geometry).Positions = particle_positions;
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = triangle_indices;
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = tex_coords;
-            //particle_model.Material = mat;
         }
 
         public void Clear() {

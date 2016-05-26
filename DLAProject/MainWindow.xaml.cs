@@ -35,6 +35,7 @@ namespace DLAProject {
         // handle to AggregateSystemManager used for updating simulation render
         private readonly AggregateSystemManager aggregate_manager;
         private uint current_particles;
+        private List<Color> colour_list;
 
         public MainWindow() {
             InitializeComponent();
@@ -44,6 +45,7 @@ namespace DLAProject {
             aggregate_manager = new AggregateSystemManager();
             isPaused = false;
             current_particles = 0;
+            colour_list = new List<Color>();
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
         }
 
@@ -85,34 +87,35 @@ namespace DLAProject {
                 while (blocking_queue.Count != 0) {
                     KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
                     Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
-                    // TODO: compute particle_colour based on current_particle using formula for a cold-hot temp gradient
-                    aggregate_manager.AddParticle(pos, ComputeColor(_total_particles), 1.0);
+                    aggregate_manager.AddParticle(pos, colour_list[(int)current_particles], 1.0);
                     ++current_particles;
                     // dispatch GUI updates to UI thread
                     Dispatcher.Invoke(() => { aggregate_manager.Update(); });
                 }
             }
         }
-
+         
         /// <summary>
-        /// Calculates the colour for a particle based on its generation number.
+        /// Fils the colour_list field with colour instances for 
+        /// each particle to be generated in an aggregate.
         /// </summary>
-        /// <param name="_total_particles">Total number of particles to generate in aggregate.</param>
-        /// <returns>Color object of generated particle.</returns>
-        private Color ComputeColor(uint _total_particles) {
-            Color colour = new Color();
-            colour.ScA = 1;
-            colour.ScR = (float)current_particles / _total_particles;
-            colour.ScB = 1 - (float)current_particles / _total_particles;
-            if (current_particles < _total_particles/2) {
-                colour.ScG = (float)current_particles / _total_particles;
+        /// <param name="_total_particles">Total number of particles to be generated.</param>
+        private void ComputeColorList(uint _total_particles) {
+            for (uint i = 0; i <= _total_particles; ++i) {
+                Color colour = new Color();
+                colour.ScA = 1;
+                colour.ScR = (float)i / _total_particles;
+                colour.ScB = 1 - (float)i / _total_particles;
+                if (i < _total_particles/2) {
+                    colour.ScG = (float)i / _total_particles;
+                }
+                else {
+                    colour.ScG = 1 - (float)i / _total_particles;
+                }
+                colour_list.Add(colour);
             }
-            else {
-                colour.ScG = 1 - (float)current_particles / _total_particles;
-            }
-            return colour;
         }
-             
+
         /// <summary>
         /// Generates a Diffusion Limited Aggregate with properties initialised by
         /// current values of sliders and combo-boxes in the UI. Should be called
@@ -137,7 +140,8 @@ namespace DLAProject {
         /// <param name="e">Variable containing state information associated with event</param>
         private void GenerateButtonHandler(object sender, RoutedEventArgs e) {
             // clear any existing aggregate
-            ClearButtonHandler(null, null);
+            if (current_particles > 0)
+                ClearButtonHandler(null, null);
             // set the coefficient of stickiness of aggregate
             // to current value of stickiness_slider
             dla_2d.SetCoeffStick(stickiness_slider.Value);
@@ -156,6 +160,7 @@ namespace DLAProject {
             ManagedAttractorType attractor_type = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type_str);
             dla_2d.SetAttractorType(attractor_type);
 
+            ComputeColorList((uint)particles_slider.Value);
             // start asynchronous task calling GenerateAggregate method
             Task.Factory.StartNew(() => GenerateAggregate());
         }
@@ -188,6 +193,7 @@ namespace DLAProject {
             // clear aggregate from user interface
             aggregate_manager.ClearAggregate();
             current_particles = 0;
+            colour_list.Clear();
         }
 
     }
