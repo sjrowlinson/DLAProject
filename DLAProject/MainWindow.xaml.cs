@@ -90,7 +90,10 @@ namespace DLAProject {
                     aggregate_manager.AddParticle(pos, colour_list[(int)current_particles], 1.0);
                     ++current_particles;
                     // dispatch GUI updates to UI thread
-                    Dispatcher.Invoke(() => { aggregate_manager.Update(); });
+                    Dispatcher.Invoke(() => {
+                        aggregate_manager.Update();
+                        DynamicParticleLabel.Content = "Particles: " + current_particles;
+                    });
                 }
             }
         }
@@ -193,6 +196,7 @@ namespace DLAProject {
             // clear aggregate from user interface
             aggregate_manager.ClearAggregate();
             current_particles = 0;
+            DynamicParticleLabel.Content = "Particles: " + current_particles;
             colour_list.Clear();
         }
 

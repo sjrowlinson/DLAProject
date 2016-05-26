@@ -26,6 +26,9 @@
                 </Viewport3D>
             </Grid>
         </StackPanel>
+        <DockPanel Background="#01000000">
+            <Label Visibility="Visible" Name="DynamicParticleLabel" DockPanel.Dock="Top" Foreground="Red" Content="Particles: 0" />
+        </DockPanel>
 
         <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" HorizontalAlignment="Left" Margin="874,19,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="135"/>
         <ComboBox x:Name="dimension_ComboBox" HorizontalAlignment="Left" Margin="1041,21,0,0" VerticalAlignment="Top" Width="120">
