@@ -32,7 +32,7 @@ size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-std::queue<std::pair<int,int>>& DLA_2d::get_batch_queue() noexcept {
+std::queue<std::pair<int,int>>& DLA_2d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
@@ -114,8 +114,7 @@ void DLA_2d::generate(size_t _n) {
 
 double DLA_2d::estimate_fractal_dimension() const {
 	// find radius which minimally bounds the aggregate
-	int rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
-	double bounding_radius = std::sqrt(rmax_sqd);
+	double bounding_radius = std::hypot(aggregate_pq.top().first, aggregate_pq.top().second);
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
@@ -153,8 +152,8 @@ void DLA_2d::spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_rea
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
-	_spawn_diam = 2 * static_cast<int>(std::sqrt(aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second)) + boundary_offset;
-	
+	_spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
+
 	double placement_pr = _dist(mt_eng);
 	// spawn on upper line of lattice boundary
 	if (placement_pr < 0.25) {

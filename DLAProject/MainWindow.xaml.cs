@@ -56,7 +56,7 @@ namespace DLAProject {
         /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListener(uint _particle_slider_val) {
             const double interval = 10.0;
-            // initialise a Timer with a 5ms interval
+            // initialise a Timer with a 10ms interval
             System.Timers.Timer timer = new System.Timers.Timer(interval);
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
             if (dla_2d.Size() < _particle_slider_val) {
@@ -99,7 +99,7 @@ namespace DLAProject {
         }
          
         /// <summary>
-        /// Fils the colour_list field with colour instances for 
+        /// Fills the colour_list field with colour instances for 
         /// each particle to be generated in an aggregate.
         /// </summary>
         /// <param name="_total_particles">Total number of particles to be generated.</param>
@@ -162,7 +162,7 @@ namespace DLAProject {
             string attractor_type_str = (string)(selected_AttractorType.Content);
             ManagedAttractorType attractor_type = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type_str);
             dla_2d.SetAttractorType(attractor_type);
-
+            // pre-compute colour_list for each particle in aggregate
             ComputeColorList((uint)particles_slider.Value);
             // start asynchronous task calling GenerateAggregate method
             Task.Factory.StartNew(() => GenerateAggregate());

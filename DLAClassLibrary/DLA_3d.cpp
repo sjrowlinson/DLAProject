@@ -32,7 +32,7 @@ size_t DLA_3d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-std::queue<triple<int, int, int>>& DLA_3d::get_batch_queue() noexcept {
+std::queue<triple<int, int, int>>& DLA_3d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
@@ -157,6 +157,8 @@ void DLA_3d::spawn_particle(int&, int&, int&, std::uniform_real_distribution<>&)
 
 void DLA_3d::spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
 	const int boundary_offset = 16;
+	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
+	// triple currently in the aggregate structure plus an offset to avoid direct sticking spawns
 	int rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second + aggregate_pq.top().third*aggregate_pq.top().third;
 	_spawn_diam = 2 * static_cast<int>(std::sqrt(rmax_sqd)) + boundary_offset;
 

@@ -66,7 +66,7 @@ public:
 
 	size_t size() const noexcept override;
 
-	std::queue<triple<int, int, int>>& get_batch_queue() noexcept;
+	std::queue<triple<int, int, int>>& batch_queue_handle() noexcept;
 
 	void clear() override;
 

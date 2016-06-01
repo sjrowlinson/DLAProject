@@ -82,7 +82,7 @@ public:
 	 *
 	 * @return reference to batch_queue of 2d aggregate
 	 */
-	std::queue<std::pair<int,int>>& get_batch_queue() noexcept;
+	std::queue<std::pair<int,int>>& batch_queue_handle() noexcept;
 
 	/**
 	 * @brief Clears the aggregrate structure
