@@ -27,11 +27,15 @@ namespace DLAProject {
 
         // lock object for multi-threading tasks
         private static readonly object locker = new object();
+        // TODO: implement locks around aggregate generation methods for pause functionality
+        // whilst using Monitor.Enter(pause_obj) and Monitor.Exit(pause_obj) in pause handler
+        private static readonly object pause_obj = new object();
         // handles to ManagedDLAContainer objects
         private readonly ManagedDLA2DContainer dla_2d;
         private readonly ManagedDLA3DContainer dla_3d;
-        // flag for pause state
+        // flags for paused and finished states
         private bool isPaused;
+        private bool hasFinished;
         // handle to AggregateSystemManager used for updating simulation render
         private readonly AggregateSystemManager aggregate_manager;
         private uint current_particles;
@@ -44,6 +48,7 @@ namespace DLAProject {
             dla_3d = new ManagedDLA3DContainer();
             aggregate_manager = new AggregateSystemManager();
             isPaused = false;
+            hasFinished = true;
             current_particles = 0;
             colour_list = new List<Color>();
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
@@ -125,6 +130,7 @@ namespace DLAProject {
         /// in a separate thread.
         /// </summary>
         private void GenerateAggregate() {
+            hasFinished = false;
             uint particle_slider_val = 0;
             // dispatch the particles_slider value access code to UI thread
             Dispatcher.Invoke(() => {
@@ -134,6 +140,7 @@ namespace DLAProject {
             Task.Factory.StartNew(() => AggregateUpdateListener(particle_slider_val));
             // generate the DLA using value of particle slider
             dla_2d.Generate(particle_slider_val);
+            hasFinished = true;
         }
 
         /// <summary>
@@ -191,8 +198,11 @@ namespace DLAProject {
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
         private void ClearButtonHandler(object sender, RoutedEventArgs e) {
+            // if an aggregate exists, clear it
             if (current_particles > 0) {
-                dla_2d.RaiseAbortSignal();
+                // if generation process not finished, raise an abort signal
+                if (!hasFinished)
+                    dla_2d.RaiseAbortSignal();
                 dla_2d.Clear();
                 dla_3d.Clear();
             }

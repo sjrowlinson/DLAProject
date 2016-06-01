@@ -321,6 +321,10 @@ namespace DLAClassLibrary {
 			return blocking_queue;
 		}
 
+		void RaiseAbortSignal() {
+			native_DLA_container_ptr->raise_abort_signal();
+		}
+
 		/**
 		* @brief Generates an aggregrate structure of size _n
 		*

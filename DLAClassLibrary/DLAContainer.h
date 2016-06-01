@@ -115,6 +115,8 @@ public:
 	 */
 	void set_bound_radii_npoints(size_t _npoints) noexcept;
 
+	void raise_abort_signal() noexcept;
+
 	/**
 	 * @brief Clears the aggregrate structure
 	 */
@@ -169,12 +171,11 @@ public:
 	std::ostream& write_bounding_radii_data(std::ostream& _os) const;
 
 protected:
-
 	LatticeType lattice_type;
 	AttractorType attractor_type;
 	double coeff_stick;
 	std::mt19937 mt_eng;
-	
+	bool abort_signal = false;
 	std::vector<std::pair<size_t, double>> bounding_radii_vec;
 	size_t bound_radii_npoints = 50;
 

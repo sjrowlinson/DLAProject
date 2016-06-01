@@ -77,6 +77,10 @@ void DLA_3d::generate(size_t _n) {
 	size_t prev_count_taken = count;
 	// aggregate generation loop
 	while (size() < _n) {
+		if (abort_signal) {
+			abort_signal = false;
+			return;
+		}
 		// spawn the next particle if previous particle
 		// successfully stuck to aggregate structure
 		if (!has_next_spawned) {

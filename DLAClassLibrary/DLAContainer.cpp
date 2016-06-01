@@ -73,6 +73,10 @@ void DLAContainer::set_bound_radii_npoints(size_t _npoints) noexcept {
 	bound_radii_npoints = _npoints;
 }
 
+void DLAContainer::raise_abort_signal() noexcept {
+	abort_signal = true;
+}
+
 void DLAContainer::clear() {
 	bounding_radii_vec.clear();
 }

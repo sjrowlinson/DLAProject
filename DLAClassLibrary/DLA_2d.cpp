@@ -36,10 +36,6 @@ std::queue<std::pair<int,int>>& DLA_2d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
-void DLA_2d::raise_abort_signal() noexcept {
-	abort_signal = true;
-}
-
 void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
