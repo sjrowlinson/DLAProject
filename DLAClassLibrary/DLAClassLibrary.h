@@ -154,6 +154,10 @@ namespace DLAClassLibrary {
 			return blocking_queue;
 		}
 
+		void RaiseAbortSignal() {
+			native_DLA_container_ptr->raise_abort_signal();
+		}
+
 		/**
 		 * @brief Clears the aggregrate of all particles
 		 */

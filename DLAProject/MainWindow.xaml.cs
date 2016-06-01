@@ -191,8 +191,11 @@ namespace DLAProject {
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
         private void ClearButtonHandler(object sender, RoutedEventArgs e) {
-            dla_2d.Clear();
-            dla_3d.Clear();
+            if (current_particles > 0) {
+                dla_2d.RaiseAbortSignal();
+                dla_2d.Clear();
+                dla_3d.Clear();
+            }
             // clear aggregate from user interface
             aggregate_manager.ClearAggregate();
             current_particles = 0;

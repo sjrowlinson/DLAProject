@@ -84,6 +84,8 @@ public:
 	 */
 	std::queue<std::pair<int,int>>& batch_queue_handle() noexcept;
 
+	void raise_abort_signal() noexcept;
+
 	/**
 	 * @brief Clears the aggregrate structure
 	 */
@@ -109,7 +111,7 @@ private:
 	// particle furthest from origin in constant time
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
 	std::queue<std::pair<int, int>> batch_queue;
-
+	bool abort_signal = false;
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;
 	void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept override;
 
