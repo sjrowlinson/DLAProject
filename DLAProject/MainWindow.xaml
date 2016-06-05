@@ -10,7 +10,7 @@
         <Grid Background="Black" Visibility="Visible" Width ="Auto" Height="Auto" Margin="5,3,623,10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Viewport3D Name="World">
                 <Viewport3D.Camera>
-                    <OrthographicCamera Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="192" />
+                    <OrthographicCamera x:Name="orthograghic_camera" Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="256" />
                 </Viewport3D.Camera>
 
                 <Viewport3D.Children>
@@ -29,36 +29,36 @@
         </DockPanel>
 
         <Grid Visibility="Visible" Margin="735,10,10,3" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" HorizontalAlignment="Left" Margin="145,23,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="135"/>
-            <ComboBox x:Name="dimension_ComboBox" HorizontalAlignment="Left" Margin="333,23,0,0" VerticalAlignment="Top" Width="120">
+            <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" Margin="0,23,333,0" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="135" Height="26" VerticalAlignment="Top"/>
+            <ComboBox x:Name="dimension_ComboBox" Margin="0,23,160,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120">
                 <ComboBoxItem IsSelected="True" Content="2D"/>
                 <ComboBoxItem Content="3D"/>
             </ComboBox>
 
-            <Label x:Name="LatticeType_Label" Content="Lattice Type" Margin="46,72,444,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647"/>
-            <ComboBox x:Name="latticeType_ComboBox" HorizontalAlignment="Left" Margin="145,74,0,0" VerticalAlignment="Top" Width="120">
+            <Label x:Name="LatticeType_Label" Content="Lattice Type" Margin="0,72,444,0" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123" Height="26" VerticalAlignment="Top"/>
+            <ComboBox x:Name="latticeType_ComboBox" Margin="0,74,348,0" HorizontalAlignment="Right" Width="120" Height="22" VerticalAlignment="Top">
                 <ComboBoxItem IsSelected="True">Square</ComboBoxItem>
                 <ComboBoxItem>Triangle</ComboBoxItem>
             </ComboBox>
 
-            <Label x:Name="AttractorType_Label" Content="Attractor Type" HorizontalAlignment="Left" Margin="333,74,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="123"/>
-            <ComboBox x:Name="attractorType_ComboBox" HorizontalAlignment="Left" Margin="461,72,0,0" VerticalAlignment="Top" Width="120">
+            <Label x:Name="AttractorType_Label" Content="Attractor Type" Margin="0,74,157,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123"/>
+            <ComboBox x:Name="attractorType_ComboBox" Margin="0,72,32,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120">
                 <ComboBoxItem IsSelected="True" Content="Point"/>
                 <ComboBoxItem Content="Line"/>
                 <ComboBoxItem>Plane</ComboBoxItem>
             </ComboBox>
 
-            <Slider Maximum="10000" TickPlacement="BottomRight" TickFrequency="200" IsSnapToTickEnabled="True" x:Name="particles_slider" HorizontalAlignment="Left" Margin="194,130,0,0" VerticalAlignment="Top" Height="25" Width="337"/>
-            <Label x:Name="NParticles_Label" Content="Number of Particles" HorizontalAlignment="Left" Margin="46,129,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="123"/>
-            <TextBox Text="{Binding ElementName=particles_slider, Path=Value, UpdateSourceTrigger=PropertyChanged}" x:Name="particle_val" HorizontalAlignment="Left" Height="23" Margin="541,129,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Width="40"/>
+            <Slider Maximum="10000" TickPlacement="BottomRight" TickFrequency="200" IsSnapToTickEnabled="True" x:Name="particles_slider" Margin="0,130,82,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
+            <Label x:Name="NParticles_Label" Content="Number of Particles" Margin="0,129,444,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123"/>
+            <TextBox Text="{Binding ElementName=particles_slider, Path=Value, UpdateSourceTrigger=PropertyChanged}" x:Name="particle_val" Height="23" Margin="0,129,32,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" HorizontalAlignment="Right" Width="40"/>
 
-            <Label x:Name="AggSticky_Label" Content="Aggregate Stickiness" HorizontalAlignment="Left" Margin="46,160,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" Width="123"/>
-            <Slider Minimum="0.01" Maximum="1.0" TickPlacement="BottomRight" TickFrequency="0.01" IsSnapToTickEnabled="True" x:Name="stickiness_slider" HorizontalAlignment="Left" Margin="194,160,0,0" VerticalAlignment="Top" Height="25" Width="337"/>
-            <TextBox Text="{Binding Value, ElementName=stickiness_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="sticky_val" HorizontalAlignment="Left" Height="23" Margin="541,160,0,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" Width="40" RenderTransformOrigin="0.496,3.33"/>
+            <Label x:Name="AggSticky_Label" Content="Aggregate Stickiness" Margin="0,160,444,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123"/>
+            <Slider Minimum="0.01" Maximum="1.0" TickPlacement="BottomRight" TickFrequency="0.01" IsSnapToTickEnabled="True" x:Name="stickiness_slider" Margin="0,160,82,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
+            <TextBox Text="{Binding Value, ElementName=stickiness_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="sticky_val" Height="23" Margin="0,160,32,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" RenderTransformOrigin="0.496,3.33" HorizontalAlignment="Right" Width="40"/>
 
-            <Button x:Name="generate_button" Content="Generate" HorizontalAlignment="Left" Margin="46,217,0,0" VerticalAlignment="Top" Width="75" Click="GenerateButtonHandler"/>
-            <Button x:Name="pause_button" Content="Pause" HorizontalAlignment="Left" Margin="145,217,0,0" VerticalAlignment="Top" Width="75" Click="PauseButtonHandler"/>
-            <Button x:Name="clear_button" Content="Clear" HorizontalAlignment="Left" Margin="245,217,0,0" VerticalAlignment="Top" Width="75" Click="ClearButtonHandler"/>
+            <Button x:Name="generate_button" Content="Generate" Margin="0,217,492,0" VerticalAlignment="Top" Click="GenerateButtonHandler" HorizontalAlignment="Right" Width="75"/>
+            <Button x:Name="pause_button" Content="Pause" Margin="0,217,393,0" VerticalAlignment="Top" Click="PauseButtonHandler" HorizontalAlignment="Right" Width="75"/>
+            <Button x:Name="clear_button" Content="Clear" Margin="0,217,293,0" VerticalAlignment="Top" Click="ClearButtonHandler" HorizontalAlignment="Right" Width="75"/>
         </Grid>
     </Grid>
 </Window>

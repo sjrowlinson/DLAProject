@@ -105,7 +105,9 @@ namespace DLAProject {
          
         /// <summary>
         /// Fills the colour_list field with colour instances for 
-        /// each particle to be generated in an aggregate.
+        /// each particle to be generated in an aggregate. This 
+        /// method uses a progressive temperature gradient from
+        /// cold to hot for each subsequent particle in the aggregate. 
         /// </summary>
         /// <param name="_total_particles">Total number of particles to be generated.</param>
         private void ComputeColorList(uint _total_particles) {
