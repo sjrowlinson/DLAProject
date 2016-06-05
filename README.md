@@ -1,7 +1,8 @@
 # DLAProject
 C++/CLI with C# project to create Diffusion Limited Aggregates (DLA) using fast C++ code with an interface managed by C# WPF.
 
-Diffusion Limited Aggregrates are structures which are generated via random walking particles sticking to an initial seed building up a
-system of sticky particles with interesting properties such as fractal behaviour. This project involves creating arbitrary DLA systems
-on varying lattice types with different types of initial attractor seed using unmanaged (native) C++ behind the scenes wrapped with 
-managed C++/CLI containers for use by C# code for producing a rich interface to interact with for creating aggregates.
+Diffusion Limited Aggregrates are structures which are generated via random walking particles sticking to an initial seed structure building up a system of sticky particles with interesting properties such as fractal behaviour. This project involves creating arbitrary DLA systems on varying lattice types with different types of initial attractor seed using unmanaged (native) C++ behind the scenes wrapped with managed C++/CLI containers for use by C# code for producing a rich interface to interact with for creating aggregates.
+
+DLAClassLibrary is the directory containing all native, unmanaged C++ code along with the managed CLI wrapper classes. The files of this class library are self-contained and independent of any external libraries and thus can be used "as-is" by any .NET application by simply adding a reference to the DLAClassLibrary CLR Project to the relevant .NET project. The native C++ code for producing aggregates is optimised for performance whilst not detracting from the quality of the simulation produced. Note that this class library code is not guaranteed to be thread-safe (not extensively tested at this point).
+
+The directory DLAProject contains the C# code which uses DLAClassLibrary as a reference in the project. This code handles the view (i.e. GUI) related aspects of the software using a `Model3DGroup` with necessary applied `Material` and `Brush` instances to perform real time rendering of the aggregrate. Multi-threading is a feature of this software whereby the generation of the aggregate (performed by the behind-the-scenes C++ code) is handled by one thread and the rendering of particles in the aggregate is executed in parallel via another thread such that the real-time simulation results are shown in the application.
