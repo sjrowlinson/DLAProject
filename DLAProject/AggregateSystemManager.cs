@@ -19,14 +19,14 @@ namespace DLAProject {
         /// Initialises a new instance of the AggregateSystemManager class.
         /// </summary>
         public AggregateSystemManager() {
-            agg_sys = new AggregateSystem();
+            agg_sys = new AggregateSystem(true);
         }
 
         /// <summary>
         /// Updates the aggregate system. 
         /// </summary>
         public void Update() {
-            agg_sys.Update();
+            agg_sys.Update_test();
         }
 
         /// <summary>
