@@ -96,7 +96,7 @@ namespace DLAProject {
         public void Update_test() {
             // get the most recently added particle
             AggregateParticle p = particle_stack.Peek();
-            int position_index = particle_stack.Count * 4;
+            int position_index = particle_stack.Count*4;
             // create points according to particle co-ords
             Point3D p1 = new Point3D(p.position.X, p.position.Y, p.position.Z);
             Point3D p2 = new Point3D(p.position.X, p.position.Y + p.size, p.position.Z);

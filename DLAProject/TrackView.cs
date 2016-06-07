@@ -26,32 +26,52 @@ namespace DLAProject {
         private Quaternion rotation_delta;
         private Viewport3D viewport;
 
+        /// <summary>
+        /// Initialises a new instance of the TrackView class.
+        /// </summary>
         public TrackView() {
             InitialiseOrReset();
             UpdateViewport(rotation);
         }
 
+        /// <summary>
+        /// Gets or sets the isEnabled flag associated with the TrackView instance.
+        /// </summary>
         public bool Enabled
         {
             get { return isEnabled && (viewport != null); }
             set { isEnabled = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the Viewport3D associated with the TrackView instance.
+        /// </summary>
         public Viewport3D Viewport
         {
             get { return viewport; }
             set { viewport = value; }
         }
 
+        /// <summary>
+        /// Initialises, or resets, properties to default values.
+        /// </summary>
         private void InitialiseOrReset() {
             rotation = new Quaternion(0.0, 0.0, 0.0, 1.0);
             rotation_delta = Quaternion.Identity;
         }
 
+        /// <summary>
+        /// Updates the viewport of the TrackView using a given Quaternion argument for rotation.
+        /// </summary>
+        /// <param name="_qtn">Quaternion instance defining the rotation properties.</param>
         private void UpdateViewport(Quaternion _qtn) {
+            // check for null viewport
             if (viewport != null) {
+                // get the ModelVisual3D instance of the viewport
                 ModelVisual3D mv3d = viewport.Children[0] as ModelVisual3D;
+                // get the Transform3DGroup associated with mv3d
                 Transform3DGroup t3dg = mv3d.Transform as Transform3DGroup;
+                // get the RotateTransform3D associated with t3dg
                 RotateTransform3D rotate_transform = t3dg.Children[0] as RotateTransform3D;
                 rotate_transform.Rotation = new AxisAngleRotation3D(_qtn.Axis, _qtn.Angle);
             }

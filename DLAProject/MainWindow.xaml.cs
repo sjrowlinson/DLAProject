@@ -66,8 +66,11 @@ namespace DLAProject {
         }
 
         private void OnLoaded(object sender, EventArgs e) {
+            // create trackview instance for rotating simulation view
             trackview = new TrackView();
+            // attach main window to trackview mouse handlers
             trackview.Attach(this);
+            // assign Viewport3D world to trackview viewport slave
             trackview.Viewport = World;
             trackview.Enabled = true;
         }
@@ -256,6 +259,7 @@ namespace DLAProject {
                     // TODO: correct orthogramic_camera properties for 3D case
                     orthograghic_camera.Position = new Point3D(16, 16, 16);
                     orthograghic_camera.LookDirection = new Vector3D(-8, -8, -8);
+                    orthograghic_camera.Width = 128.0;
                     dla_3d.SetCoeffStick(stickiness_slider.Value);
                     // set the lattice type to current selected item
                     // of latticeType_ComboBox ui element
