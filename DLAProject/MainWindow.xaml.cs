@@ -105,7 +105,7 @@ namespace DLAProject {
         }
 
         /// <summary>
-        /// Updates the aggregate based on current contents of DLA batch_queue - processes this
+        /// Updates a 2D aggregate based on current contents of dla_2d batch_queue - processes this
         /// batch_queue and adds its contents to the simulation view.
         /// </summary>
         /// <param name="source"></param>
@@ -130,7 +130,14 @@ namespace DLAProject {
                 }
             }
         }
-         
+        
+        /// <summary>
+        /// Updates a 3D aggregate based on current contents of dla_3d batch_queue - processes this
+        /// batch_queue and adds its contents to the simulation view.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+                 
         private void Aggregate3DUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
@@ -201,6 +208,10 @@ namespace DLAProject {
             hasFinished = true;
         }
 
+        /// <summary>
+        /// Sets up all the properties of the aggregate necessary for generation, including 
+        /// lattice type, attractor type and the dimensions of the aggregate.
+        /// </summary>
         private void SetUpAggregateProperties() {
             // get the selected dimension type
             ComboBoxItem selected_dimension = (ComboBoxItem)(dimension_ComboBox.SelectedValue);
@@ -263,6 +274,7 @@ namespace DLAProject {
             // clear any existing aggregate
             if (current_particles > 0)
                 ClearButtonHandler(null, null);
+            // (re)-initialise aggregate properties
             SetUpAggregateProperties();
             // pre-compute colour_list for each particle in aggregate
             ComputeColorList((uint)particles_slider.Value);
