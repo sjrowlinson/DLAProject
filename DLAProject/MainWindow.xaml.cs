@@ -21,6 +21,14 @@ using DLAClassLibrary;
 
 namespace DLAProject {
     /// <summary>
+    /// Enum representing dimensions of lattice structure.
+    /// </summary>
+    public enum LatticeDimension {
+        _2D,
+        _3D
+    }
+
+    /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
@@ -40,6 +48,7 @@ namespace DLAProject {
         private readonly AggregateSystemManager aggregate_manager;
         private uint current_particles;
         private List<Color> colour_list;
+        private LatticeDimension lattice_dimension;
 
         public MainWindow() {
             InitializeComponent();
@@ -51,6 +60,7 @@ namespace DLAProject {
             hasFinished = true;
             current_particles = 0;
             colour_list = new List<Color>();
+            lattice_dimension = LatticeDimension._2D;
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
         }
 
@@ -60,20 +70,38 @@ namespace DLAProject {
         /// </summary>
         /// <param name="_particle_slider_val">Number of particles to generate in aggregate.</param>
         private void AggregateUpdateListener(uint _particle_slider_val) {
+            // interval of timer for refreshing aggregate in ms
             const double interval = 10.0;
             // initialise a Timer with a 10ms interval
             System.Timers.Timer timer = new System.Timers.Timer(interval);
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
-            if (dla_2d.Size() < _particle_slider_val) {
-                timer.Elapsed += (sender, e) => AggregateUpdateOnTimedEvent(sender, e, _particle_slider_val);
-                timer.AutoReset = true;
-                timer.Enabled = true;
+            switch (lattice_dimension) {
+                case LatticeDimension._2D:
+                    if (dla_2d.Size() < _particle_slider_val) {
+                        timer.Elapsed += Aggregate2DUpdateOnTimedEvent;
+                        timer.AutoReset = true;
+                        timer.Enabled = true;
+                    }
+                    // stop timer and dispose all attached resources
+                    else {
+                        timer.Stop();
+                        timer.Dispose();
+                    }
+                    break;
+                case LatticeDimension._3D:
+                    if (dla_3d.Size() < _particle_slider_val) {
+                        timer.Elapsed += Aggregate3DUpdateOnTimedEvent;
+                        timer.AutoReset = true;
+                        timer.Enabled = true;
+                    }
+                    // stop timer and dispose all attached resources
+                    else {
+                        timer.Stop();
+                        timer.Dispose();
+                    }
+                    break;
             }
-            // stop timer and dispose all attached resources
-            else {
-                timer.Stop();
-                timer.Dispose();
-            }
+            
         }
 
         /// <summary>
@@ -82,7 +110,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        private void AggregateUpdateOnTimedEvent(object source, ElapsedEventArgs e, uint _total_particles) {
+        private void Aggregate2DUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
@@ -103,6 +131,27 @@ namespace DLAProject {
             }
         }
          
+        private void Aggregate3DUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
+            // lock around aggregate updating and batch queue processing to prevent 
+            // non-dereferencable std::deque iterator run-time errors
+            lock (locker) {
+                // get and process the batch_queue from the DLA handle
+                BlockingCollection<Tuple<int, int, int>> blocking_queue = dla_3d.ProcessBatchQueue();
+                // loop over blocking_queue adding contents to interface and dequeueing on each iteration
+                while (blocking_queue.Count != 0) {
+                    Tuple<int, int, int> agg_tuple = blocking_queue.Take();
+                    Point3D pos = new Point3D(agg_tuple.Item1, agg_tuple.Item2, agg_tuple.Item3);
+                    aggregate_manager.AddParticle(pos, colour_list[(int)current_particles], 1.0);
+                    ++current_particles;
+                    // dispatch GUI updates to UI thread
+                    Dispatcher.Invoke(() => {
+                        aggregate_manager.Update();
+                        DynamicParticleLabel.Content = "Particles: " + current_particles;
+                    });
+                }
+            }
+        }
+
         /// <summary>
         /// Fills the colour_list field with colour instances for 
         /// each particle to be generated in an aggregate. This 
@@ -141,8 +190,68 @@ namespace DLAProject {
             // start asynchronous task calling AggregateUpdateListener to perform rendering
             Task.Factory.StartNew(() => AggregateUpdateListener(particle_slider_val));
             // generate the DLA using value of particle slider
-            dla_2d.Generate(particle_slider_val);
+            switch (lattice_dimension) {
+                case LatticeDimension._2D:
+                    dla_2d.Generate(particle_slider_val);
+                    break;
+                case LatticeDimension._3D:
+                    dla_3d.Generate(particle_slider_val);
+                    break;
+            }
             hasFinished = true;
+        }
+
+        private void SetUpAggregateProperties() {
+            // get the selected dimension type
+            ComboBoxItem selected_dimension = (ComboBoxItem)(dimension_ComboBox.SelectedValue);
+            string dimension_str = (string)(selected_dimension.Content);
+            // set corresponding lattice_dimension constant
+            switch (dimension_str) {
+                case "2D":
+                    lattice_dimension = LatticeDimension._2D;
+                    break;
+                case "3D":
+                    lattice_dimension = LatticeDimension._3D;
+                    break;
+            }
+            // switch on current lattice dimension constant
+            switch (lattice_dimension) {
+                case LatticeDimension._2D:
+                    orthograghic_camera.Position = new Point3D(0, 0, 32);
+                    orthograghic_camera.LookDirection = new Vector3D(0, 0, -32);
+                    dla_2d.SetCoeffStick(stickiness_slider.Value);
+                    // set the lattice type to current selected item
+                    // of latticeType_ComboBox ui element
+                    ComboBoxItem selected_2DlatticeType = (ComboBoxItem)(latticeType_ComboBox.SelectedValue);
+                    string lattice_type2D_str = (string)(selected_2DlatticeType.Content);
+                    ManagedLatticeType lattice_type2D = (ManagedLatticeType)Enum.Parse(typeof(ManagedLatticeType), lattice_type2D_str);
+                    dla_2d.SetLatticeType(lattice_type2D);
+                    // set the attractor type to current selected item
+                    // of attractorType_ComboBox ui element
+                    ComboBoxItem selected_2DAttractorType = (ComboBoxItem)(attractorType_ComboBox.SelectedValue);
+                    string attractor_type2D_str = (string)(selected_2DAttractorType.Content);
+                    ManagedAttractorType attractor_type2D = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type2D_str);
+                    dla_2d.SetAttractorType(attractor_type2D);
+                    break;
+                case LatticeDimension._3D:
+                    // TODO: correct orthogramic_camera properties for 3D case
+                    orthograghic_camera.Position = new Point3D(16, 16, 16);
+                    orthograghic_camera.LookDirection = new Vector3D(-8, -8, -8);
+                    dla_3d.SetCoeffStick(stickiness_slider.Value);
+                    // set the lattice type to current selected item
+                    // of latticeType_ComboBox ui element
+                    ComboBoxItem selected_3DlatticeType = (ComboBoxItem)(latticeType_ComboBox.SelectedValue);
+                    string lattice_type3D_str = (string)(selected_3DlatticeType.Content);
+                    ManagedLatticeType lattice_type3D = (ManagedLatticeType)Enum.Parse(typeof(ManagedLatticeType), lattice_type3D_str);
+                    dla_3d.SetLatticeType(lattice_type3D);
+                    // set the attractor type to current selected item
+                    // of attractorType_ComboBox ui element
+                    ComboBoxItem selected_3DAttractorType = (ComboBoxItem)(attractorType_ComboBox.SelectedValue);
+                    string attractor_type3D_str = (string)(selected_3DAttractorType.Content);
+                    ManagedAttractorType attractor_type3D = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type3D_str);
+                    dla_3d.SetAttractorType(attractor_type3D);
+                    break;
+            }
         }
 
         /// <summary>
@@ -154,23 +263,7 @@ namespace DLAProject {
             // clear any existing aggregate
             if (current_particles > 0)
                 ClearButtonHandler(null, null);
-            // set the coefficient of stickiness of aggregate
-            // to current value of stickiness_slider
-            dla_2d.SetCoeffStick(stickiness_slider.Value);
-
-            // set the lattice type to current selected item
-            // of latticeType_ComboBox ui element
-            ComboBoxItem selected_latticeType = (ComboBoxItem)(latticeType_ComboBox.SelectedValue);
-            string lattice_type_str = (string)(selected_latticeType.Content);
-            ManagedLatticeType lattice_type = (ManagedLatticeType)Enum.Parse(typeof(ManagedLatticeType), lattice_type_str);
-            dla_2d.SetLatticeType(lattice_type);
-
-            // set the attractor type to current selected item
-            // of attractorType_ComboBox ui element
-            ComboBoxItem selected_AttractorType = (ComboBoxItem)(attractorType_ComboBox.SelectedValue);
-            string attractor_type_str = (string)(selected_AttractorType.Content);
-            ManagedAttractorType attractor_type = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type_str);
-            dla_2d.SetAttractorType(attractor_type);
+            SetUpAggregateProperties();
             // pre-compute colour_list for each particle in aggregate
             ComputeColorList((uint)particles_slider.Value);
             // start asynchronous task calling GenerateAggregate method
@@ -202,11 +295,21 @@ namespace DLAProject {
         private void ClearButtonHandler(object sender, RoutedEventArgs e) {
             // if an aggregate exists, clear it
             if (current_particles > 0) {
-                // if generation process not finished, raise an abort signal
-                if (!hasFinished)
-                    dla_2d.RaiseAbortSignal();
-                dla_2d.Clear();
-                dla_3d.Clear();
+                // switch on dimension of lattice
+                switch (lattice_dimension) {
+                    case LatticeDimension._2D:
+                        // if generation process not finished, raise an abort signal
+                        if (!hasFinished)
+                            dla_2d.RaiseAbortSignal();
+                        dla_2d.Clear();
+                        break;
+                    case LatticeDimension._3D:
+                        // if generation process not finished, raise an abort signal
+                        if (!hasFinished)
+                            dla_3d.RaiseAbortSignal();
+                        dla_3d.Clear();
+                        break;
+                }
             }
             // clear aggregate from user interface
             aggregate_manager.ClearAggregate();
