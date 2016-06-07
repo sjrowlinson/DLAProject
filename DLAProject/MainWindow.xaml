@@ -5,18 +5,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DLAProject"
         mc:Ignorable="d"
-        Title="Diffusion Limited Aggregation" Height="768" Width="1366">
+        Title="Diffusion Limited Aggregation" Height="768" Width="1366"
+        Loaded="OnLoaded">
     <Grid>
         <Grid Background="Black" Visibility="Visible" Width ="Auto" Height="Auto" Margin="5,3,623,10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Viewport3D Name="World">
+            <Viewport3D Name="World" Focusable="True">
                 <Viewport3D.Camera>
                     <OrthographicCamera x:Name="orthograghic_camera" Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="256" />
                 </Viewport3D.Camera>
 
                 <Viewport3D.Children>
                     <ModelVisual3D>
+
+                        <ModelVisual3D.Transform>
+                            <Transform3DGroup>
+                                <Transform3DGroup.Children>
+                                    <Transform3DCollection>
+                                        <RotateTransform3D>
+                                            <RotateTransform3D.Rotation>
+                                                <AxisAngleRotation3D Axis="0 1 0" Angle="0"></AxisAngleRotation3D>
+                                            </RotateTransform3D.Rotation>
+                                        </RotateTransform3D>
+                                    </Transform3DCollection>
+                                </Transform3DGroup.Children>
+                            </Transform3DGroup>
+                        </ModelVisual3D.Transform>
+                        
                         <ModelVisual3D.Content>
                             <Model3DGroup x:Name="WorldModels">
+                                <Model3DGroup.Transform>
+                                    <Transform3DGroup>
+                                        <Transform3DGroup.Children>
+                                            <Transform3DCollection>
+                                                <RotateTransform3D>
+                                                    <RotateTransform3D.Rotation>
+                                                        <AxisAngleRotation3D Axis="0 1 0" Angle="0"></AxisAngleRotation3D>
+                                                    </RotateTransform3D.Rotation>
+                                                </RotateTransform3D>
+                                            </Transform3DCollection>
+                                        </Transform3DGroup.Children>
+                                    </Transform3DGroup>
+                                </Model3DGroup.Transform>
                                 <AmbientLight Color="#FFFFFFFF" />
                             </Model3DGroup>
                         </ModelVisual3D.Content>

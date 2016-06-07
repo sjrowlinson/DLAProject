@@ -46,6 +46,7 @@ namespace DLAProject {
         private bool hasFinished;
         // handle to AggregateSystemManager used for updating simulation render
         private readonly AggregateSystemManager aggregate_manager;
+        private TrackView trackview;
         private uint current_particles;
         private List<Color> colour_list;
         private LatticeDimension lattice_dimension;
@@ -62,6 +63,13 @@ namespace DLAProject {
             colour_list = new List<Color>();
             lattice_dimension = LatticeDimension._2D;
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
+        }
+
+        private void OnLoaded(object sender, EventArgs e) {
+            trackview = new TrackView();
+            trackview.Attach(this);
+            trackview.Viewport = World;
+            trackview.Enabled = true;
         }
 
         /// <summary>
