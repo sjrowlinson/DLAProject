@@ -11,7 +11,7 @@
         <Grid Background="Black" Visibility="Visible" Width ="Auto" Height="Auto" Margin="5,3,623,10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Viewport3D Name="World" Focusable="True">
                 <Viewport3D.Camera>
-                    <OrthographicCamera x:Name="orthograghic_camera" Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="256" />
+                    <OrthographicCamera x:Name="orthograghic_camera" Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="256"/>
                 </Viewport3D.Camera>
 
                 <Viewport3D.Children>
@@ -21,11 +21,15 @@
                             <Transform3DGroup>
                                 <Transform3DGroup.Children>
                                     <Transform3DCollection>
+                                        
                                         <RotateTransform3D>
                                             <RotateTransform3D.Rotation>
                                                 <AxisAngleRotation3D Axis="0 1 0" Angle="0"></AxisAngleRotation3D>
                                             </RotateTransform3D.Rotation>
                                         </RotateTransform3D>
+                                        <ScaleTransform3D ScaleX="1" ScaleY="1" ScaleZ="1">
+                                        </ScaleTransform3D>
+                                        
                                     </Transform3DCollection>
                                 </Transform3DGroup.Children>
                             </Transform3DGroup>

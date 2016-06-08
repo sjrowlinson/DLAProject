@@ -24,6 +24,11 @@ namespace DLAProject {
         private Quaternion rotation;
         // change to rotation because of drag
         private Quaternion rotation_delta;
+        // is scaling event occurring
+        private bool isScaling;
+        private double scale;
+        // change to scale because of drag
+        private double scale_delta;
         private Viewport3D viewport;
 
         /// <summary>
@@ -31,7 +36,7 @@ namespace DLAProject {
         /// </summary>
         public TrackView() {
             InitialiseOrReset();
-            UpdateViewport(rotation);
+            UpdateViewport(rotation, scale);
         }
 
         /// <summary>
@@ -57,7 +62,7 @@ namespace DLAProject {
         /// </summary>
         public void ResetView() {
             InitialiseOrReset();
-            UpdateViewport(rotation);
+            UpdateViewport(rotation, scale);
         }
 
         /// <summary>
@@ -66,13 +71,15 @@ namespace DLAProject {
         private void InitialiseOrReset() {
             rotation = new Quaternion(0.0, 0.0, 0.0, 1.0);
             rotation_delta = Quaternion.Identity;
+            scale = 1.0;
+            scale_delta = 1.0;
         }
 
         /// <summary>
         /// Updates the viewport of the TrackView using a given Quaternion argument for rotation.
         /// </summary>
         /// <param name="_qtn">Quaternion instance defining the rotation properties.</param>
-        private void UpdateViewport(Quaternion _qtn) {
+        private void UpdateViewport(Quaternion _qtn, double _scale) {
             // check for null viewport
             if (viewport != null) {
                 // get the ModelVisual3D instance of the viewport
@@ -82,6 +89,10 @@ namespace DLAProject {
                 // get the RotateTransform3D associated with t3dg
                 RotateTransform3D rotate_transform = t3dg.Children[0] as RotateTransform3D;
                 rotate_transform.Rotation = new AxisAngleRotation3D(_qtn.Axis, _qtn.Angle);
+                ScaleTransform3D scale_transform = t3dg.Children[1] as ScaleTransform3D;
+                scale_transform.ScaleX = _scale;
+                scale_transform.ScaleY = _scale;
+                scale_transform.ScaleZ = _scale;
             }
         }
 
@@ -93,6 +104,7 @@ namespace DLAProject {
             _element.MouseMove += MouseMoveHandler;
             _element.MouseRightButtonDown += MouseDownHandler;
             _element.MouseRightButtonUp += MouseUpHandler;
+            _element.MouseWheel += MouseWheelHandler;
         }
 
         /// <summary>
@@ -103,6 +115,7 @@ namespace DLAProject {
             _element.MouseMove -= MouseMoveHandler;
             _element.MouseRightButtonDown -= MouseDownHandler;
             _element.MouseRightButtonUp -= MouseUpHandler;
+            _element.MouseWheel -= MouseWheelHandler;
         }
 
         /// <summary>
@@ -117,6 +130,7 @@ namespace DLAProject {
             // get position of initial drag point relative to sender element
             var elem = (UIElement)sender;
             drag_point = e.MouseDevice.GetPosition(elem);
+            isScaling = (e.MiddleButton == MouseButtonState.Pressed);
             isRotating = true;
             elem.CaptureMouse();
         }
@@ -168,7 +182,7 @@ namespace DLAProject {
                     const double epsilon = 0.00001;
                     // if length of axis is less than some small factor, set rotation_delta to
                     // a Quaternion with k vector axis of rotation and 0.0 angle 
-                    if (axis_length < epsilon) {
+                    if (axis_length < epsilon || isScaling) {
                         rotation_delta = new Quaternion(new Vector3D(0.0, 0.0, 1.0), 0.0);
                     }
                     // else set rotation_delta to a Quaternion with computed rotation axis
@@ -183,8 +197,21 @@ namespace DLAProject {
                     //TODO: figure out code for !isRotating mouse movement handling
                 }
                 // update the viewport
-                UpdateViewport(qtn);
+                UpdateViewport(qtn, scale*scale_delta);
             }
+        }
+
+        /// <summary>
+        /// Handles mouse wheel event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MouseWheelHandler(object sender, MouseWheelEventArgs e) {
+            e.Handled = true;
+            // set scale_delta to Delta of mouse wheel over 1000 for smaller changes
+            scale_delta += e.Delta / (double)1000;
+            // update the viewport to new zoom level
+            UpdateViewport(rotation, scale * scale_delta);
         }
 
     }
