@@ -40,7 +40,7 @@ namespace DLAProject {
         }
 
         public void ClearAggregate() {
-            agg_sys.Clear();
+            agg_sys.Clear_test();
         }
 
         /// <summary>

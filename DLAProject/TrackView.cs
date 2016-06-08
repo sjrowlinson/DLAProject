@@ -53,6 +53,14 @@ namespace DLAProject {
         }
 
         /// <summary>
+        /// Resets the viewport to initial state.
+        /// </summary>
+        public void ResetView() {
+            InitialiseOrReset();
+            UpdateViewport(rotation);
+        }
+
+        /// <summary>
         /// Initialises, or resets, properties to default values.
         /// </summary>
         private void InitialiseOrReset() {
@@ -119,10 +127,10 @@ namespace DLAProject {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void MouseUpHandler(object sender, MouseButtonEventArgs e) {
-            if (!isEnabled)
+            if (!Enabled)
                 return;
             e.Handled = true;
-            // put initial and delta into initial such that the next move occurs
+            // put initial-delta product into initial such that the next move occurs
             // from correct position
             if (isRotating)
                 rotation *= rotation_delta;
@@ -145,26 +153,36 @@ namespace DLAProject {
 
             var elem = (UIElement)sender;
             if (elem.IsMouseCaptured) {
+                // get displacement between initial drag point and position of mouse relative to sender
                 Vector delta = drag_point - e.MouseDevice.GetPosition(elem);
                 delta /= 2;
+                // assign local Quaternion variable to rotation field
                 Quaternion qtn = rotation;
                 if (isRotating) {
                     // map 2D mouse delta to 3D mouse delta with vector
                     // into the display as Z component
                     Vector3D mouse_vec = new Vector3D(delta.X, -delta.Y, 0.0);
+                    // compute rotation axis from cross product of mouse_vec with k vector
                     Vector3D rot_axis = Vector3D.CrossProduct(mouse_vec, new Vector3D(0.0, 0.0, 1.0));
                     double axis_length = rot_axis.Length;
-                    if (axis_length < 0.00001) {
+                    const double epsilon = 0.00001;
+                    // if length of axis is less than some small factor, set rotation_delta to
+                    // a Quaternion with k vector axis of rotation and 0.0 angle 
+                    if (axis_length < epsilon) {
                         rotation_delta = new Quaternion(new Vector3D(0.0, 0.0, 1.0), 0.0);
                     }
+                    // else set rotation_delta to a Quaternion with computed rotation axis
+                    // and axis length from above
                     else {
                         rotation_delta = new Quaternion(rot_axis, axis_length);
                     }
+                    // multiply qtn by rotation_delta and assign result to qtn
                     qtn *= rotation_delta;
                 }
                 else {
                     //TODO: figure out code for !isRotating mouse movement handling
                 }
+                // update the viewport
                 UpdateViewport(qtn);
             }
         }

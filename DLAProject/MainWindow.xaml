@@ -30,7 +30,7 @@
                                 </Transform3DGroup.Children>
                             </Transform3DGroup>
                         </ModelVisual3D.Transform>
-                        
+
                         <ModelVisual3D.Content>
                             <Model3DGroup x:Name="WorldModels">
                                 <Model3DGroup.Transform>
@@ -54,7 +54,7 @@
             </Viewport3D>
         </Grid>
         <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,0,-10">
-            <Label Visibility="Visible" Name="DynamicParticleLabel" DockPanel.Dock="Top" Foreground="Red" Content="Particles: 0" />
+            <Label Visibility="Visible" Name="DynamicParticleLabel" DockPanel.Dock="Top" Foreground="Red" />
         </DockPanel>
 
         <Grid Visibility="Visible" Margin="735,10,10,3" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -88,6 +88,7 @@
             <Button x:Name="generate_button" Content="Generate" Margin="0,217,492,0" VerticalAlignment="Top" Click="GenerateButtonHandler" HorizontalAlignment="Right" Width="75"/>
             <Button x:Name="pause_button" Content="Pause" Margin="0,217,393,0" VerticalAlignment="Top" Click="PauseButtonHandler" HorizontalAlignment="Right" Width="75"/>
             <Button x:Name="clear_button" Content="Clear" Margin="0,217,293,0" VerticalAlignment="Top" Click="ClearButtonHandler" HorizontalAlignment="Right" Width="75"/>
+            <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="ResetViewButtonHandler" HorizontalAlignment="Right" Width="75" Margin="0,217,194,0"/>
         </Grid>
     </Grid>
 </Window>

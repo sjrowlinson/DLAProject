@@ -65,6 +65,12 @@ namespace DLAProject {
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
         }
 
+        /// <summary>
+        /// Method called on loading MainWindow. Initialises trackview ready for 
+        /// transforming simulation viewport.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnLoaded(object sender, EventArgs e) {
             // create trackview instance for rotating simulation view
             trackview = new TrackView();
@@ -148,7 +154,6 @@ namespace DLAProject {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-                 
         private void Aggregate3DUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
@@ -236,11 +241,11 @@ namespace DLAProject {
                     lattice_dimension = LatticeDimension._3D;
                     break;
             }
+            // reset simulation view
+            ResetViewButtonHandler(null, null);
             // switch on current lattice dimension constant
             switch (lattice_dimension) {
                 case LatticeDimension._2D:
-                    orthograghic_camera.Position = new Point3D(0, 0, 32);
-                    orthograghic_camera.LookDirection = new Vector3D(0, 0, -32);
                     dla_2d.SetCoeffStick(stickiness_slider.Value);
                     // set the lattice type to current selected item
                     // of latticeType_ComboBox ui element
@@ -256,10 +261,6 @@ namespace DLAProject {
                     dla_2d.SetAttractorType(attractor_type2D);
                     break;
                 case LatticeDimension._3D:
-                    // TODO: correct orthogramic_camera properties for 3D case
-                    orthograghic_camera.Position = new Point3D(16, 16, 16);
-                    orthograghic_camera.LookDirection = new Vector3D(-8, -8, -8);
-                    orthograghic_camera.Width = 128.0;
                     dla_3d.SetCoeffStick(stickiness_slider.Value);
                     // set the lattice type to current selected item
                     // of latticeType_ComboBox ui element
@@ -340,6 +341,29 @@ namespace DLAProject {
             current_particles = 0;
             DynamicParticleLabel.Content = "Particles: " + current_particles;
             colour_list.Clear();
+        }
+
+        /// <summary>
+        /// Handler for reset_view_button click event. Resets the viewport to initial state.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ResetViewButtonHandler(object sender, RoutedEventArgs e) {
+            // reset rotational view
+            trackview.ResetView();
+            // reset orthographic_camera properties
+            switch (lattice_dimension) {
+                case LatticeDimension._2D:
+                    orthograghic_camera.Position = new Point3D(0, 0, 32);
+                    orthograghic_camera.LookDirection = new Vector3D(0, 0, -32);
+                    orthograghic_camera.Width = 256.0;
+                    break;
+                case LatticeDimension._3D:
+                    orthograghic_camera.Position = new Point3D(16, 16, 16);
+                    orthograghic_camera.LookDirection = new Vector3D(-8, -8, -8);
+                    orthograghic_camera.Width = 128.0;
+                    break;
+            }
         }
 
     }

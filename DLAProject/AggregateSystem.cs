@@ -178,6 +178,8 @@ namespace DLAProject {
             ((MeshGeometry3D)particle_model.Geometry).Positions.Clear();
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices.Clear();
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates.Clear();
+            rad_brush = new RadialGradientBrush();
+            ellipse.Fill = rad_brush;
         }
 
         public void Clear() {
@@ -186,8 +188,6 @@ namespace DLAProject {
             ((MeshGeometry3D)particle_model.Geometry).Positions.Clear();
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices.Clear();
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates.Clear();
-            rad_brush = new RadialGradientBrush();
-            ellipse.Fill = rad_brush;
         }
 
         /// <summary>
