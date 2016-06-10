@@ -138,12 +138,12 @@ namespace DLAProject {
                     KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
                     Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
                     aggregate_manager.AddParticle(pos, colour_list[(int)current_particles], 1.0);
-                    ++current_particles;
                     // dispatch GUI updates to UI thread
                     Dispatcher.Invoke(() => {
                         aggregate_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                     });
+                    ++current_particles;
                 }
             }
         }

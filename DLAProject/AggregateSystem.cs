@@ -18,18 +18,21 @@ namespace DLAProject {
         // added is accessed in constant time
         private readonly Stack<AggregateParticle> particle_stack;
         private readonly GeometryModel3D particle_model;
-
         // collections to store graphics related quantities for
         // particle_model MeshGeometry3D Model
         private readonly Point3DCollection particle_positions;
         private readonly Int32Collection triangle_indices;
         private readonly PointCollection tex_coords;
-
-        //_test
+        // radial gradient brush for particle_model material
         private RadialGradientBrush rad_brush;
+        // ellipse for target rendering
         private Ellipse ellipse;
+        // bitmap for rendering the image source
         private RenderTargetBitmap render_bitmap;
 
+        /// <summary>
+        /// Initialises a new instance of the AggregateSystem class.
+        /// </summary>
         public AggregateSystem() {
             particle_stack = new Stack<AggregateParticle>();
             particle_model = new GeometryModel3D { Geometry = new MeshGeometry3D() };
@@ -55,6 +58,10 @@ namespace DLAProject {
 
         public Model3D AggregateModel => particle_model;
 
+        /// <summary>
+        /// Updates the view of a simulation model for an
+        /// aggregate on a 2D lattice.
+        /// </summary>
         public void Update() {
             // get the most recently added particle
             AggregateParticle p = particle_stack.Peek();
@@ -94,6 +101,17 @@ namespace DLAProject {
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = tex_coords;
         }
 
+        /// <summary>
+        /// Updates the view of a simulation model for an 
+        /// aggregate on a 3D lattice.
+        /// </summary>
+        public void Update3D() {
+            // TODO: apply simulation view updates creating spheres to add to particle_model
+        }
+
+        /// <summary>
+        /// Clears the view of the aggregate simulation.
+        /// </summary>
         public void Clear() {
             // clear all collections
             particle_stack.Clear();

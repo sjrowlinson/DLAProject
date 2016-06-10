@@ -11,7 +11,7 @@ using System.Windows.Media.Media3D;
 namespace DLAProject {
 
     /// <summary>
-    /// Tracking class for moving the view of an aggregate around.
+    /// Tracking class for transforming the view of an aggregate.
     /// </summary>
     public class TrackView {
 

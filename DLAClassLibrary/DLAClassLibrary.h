@@ -1,11 +1,10 @@
 // DLAClassLibrary.h
 
 #pragma once
-#include <fstream>
-
 #include "DLAContainer.h"
 #include "DLA_2d.h"
 #include "DLA_3d.h"
+#include <fstream>
 
 using namespace System;
 using namespace System::Collections;
