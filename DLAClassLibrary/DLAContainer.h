@@ -1,5 +1,5 @@
 #pragma once
-
+#include "utilities.h"
 #include <algorithm>
 #include <cmath>
 #include <iterator>
@@ -8,8 +8,6 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-
-#include "utilities.h"
 
 enum class LatticeType {
 	SQUARE,

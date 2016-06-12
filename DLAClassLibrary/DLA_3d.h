@@ -1,10 +1,8 @@
 #pragma once
-
+#include "DLAContainer.h"
 #include <queue>
 #include <unordered_map>
 #include <vector>
-
-#include "DLAContainer.h"
 
 /**
  * @struct triple_hash
