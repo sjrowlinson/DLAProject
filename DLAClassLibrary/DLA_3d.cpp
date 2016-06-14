@@ -154,11 +154,6 @@ std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	return _os;
 }
 
-void DLA_3d::spawn_particle(int&, int&, int&, std::uniform_real_distribution<>&) noexcept {
-	// 2d lattice case not applicable to 3d aggregrates
-	return;
-}
-
 void DLA_3d::spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
@@ -204,10 +199,6 @@ void DLA_3d::spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::un
 		_y = _spawn_diam / 2;
 		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
 	}
-}
-
-bool DLA_3d::aggregate_collision(const int&, const int&, const int&, const int&, const double&, size_t&) {
-	return false;
 }
 
 bool DLA_3d::aggregate_collision(const int& _x, const int& _y, const int& _z, const int& _prev_x, const int& _prev_y, const int& _prev_z, const double& _sticky_pr, size_t& _count) {

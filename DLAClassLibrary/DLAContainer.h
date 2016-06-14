@@ -178,26 +178,6 @@ protected:
 	size_t bound_radii_npoints = 50;
 
 	/**
-	 * @brief Spawns particle in a random boundary position dependent upon attractor type and current size of aggregate
-	 *
-	 * @param _x Position to set spawn in x co-ordinate
-	 * @param _y Position to set spawn in y co-ordinate
-	 * @param _spawn_diam Variable to set for allowed spawning diameter
-	 * @param _dist std::uniform_real_distribution<> for prng
-	 */
-	virtual void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept = 0;
-	/**
-	 * @brief Spawns particle in a random boundary position dependent upon attractor type and current size of aggregate
-	 *
-	 * @param _x Position to set spawn in x co-ordinate
-	 * @param _y Position to set spawn in y co-ordinate
-	 * @param _z Position to set spawn in z co-ordinate
-	 * @param _spawn_diam Variable to set for allowed spawning diameter
-	 * @param _dist std::uniform_real_distribution<> for prng
-	 */
-	virtual void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept = 0;
-
-	/**
 	 * @brief Update the position of a particle via unbiased random walk motion
 	 *
 	 * @param _x Position in x co-ordinate
@@ -239,34 +219,5 @@ protected:
 	 * @return true if boundary collision occurred, false otherwise
 	 */
 	bool lattice_boundary_collision(int& _x, int& _y, int& _z, const int& _prev_x, const int& _prev_y, const int& _prev_z, const int& _spawn_diam) const noexcept;
-
-	/**
-	 * @brief Check for collision of a particle with the aggregate and add particle to
-	 *        aggregrate structure if true (subject to _sticky_pr <= coeff_stick)
-	 *
-	 * @param _x Position in x co-ordinate
-	 * @param _y Position in y co-ordinate
-	 * @param _prev_x Previous position in x
-	 * @param _prev_y Previous position in y
-	 * @param _sticky_pr Constraint on stickiness, if <= coeff_stick then sticking occurs
- 	 * @param _count Current number of particles in aggregate
- 	 * @return true if aggregrate collision occurred and particle was added, false otherwise
-	 */
-	virtual bool aggregate_collision(const int& _x, const int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) = 0;
-	/**
-	 * @brief Check for collision of a particle with the aggregate and add particle to
-	 *        aggregrate structure if true (subject to _sticky_pr <= coeff_stick)
-	 *
-	 * @param _x Position in x co-ordinate
-	 * @param _y Position in y co-ordinate
-	 * @param _z Position in z co-ordinate
-	 * @param _prev_x Previous position in x
-	 * @param _prev_y Previous position in y
-	 * @param _prev_z Previous position in z
-	 * @param _sticky_pr Constraint on stickiness, if <= coeff_stick then sticking occurs
-	 * @param _count Current number of particles in aggregate
-	 * @return true if aggregrate collision occurred and particle was added, false otherwise
-	 */
-	virtual bool aggregate_collision(const int& _x, const int& _y, const int& _z, const int& _prev_x, const int& _prev_y, const int& _prev_z, const double& _sticky_pr, size_t& _count) = 0;
 
 };

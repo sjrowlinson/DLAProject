@@ -181,10 +181,6 @@ void DLA_2d::spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_rea
 	}
 }
 
-void DLA_2d::spawn_particle(int&, int&, int&, int&, std::uniform_real_distribution<>&) noexcept {
-	return;
-}
-
 bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) {
 	// find the given point in the aggregrete, yields aggregrate_map.end() if not in container
 	auto search = aggregate_map.find(std::make_pair(_x, _y));
@@ -197,9 +193,5 @@ bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_
 		batch_queue.push(added_particle);
 		return true;
 	}
-	return false;
-}
-
-bool DLA_2d::aggregate_collision(const int&, const int&, const int&, const int&, const int&, const int&, const double&, size_t&) {
 	return false;
 }
