@@ -116,7 +116,7 @@ private:
 	 * @param[out] _spawn_diam Diameter of spawn zone
 	 * @param[in] _dist Uniform real distribution for probability generation
 	 */
-	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
+	void spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
 
 	bool aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, size_t& _count);
 

@@ -72,35 +72,35 @@ public:
 	double get_coeff_stick() const noexcept;
 
 	/**
-	* @brief Sets the coefficient of stickiness of the aggregrate
+	* @brief Sets the coefficient of stickiness of the aggregrate.
 	*
 	* @param _coeff_stick Coefficient of stickiness to set
 	*/
 	void set_coeff_stick(const double& _coeff_stick);
 
 	/**
-	 * @brief Gets the type of lattice
+	 * @brief Gets the type of lattice.
 	 *
 	 * @return lattice_type of this instance
 	 */
 	LatticeType get_lattice_type() const noexcept;
 
 	/**
-	 * @brief Gets the type of attractor
+	 * @brief Gets the type of attractor.
 	 *
 	 * @return attractor_type of this instance
 	 */
 	AttractorType get_attractor_type() const noexcept;
 
 	/**
-	 * @brief Sets the type of lattice
+	 * @brief Sets the type of lattice.
 	 *
 	 * @param _lattice_type LatticeType to update to
 	 */
 	void set_lattice_type(LatticeType _lattice_type) noexcept;
 
 	/**
-	 * @brief Sets the type of attractor
+	 * @brief Sets the type of attractor.
 	 *
 	 * @param _attractor_type AttractorType to update to
 	 */
@@ -116,7 +116,7 @@ public:
 	void raise_abort_signal() noexcept;
 
 	/**
-	 * @brief Clears the aggregrate structure
+	 * @brief Clears the aggregrate structure.
 	 */
 	virtual void clear();
 
@@ -129,7 +129,7 @@ public:
 	virtual void generate(size_t n) = 0;
 
 	/**
-	* @brief Computes an estimate of the fractal dimension for the aggregrate
+	* @brief Computes an estimate of the fractal dimension for the aggregrate.
 	*
 	* @return Estimate of aggregrate fractal dimension
 	*/
@@ -178,46 +178,22 @@ protected:
 	size_t bound_radii_npoints = 50;
 
 	/**
-	 * @brief Update the position of a particle via unbiased random walk motion
+	 * @brief Updates position of random walking particle.
 	 *
-	 * @param _x Position in x co-ordinate
-	 * @param _y Position in y co-ordinate
-	 * @param _movement_choice Probability determining direction of movement
+	 * @param _current Current position, to be updated.
+	 * @param _movement_choice Double in [0,1] for direction choice.
 	 */
-	void update_particle_position(int& _x, int& _y, const double& _movement_choice) const noexcept;
-	/**
-	 * @brief Update the position of a particle via unbiased random walk motion
-	 *
-	 * @param _x Position in x co-ordinate
-	 * @param _y Position in y co-ordinate
-	 * @param _z Position in z co-ordinate
-	 * @param _movement_choice Probability determining direction of movement
-	 */
-	void update_particle_position(int& _x, int& _y, int& _z, const double& _movement_choice) const noexcept;
+	void update_particle_position(std::pair<int,int>& _current, const double& _movement_choice) const noexcept;
+	void update_particle_position(triple<int,int,int>& _current, const double& _movement_choice) const noexcept;
 
 	/**
-	 * @brief Check for collision of a particle with a lattice boundary and reflect if true
+	 * @brief Checks for collision with boundary of lattice and reflects.
 	 *
-	 * @param _x Position in x co-ordinate
-	 * @param _y Position in y co-ordinate
-	 * @param _prev_x Previous position in x
-	 * @param _prev_y Previous position in y
-	 * @param _spawn_diam Current diameter of spawning zone
-	 * @return true if boundary collision occurred, false otherwise
+	 * @param _current Current position, updated if collision occurred.
+	 * @param _previous Previous position.
+	 * @param _spawn_diam Current diameter of spawning box.
 	 */
-	bool lattice_boundary_collision(int& _x, int& _y, const int& _prev_x, const int& _prev_y, const int& _spawn_diam) const noexcept;
-	/**
-	 * @brief Check for collision of a particle with a lattice boundary and reflect if true
-	 *
-	 * @param _x Position in x co-ordinate
-	 * @param _y Position in y co-ordinate
-	 * @param _z Position in z co-ordinate
-	 * @param _prev_x Previous position in x
-	 * @param _prev_y Previous position in y
-	 * @param _prev_z Previous position in z
-	 * @param _spawn_diam Current diameter of spawning zone
-	 * @return true if boundary collision occurred, false otherwise
-	 */
-	bool lattice_boundary_collision(int& _x, int& _y, int& _z, const int& _prev_x, const int& _prev_y, const int& _prev_z, const int& _spawn_diam) const noexcept;
+	bool lattice_boundary_collision(std::pair<int,int>& _current, const std::pair<int,int>& _previous, const int& _spawn_diam) const noexcept;
+	bool lattice_boundary_collision(triple<int,int,int>& _current, const triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept;
 
 };

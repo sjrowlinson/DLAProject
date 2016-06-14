@@ -1,6 +1,6 @@
 #pragma once
-
 #include <ostream>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -31,22 +31,25 @@ template<typename _Ty1, typename _Ty2, typename _Ty3> struct triple {
 		constexpr triple() : first(), second(), third() {}
 
 	/**
-	* @brief Construct a triple object from specified values
-	*/
-	triple(const _Ty1& _first, const _Ty2& _second, const _Ty3& _third) : first(_first), second(_second), third(_third) {
-
-	}
-
+	 * @brief Construct a triple object from specified values
+	 */
+	template<class _Uty1 = _Ty1,
+		class _Uty2 = _Ty2,
+		class _Uty3 = _Ty3,
+		class = std::enable_if_t<std::is_copy_constructible<_Uty1>::value
+		&& std::is_copy_constructible<_Uty2>::value 
+		&& std::is_copy_constructible<_Uty3>::value> >
+	triple(const _Ty1& _first, const _Ty2& _second, const _Ty3& _third) : first(_first), second(_second), third(_third) {}
 };
 
 /**
-* @brief Makes a triple object, similar to std::make_pair
-*
-* @param _val1 rvalue reference to first value
-* @param _val2 rvalue reference to second value
-* @param _val3 rvalue reference to third value
-* @return triple object comprised of params
-*/
+ * @brief Makes a triple object, similar to std::make_pair
+ *
+ * @param _val1 rvalue reference to first value
+ * @param _val2 rvalue reference to second value
+ * @param _val3 rvalue reference to third value 
+ * @return triple object comprised of params
+ */
 template<typename _Ty1, typename _Ty2, typename _Ty3> inline constexpr
 triple<typename std::_Unrefwrap<_Ty1>::type, typename std::_Unrefwrap<_Ty2>::type, typename std::_Unrefwrap<_Ty3>::type> make_triple(_Ty1&& _val1, _Ty2&& _val2, _Ty3&& _val3) {
 	typedef triple<typename std::_Unrefwrap<_Ty1>::type, typename std::_Unrefwrap<_Ty2>::type, typename std::_Unrefwrap<_Ty3>::type> _ret_triple;

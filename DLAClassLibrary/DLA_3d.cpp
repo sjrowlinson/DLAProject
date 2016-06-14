@@ -51,13 +51,9 @@ void DLA_3d::generate(size_t _n) {
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
 	batch_queue.push(origin_sticky);
-    // initialise variable for particle position, altered immediately in generation loop
-	int x = 0;
-	int y = 0;
-	int z = 0;
-	int prev_x = x;
-	int prev_y = y;
-	int prev_z = z;
+	// initialise current and previous co-ordinate containers
+	triple<int, int, int> current = { 0,0,0 };
+	triple<int, int, int> prev = current;
 
 	bool has_next_spawned = false;
 	// variable to store current allowed size of bounding
@@ -84,25 +80,22 @@ void DLA_3d::generate(size_t _n) {
 		// spawn the next particle if previous particle
 		// successfully stuck to aggregate structure
 		if (!has_next_spawned) {
-			spawn_particle(x, y, z, spawn_diameter, dist);
+			spawn_particle(current, spawn_diameter, dist);
 			has_next_spawned = true;
 		}
+		// generate random double in [0,1] for movement choice direction
 		double movement_choice = dist(mt_eng);
-
-		prev_x = x;
-		prev_y = y;
-		prev_z = z;
+		prev = current;
 		// update position of particle via unbiased random walk
-		update_particle_position(x, y, z, movement_choice);
+		update_particle_position(current, movement_choice);
 		// check for collision with bounding walls and reflect if true
-		lattice_boundary_collision(x, y, z, prev_x, prev_y, prev_z, spawn_diameter);
+		lattice_boundary_collision(current, prev, spawn_diameter);
 
 		double stick_pr = dist(mt_eng);
-
 		// check for collision with aggregate structure and add particle to 
 		// the aggregate (both to map and pq) if true, set flag ready for
 		// next particle spawn
-		if (aggregate_collision(make_triple(x,y,z), make_triple(prev_x,prev_y,prev_z), stick_pr, count)) {
+		if (aggregate_collision(current, prev, stick_pr, count)) {
 			has_next_spawned = false;
 		}
 		// record no. of particles in aggregate and corresponding minimal
@@ -154,50 +147,48 @@ std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	return _os;
 }
 
-void DLA_3d::spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
+void DLA_3d::spawn_particle(triple<int,int,int>& _current, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// triple currently in the aggregate structure plus an offset to avoid direct sticking spawns
 	int rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second + aggregate_pq.top().third*aggregate_pq.top().third;
 	_spawn_diam = 2 * static_cast<int>(std::sqrt(rmax_sqd)) + boundary_offset;
-
 	double placement_pr = _dist(mt_eng);
-
 	// Spawn on negative constant z plane of bounding box
 	if (placement_pr < 1.0 / 6.0) {
-		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_z = -_spawn_diam / 2;
+		_current.first = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.second = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.third = -_spawn_diam / 2;
 	}
 	// Spawn on positive constant z plane of bounding box
 	else if (placement_pr >= 1.0 / 6.0 && placement_pr < 2.0 / 6.0) {
-		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_z = _spawn_diam / 2;
+		_current.first = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.second = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.third = _spawn_diam / 2;
 	}
 	// Spawn on negative constant x plane of bounding box
 	else if (placement_pr >= 2.0 / 6.0 && placement_pr < 3.0 / 6.0) {
-		_x = -_spawn_diam / 2;
-		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.first = -_spawn_diam / 2;
+		_current.second = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.third = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
 	}
 	// Spawn on positive constant x plane of bounding box
 	else if (placement_pr >= 3.0 / 6.0 && placement_pr < 4.0 / 6.0) {
-		_x = _spawn_diam / 2;
-		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.first = _spawn_diam / 2;
+		_current.second = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.third = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
 	}
 	// Spawn on negative constant y plane of bounding box
 	else if (placement_pr >= 4.0 / 6.0 && placement_pr < 5.0 / 6.0) {
-		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_y = -_spawn_diam / 2;
-		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.first = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.second = -_spawn_diam / 2;
+		_current.third = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
 	}
 	// Spawn on positive constant z plane of bounding box
 	else if (placement_pr >= 5.0 / 6.0 && placement_pr < 1.0) {
-		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_y = _spawn_diam / 2;
-		_z = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.first = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_current.second = _spawn_diam / 2;
+		_current.third = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
 	}
 }
 

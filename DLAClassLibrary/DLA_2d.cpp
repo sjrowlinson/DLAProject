@@ -51,12 +51,9 @@ void DLA_2d::generate(size_t _n) {
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
 	batch_queue.push(origin_sticky);
-
-	// initialise variables for particle position, altered immediately in generation loop
-	int x = 0;
-	int y = 0;
-	int prev_x = x;
-	int prev_y = y;
+	// initialise current and previous co-ordinate containers
+	std::pair<int, int> current = { 0, 0 };
+	std::pair<int, int> prev = current;
 
 	bool has_next_spawned = false;
 	// variable to store current allowed size of bounding
@@ -83,26 +80,22 @@ void DLA_2d::generate(size_t _n) {
 		// spawn the next particle if previous particle
 		// successfully stuck to aggregate structure
 		if (!has_next_spawned) {
-			spawn_particle(x, y, spawn_diameter, dist);
+			spawn_particle(current, spawn_diameter, dist);
 			has_next_spawned = true;
 		}
-
+		// generate random double in [0,1] for movement choice direction
 		double movement_choice = dist(mt_eng);
-
-		prev_x = x;
-		prev_y = y;
-
+		prev = current;
 		// update position of particle via unbiased random walk
-		update_particle_position(x, y, movement_choice);
+		update_particle_position(current, movement_choice);
 		// check for collision with bounding walls and reflect if true
-		lattice_boundary_collision(x, y, prev_x, prev_y, spawn_diameter);
+		lattice_boundary_collision(current, prev, spawn_diameter);
 
 		double stick_pr = dist(mt_eng);
-
 		// check for collision with aggregate structure and add particle to 
 		// the aggregate (both to map and pq) if true, set flag ready for
 		// next particle spawn
-		if (aggregate_collision(std::make_pair(x, y), std::make_pair(prev_x, prev_y), stick_pr, count)) {
+		if (aggregate_collision(current, prev, stick_pr, count)) {
 			has_next_spawned = false;
 		}
 		// record no. of particles in aggregate and corresponding minimal
@@ -112,7 +105,6 @@ void DLA_2d::generate(size_t _n) {
 			bounding_radii_vec.push_back(std::make_pair(aggregate_map.size(), std::sqrt(rmax_sqd)));
 			prev_count_taken = size();
 		}
-
 	}
 }
 
@@ -152,32 +144,32 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	return _os;
 }
 
-void DLA_2d::spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
+void DLA_2d::spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
 	_spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
-
+	// generate random double in [0,1]
 	double placement_pr = _dist(mt_eng);
 	// spawn on upper line of lattice boundary
 	if (placement_pr < 0.25) {
-		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_y = _spawn_diam / 2;
+		_spawn_pos.first = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_spawn_pos.second = _spawn_diam / 2;
 	}
 	// spawn on lower line of lattice boundary
 	else if (placement_pr >= 0.25 && placement_pr < 0.5) {
-		_x = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
-		_y = -_spawn_diam / 2;
+		_spawn_pos.first = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_spawn_pos.second = -_spawn_diam / 2;
 	}
 	// spawn on right line of lattice boundary
 	else if (placement_pr >= 0.5 && placement_pr < 0.75) {
-		_x = _spawn_diam / 2;
-		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_spawn_pos.first = _spawn_diam / 2;
+		_spawn_pos.second = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
 	}
 	// spawn on left line of lattice boundary
 	else {
-		_x = -_spawn_diam / 2;
-		_y = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_spawn_pos.first = -_spawn_diam / 2;
+		_spawn_pos.second = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
 	}
 }
 

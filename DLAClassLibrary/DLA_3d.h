@@ -83,7 +83,7 @@ private:
 	std::priority_queue<triple<int, int, int>, std::vector<triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
 	std::queue<triple<int, int, int>> batch_queue;
 
-	void spawn_particle(int& _x, int& _y, int& _z, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
+	void spawn_particle(triple<int,int,int>& _current, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
 
 	bool aggregate_collision(const triple<int,int,int>& _current, const triple<int,int,int>& _previous, const double& _sticky_pr, size_t& count);
 
