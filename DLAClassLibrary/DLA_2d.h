@@ -108,8 +108,16 @@ private:
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
 	std::queue<std::pair<int, int>> batch_queue;
 
+	/**
+	 * @brief Spawns a particle at a random position on the lattice boundary.
+	 *
+	 * @param[out] _x Position in x
+	 * @param[out] _y Position in y
+	 * @param[out] _spawn_diam Diameter of spawn zone
+	 * @param[in] _dist Uniform real distribution for probability generation
+	 */
 	void spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
 
-	bool aggregate_collision(const int& _x, const int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count);
+	bool aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, size_t& _count);
 
 };

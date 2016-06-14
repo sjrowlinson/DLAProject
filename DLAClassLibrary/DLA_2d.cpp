@@ -102,7 +102,7 @@ void DLA_2d::generate(size_t _n) {
 		// check for collision with aggregate structure and add particle to 
 		// the aggregate (both to map and pq) if true, set flag ready for
 		// next particle spawn
-		if (aggregate_collision(x, y, prev_x, prev_y, stick_pr, count)) {
+		if (aggregate_collision(std::make_pair(x, y), std::make_pair(prev_x, prev_y), stick_pr, count)) {
 			has_next_spawned = false;
 		}
 		// record no. of particles in aggregate and corresponding minimal
@@ -181,16 +181,15 @@ void DLA_2d::spawn_particle(int& _x, int& _y, int& _spawn_diam, std::uniform_rea
 	}
 }
 
-bool DLA_2d::aggregate_collision(const int& _x, const int& _y, const int& _prev_x, const int& _prev_y, const double& _sticky_pr, size_t& _count) {
+bool DLA_2d::aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, size_t& _count) {
 	// find the given point in the aggregrete, yields aggregrate_map.end() if not in container
-	auto search = aggregate_map.find(std::make_pair(_x, _y));
+	auto search = aggregate_map.find(_current);
 	// co-ordinates _x, _y occur in the aggregate, collision occurred
 	if (search != aggregate_map.end() && _sticky_pr <= coeff_stick) {
-		std::pair<int, int> added_particle = std::make_pair(_prev_x, _prev_y);
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
-		aggregate_map.insert(std::make_pair(added_particle, ++_count));
-		aggregate_pq.push(added_particle);
-		batch_queue.push(added_particle);
+		aggregate_map.insert(std::make_pair(_previous, ++_count));
+		aggregate_pq.push(_previous);
+		batch_queue.push(_previous);
 		return true;
 	}
 	return false;
