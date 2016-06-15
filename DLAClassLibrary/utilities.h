@@ -20,7 +20,7 @@ template<typename _Ty1, typename _Ty2, typename _Ty3> struct triple {
 	_Ty3 third;
 	
 	/**
-	 * @brief Default constructor
+	 * @brief Default constructor, fields are initialised with default values.
 	 */
 	template<class _Uty1 = _Ty1,
 		class _Uty2 = _Ty2,
@@ -31,7 +31,7 @@ template<typename _Ty1, typename _Ty2, typename _Ty3> struct triple {
 		constexpr triple() : first(), second(), third() {}
 
 	/**
-	 * @brief Construct a triple object from specified values
+	 * @brief Construct a triple object from specified values using copy construction.
 	 */
 	template<class _Uty1 = _Ty1,
 		class _Uty2 = _Ty2,
@@ -40,6 +40,17 @@ template<typename _Ty1, typename _Ty2, typename _Ty3> struct triple {
 		&& std::is_copy_constructible<_Uty2>::value 
 		&& std::is_copy_constructible<_Uty3>::value> >
 	triple(const _Ty1& _first, const _Ty2& _second, const _Ty3& _third) : first(_first), second(_second), third(_third) {}
+
+	/**
+	 * @brief Construct a triple object from specified values using move construction.
+	 */
+	template<class _Uty1 = _Ty1,
+		class _Uty2 = _Ty2,
+		class _Uty3 = _Ty3,
+		class = std::enable_if_t<std::is_move_constructible<_Uty1>::value
+		&& std::is_move_constructible<_Uty2>::value
+		&& std::is_move_constructible<_Uty3>::value> > 
+		triple(_Ty1&& _first, _Ty2&& _second, _Ty3&& _third) : first(std::move(_first)), second(std::move(_second)), third(std::move(_third)) {}
 };
 
 /**
