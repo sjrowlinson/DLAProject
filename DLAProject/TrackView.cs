@@ -29,6 +29,11 @@ namespace DLAProject {
         private double scale;
         // change to scale because of drag
         private double scale_delta;
+        private Vector3D translate;
+        // change to translation because of drag
+        private Vector3D translate_delta;
+        private bool isCentred;
+        private Vector3D centre;
         private Viewport3D viewport;
 
         /// <summary>
@@ -36,7 +41,7 @@ namespace DLAProject {
         /// </summary>
         public TrackView() {
             InitialiseOrReset();
-            UpdateViewport(rotation, scale);
+            UpdateViewport(rotation, scale, translate);
         }
 
         /// <summary>
@@ -62,7 +67,7 @@ namespace DLAProject {
         /// </summary>
         public void ResetView() {
             InitialiseOrReset();
-            UpdateViewport(rotation, scale);
+            UpdateViewport(rotation, scale, translate);
         }
 
         /// <summary>
@@ -73,13 +78,19 @@ namespace DLAProject {
             rotation_delta = Quaternion.Identity;
             scale = 1.0;
             scale_delta = 1.0;
+            translate.X = 0;
+            translate.Y = 0;
+            translate.Z = 0;
+            translate_delta.X = 0;
+            translate_delta.Y = 0;
+            translate_delta.Z = 0;
         }
 
         /// <summary>
         /// Updates the viewport of the TrackView using a given Quaternion argument for rotation.
         /// </summary>
         /// <param name="_qtn">Quaternion instance defining the rotation properties.</param>
-        private void UpdateViewport(Quaternion _qtn, double _scale) {
+        private void UpdateViewport(Quaternion _qtn, double _scale, Vector3D _translate) {
             // check for null viewport
             if (viewport != null) {
                 // get the ModelVisual3D instance of the viewport
@@ -89,10 +100,16 @@ namespace DLAProject {
                 // get the RotateTransform3D associated with t3dg
                 RotateTransform3D rotate_transform = t3dg.Children[0] as RotateTransform3D;
                 rotate_transform.Rotation = new AxisAngleRotation3D(_qtn.Axis, _qtn.Angle);
+                // get ScaleTransform3D associated with t3dg
                 ScaleTransform3D scale_transform = t3dg.Children[1] as ScaleTransform3D;
                 scale_transform.ScaleX = _scale;
                 scale_transform.ScaleY = _scale;
                 scale_transform.ScaleZ = _scale;
+                // get TranslateTransform3D associated with t3dg
+                TranslateTransform3D translate_transform = t3dg.Children[2] as TranslateTransform3D;
+                translate_transform.OffsetX = _translate.X;
+                translate_transform.OffsetY = _translate.Y;
+                translate_transform.OffsetZ = _translate.Z;
             }
         }
 
@@ -102,8 +119,8 @@ namespace DLAProject {
         /// <param name="_element"></param>
         public void Attach(FrameworkElement _element) {
             _element.MouseMove += MouseMoveHandler;
-            _element.MouseRightButtonDown += MouseDownHandler;
-            _element.MouseRightButtonUp += MouseUpHandler;
+            _element.MouseRightButtonDown += MouseRightDownHandler;
+            _element.MouseRightButtonUp += MouseRightUpHandler;
             _element.MouseWheel += MouseWheelHandler;
         }
 
@@ -113,8 +130,8 @@ namespace DLAProject {
         /// <param name="_element"></param>
         public void Detach(FrameworkElement _element) {
             _element.MouseMove -= MouseMoveHandler;
-            _element.MouseRightButtonDown -= MouseDownHandler;
-            _element.MouseRightButtonUp -= MouseUpHandler;
+            _element.MouseRightButtonDown -= MouseRightDownHandler;
+            _element.MouseRightButtonUp -= MouseRightUpHandler;
             _element.MouseWheel -= MouseWheelHandler;
         }
 
@@ -123,15 +140,23 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MouseDownHandler(object sender, MouseButtonEventArgs e) {
+        private void MouseRightDownHandler(object sender, MouseButtonEventArgs e) {
             if (!Enabled)
                 return;
             e.Handled = true;
             // get position of initial drag point relative to sender element
             var elem = (UIElement)sender;
             drag_point = e.MouseDevice.GetPosition(elem);
+            // check for centred view
+            if (!isCentred) {
+                // get the camera associated with viewport
+                OrthographicCamera camera = (OrthographicCamera)viewport.Camera;
+                centre = camera.LookDirection;
+                isCentred = true;
+            }
             isScaling = (e.MiddleButton == MouseButtonState.Pressed);
-            isRotating = true;
+            // if is translating, set rotation flag to false
+            isRotating = Keyboard.IsKeyDown(Key.T) == false;
             elem.CaptureMouse();
         }
 
@@ -140,7 +165,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MouseUpHandler(object sender, MouseButtonEventArgs e) {
+        private void MouseRightUpHandler(object sender, MouseButtonEventArgs e) {
             if (!Enabled)
                 return;
             e.Handled = true;
@@ -148,8 +173,11 @@ namespace DLAProject {
             // from correct position
             if (isRotating)
                 rotation *= rotation_delta;
+            // set up translate properties
             else {
-
+                translate += translate_delta;
+                translate_delta.X = 0;
+                translate_delta.Y = 0;
             }
             var elem = (UIElement)sender;
             elem.ReleaseMouseCapture();
@@ -193,11 +221,15 @@ namespace DLAProject {
                     // multiply qtn by rotation_delta and assign result to qtn
                     qtn *= rotation_delta;
                 }
+                // else translate the view
                 else {
-                    //TODO: figure out code for !isRotating mouse movement handling
+                    delta /= 20;
+                    translate_delta.X = -delta.X;
+                    translate_delta.Y = delta.Y;
                 }
+                Vector3D tr = translate + translate_delta;
                 // update the viewport
-                UpdateViewport(qtn, scale*scale_delta);
+                UpdateViewport(qtn, scale*scale_delta, tr);
             }
         }
 
@@ -211,7 +243,7 @@ namespace DLAProject {
             // set scale_delta to Delta of mouse wheel over 1000 for smaller changes
             scale_delta += e.Delta / (double)1000;
             // update the viewport to new zoom level
-            UpdateViewport(rotation, scale * scale_delta);
+            UpdateViewport(rotation, scale * scale_delta, translate);
         }
 
     }
