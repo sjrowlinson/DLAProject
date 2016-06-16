@@ -1,7 +1,6 @@
 #include "Stdafx.h"
 #include "DLAContainer.h"
 
-
 DLAContainer::DLAContainer(const double& _coeff_stick) : lattice_type(LatticeType::SQUARE), attractor_type(AttractorType::POINT) {
 	set_coeff_stick(_coeff_stick);
 	std::random_device rd;
@@ -138,7 +137,7 @@ void DLAContainer::update_particle_position(std::pair<int,int>& _current, const 
 			--_current.second;
 		}
 		break;
-		// TODO: add extra cases for differemt LatticeType constants
+		// TODO: add extra cases for different LatticeType constants
 	}
 }
 

@@ -5,9 +5,9 @@
 #include <vector>
 
 /**
- * @struct pair_hash
+ * \struct pair_hash
  *
- * @brief Implements a hash function for a std::pair of generic types.
+ * \brief Implements a hash function object for a std::pair of generic types.
  */
 struct pair_hash {
 	template<typename _Ty1, typename _Ty2> std::size_t operator()(const std::pair<_Ty1, _Ty2>& _p) const {
@@ -16,9 +16,9 @@ struct pair_hash {
 };
 
 /**
- * @struct distance_comparator
+ * \struct distance_comparator
  *
- * @brief Implements a comparator function object for std::pair<int,int> objects which can be used to
+ * \brief Implements a comparator function object for std::pair<int,int> objects which can be used to
  *        to choose the instance of a std::pair which has a greater distance from the origin.
  */
 struct distance_comparator {
@@ -28,45 +28,47 @@ struct distance_comparator {
 };
 
 /**
- * @class DLA_2d
+ * \class DLA_2d
  *
- * @brief Defines a diffusion limited aggregate on a two-dimensional lattice.
+ * \brief Defines a diffusion limited aggregate on a two-dimensional lattice.
  *
- * @author Samuel Rowlinson
- * @date May, 2016
+ * \author Samuel Rowlinson
+ * \date May, 2016
  */
 class DLA_2d : public DLAContainer {
 
 public:
 
 	/**
-	 * @brief Default constructor, initialises empty 2d aggregate with given stickiness coefficient.
+	 * \brief Default constructor, initialises empty 2d aggregate with given stickiness coefficient.
 	 *
-	 * @param _coeff_stick [= 1.0] Coefficient of stickiness
-	 * @throw Throws std::invalid_argument exception if _coeff_stick not in (0,1]
+	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
+	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
 	 */
 	DLA_2d(const double& _coeff_stick = 1.0);
 
 	/**
-	 * @brief Initialises empty 2d aggregate with specified lattice and attractor types.
+	 * \brief Initialises empty 2d aggregate with specified lattice and attractor types.
 	 *
-	 * @param _lattice_type Type of lattice for construction 
-	 * @param _attractor_type Type of attractor of initial aggregate
-	 * @param _coeff_stick [= 1.0] Coefficient of stickiness
+	 * \param _lattice_type Type of lattice for construction.
+	 * \param _attractor_type Type of attractor of initial aggregate.
+	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
 	 */
 	DLA_2d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
 
 	/**
-	 * @brief Copy constructor
+	 * \brief Copy constructor, copies contents of parameterised DLA_2d to this.
 	 *
-	 * @param _other const reference to DLA_2d instance
+	 * \param _other const reference to DLA_2d instance.
 	 */
 	DLA_2d(const DLA_2d& _other);
 
 	/**
-	 * @brief Move constructor
+	 * \brief Move constructor, uses move-semantics for constructing a DLA_2d.
+	 *        from an rvalue reference of a DLA_2d - leaving that container.
+ 	 *        in a valid but unspecified state.
 	 *
-	 * @param _other rvalue reference to DLA_2d instance
+	 * \param _other rvalue reference to DLA_2d instance
 	 */
 	DLA_2d(DLA_2d&& _other);
 
@@ -75,23 +77,20 @@ public:
 	size_t size() const noexcept override;
 
 	/**
-	 * @brief Gets a non-const reference to the batch_queue of the aggregate, used
-	 *        in C++/CLI ManagedDLA2DContainer::ProcessBatchQueue for GUI updates
+	 * \brief Gets a non-const reference to the batch_queue of the aggregate, used
+	 *        in C++/CLI ManagedDLA2DContainer::ProcessBatchQueue for GUI updating.
 	 *
-	 * @return reference to batch_queue of 2d aggregate
+	 * \return reference to batch_queue of 2d aggregate.
 	 */
 	std::queue<std::pair<int,int>>& batch_queue_handle() noexcept;
 
-	/**
-	 * @brief Clears the aggregrate structure
-	 */
 	void clear() override;
 
 	/**
-	 * @brief Generates a 2D diffusion limited aggregate consisting of the parameterised
-	 *        number of particles using a stickiness coefficient given.
+	 * \brief Generates a 2D diffusion limited aggregate consisting of the parameterised
+	 *        number of particles.
 	 *
-	 * @param _n Number of particles to generate in the 2D DLA
+	 * \param _n Number of particles to generate in the 2D DLA.
 	 */
 	void generate(size_t _n) override;
 
@@ -109,15 +108,23 @@ private:
 	std::queue<std::pair<int, int>> batch_queue;
 
 	/**
-	 * @brief Spawns a particle at a random position on the lattice boundary.
+	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *
-	 * @param[out] _x Position in x
-	 * @param[out] _y Position in y
-	 * @param[out] _spawn_diam Diameter of spawn zone
-	 * @param[in] _dist Uniform real distribution for probability generation
+	 * \param[out] _spawn_pos Position of spawn.
+	 * \param[out] _spawn_diam Diameter of spawn zone.
+	 * \param[in] _dist Uniform real distribution for probability generation.
 	 */
 	void spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
 
+	/**
+	 * \brief Checks for collision of random-walking particle with aggregate structure
+	 *        and adds this particles' previous position to aggregate if collision occurred.
+	 *
+	 * \param _current Current co-ordinates of particle.
+	 * \param _previous Previous co-ordinates of particle.
+	 * \param _sticky_pr |coeff_stick - _sticky_pr| = |1 - probability of sticking to aggregate|.
+	 * \param _count Current number of particles generated in aggregate.
+	 */
 	bool aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, size_t& _count);
 
 };

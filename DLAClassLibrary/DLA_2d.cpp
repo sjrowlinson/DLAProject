@@ -124,13 +124,11 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		for (auto it = aggregate_map.cbegin(); it != aggregate_map.cend(); ++it) {
 			agg_vec.push_back(std::make_pair(it->second, it->first));
 		}
-
 		// lambda for sorting aggregate via order in which particles were generated
 		auto sort_agg = [](const std::pair<size_t, std::pair<int, int>>& _lhs, const std::pair<size_t, std::pair<int, int>>& _rhs) {return _lhs.first < _rhs.first; };
-
 		// sort agg_vec using the lambda sort_agg
 		std::sort(agg_vec.begin(), agg_vec.end(), sort_agg);
-
+        // write sorted data to stream
 		for (auto it = agg_vec.cbegin(); it < agg_vec.cend(); ++it) {
 			_os << it->second << "\n";
 		}
