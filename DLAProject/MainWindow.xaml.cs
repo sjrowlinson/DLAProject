@@ -311,11 +311,9 @@ namespace DLAProject {
             SetUpAggregateProperties();
             // pre-compute colour_list for each particle in aggregate
             ComputeColorList((uint)particles_slider.Value);
-
             for (int i = 0; i < (int)particles_slider.Value; ++i) {
                 WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
             }
-
             // start asynchronous task calling GenerateAggregate method
             Task.Factory.StartNew(() => GenerateAggregate());
         }
@@ -363,6 +361,8 @@ namespace DLAProject {
             }
             // clear aggregate from user interface
             //aggregate_manager.ClearAggregate();
+            WorldModels.Children.Clear();
+            WorldModels.Children.Add(new AmbientLight(Colors.White));
             comp_manager.Clear();
             current_particles = 0;
             DynamicParticleLabel.Content = "Particles: " + current_particles;

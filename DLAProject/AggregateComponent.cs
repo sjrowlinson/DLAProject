@@ -12,10 +12,10 @@ using System.Windows.Shapes;
 namespace DLAProject {
 
     public class AggregateComponent {
-        private readonly GeometryModel3D component_model;
-        private readonly Point3DCollection particle_positions;
-        private readonly Int32Collection triangle_indices;
-        private readonly PointCollection tex_coords;
+        private GeometryModel3D component_model;
+        private Point3DCollection particle_positions;
+        private Int32Collection triangle_indices;
+        private PointCollection tex_coords;
         private AggregateParticle p;
         private readonly int id;
 
@@ -33,10 +33,12 @@ namespace DLAProject {
             ellipse.Fill = rb;
             ellipse.Measure(new Size(32.0, 32.0));
             ellipse.Arrange(new Rect(0.0, 0.0, 32.0, 32.0));
-            RenderTargetBitmap bm = new RenderTargetBitmap(32, 32, 96.0, 96.0, PixelFormats.Pbgra32);
-            bm.Render(ellipse);
-            bm.Freeze();
-            ImageBrush ib = new ImageBrush(bm);
+            //RenderTargetBitmap bm = new RenderTargetBitmap(32, 32, 96.0, 96.0, PixelFormats.Pbgra32);
+            //bm.Render(ellipse);
+            //bm.Freeze();
+            //ImageBrush ib = new ImageBrush(bm);
+            ellipse.CacheMode = new BitmapCache();
+            BitmapCacheBrush ib = new BitmapCacheBrush(ellipse);
             DiffuseMaterial dm = new DiffuseMaterial(ib);
             component_model.Material = dm;
             particle_positions = new Point3DCollection();

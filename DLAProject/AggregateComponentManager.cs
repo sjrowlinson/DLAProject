@@ -19,25 +19,32 @@ namespace DLAProject {
         }
 
         public Model3D CreateAggregateComponent(Color _color) {
+            // create an AggregateComponent with given color and id
             AggregateComponent agg_comp = new AggregateComponent(_color, ++id_counter);
             agg_comp_list.Add(agg_comp);
             return agg_comp.ComponentModel;
         }
 
         public void AddParticleToComponent(Point3D _pos, double _size) {
+            // spawn the particle corresponding to next index of agg_comp_list
             agg_comp_list[++current_counter].SpawnParticle(_pos, _size);
         }
 
         public void Update() {
+            // update all components
             foreach (var p in agg_comp_list) {
                 p.Update();
             }
         }
 
         public void Clear() {
+            id_counter = 0;
+            current_counter = -1;
+            // clear all components
             foreach (var p in agg_comp_list) {
                 p.Clear();
             }
+            agg_comp_list.Clear();
         }
     }
 }
