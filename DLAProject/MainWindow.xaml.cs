@@ -51,6 +51,8 @@ namespace DLAProject {
         private List<Color> colour_list;
         private LatticeDimension lattice_dimension;
 
+        private readonly AggregateComponentManager comp_manager;
+
         public MainWindow() {
             InitializeComponent();
             // initalise aggregate containers
@@ -62,7 +64,9 @@ namespace DLAProject {
             current_particles = 0;
             colour_list = new List<Color>();
             lattice_dimension = LatticeDimension._2D;
-            WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
+            //WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
+
+            comp_manager = new AggregateComponentManager();
         }
 
         /// <summary>
@@ -95,7 +99,7 @@ namespace DLAProject {
             switch (lattice_dimension) {
                 case LatticeDimension._2D:
                     if (dla_2d.Size() < _particle_slider_val) {
-                        timer.Elapsed += Aggregate2DUpdateOnTimedEvent;
+                        timer.Elapsed += Aggregate2DUpdateOnTimedEventTest;
                         timer.AutoReset = true;
                         timer.Enabled = true;
                     }
@@ -119,6 +123,22 @@ namespace DLAProject {
                     break;
             }
             
+        }
+
+        private void Aggregate2DUpdateOnTimedEventTest(object source, ElapsedEventArgs e) {
+            lock(locker) {
+                BlockingCollection<KeyValuePair<int, int>> blocking_queue = dla_2d.ProcessBatchQueue();
+                while (blocking_queue.Count != 0) {
+                    KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
+                    Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0.0);
+                    comp_manager.AddParticleToComponent(pos, 1.0);
+                    Dispatcher.Invoke(() => {
+                        comp_manager.Update();
+                        DynamicParticleLabel.Content = "Particles: " + current_particles;
+                    });
+                    ++current_particles;
+                }
+            }
         }
 
         /// <summary>
@@ -291,6 +311,11 @@ namespace DLAProject {
             SetUpAggregateProperties();
             // pre-compute colour_list for each particle in aggregate
             ComputeColorList((uint)particles_slider.Value);
+
+            for (int i = 0; i < (int)particles_slider.Value; ++i) {
+                WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
+            }
+
             // start asynchronous task calling GenerateAggregate method
             Task.Factory.StartNew(() => GenerateAggregate());
         }
@@ -337,7 +362,8 @@ namespace DLAProject {
                 }
             }
             // clear aggregate from user interface
-            aggregate_manager.ClearAggregate();
+            //aggregate_manager.ClearAggregate();
+            comp_manager.Clear();
             current_particles = 0;
             DynamicParticleLabel.Content = "Particles: " + current_particles;
             colour_list.Clear();
