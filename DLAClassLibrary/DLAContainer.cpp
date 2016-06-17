@@ -81,6 +81,7 @@ void DLAContainer::clear() {
 }
 
 std::ostream& DLAContainer::write_bounding_radii_data(std::ostream& _os) const {
+	using utl::operator<<;
 	// write bounding_radii_vec to _os using overloaded operator<< for std::vector
 	_os << bounding_radii_vec;
 	return _os;
@@ -141,7 +142,7 @@ void DLAContainer::update_particle_position(std::pair<int,int>& _current, const 
 	}
 }
 
-void DLAContainer::update_particle_position(triple<int,int,int>& _current, const double& _movement_choice) const noexcept {
+void DLAContainer::update_particle_position(utl::triple<int,int,int>& _current, const double& _movement_choice) const noexcept {
 	// perform different translations dependent upon type of lattice
 	switch (lattice_type) {
 	case LatticeType::SQUARE:
@@ -231,7 +232,7 @@ bool DLAContainer::lattice_boundary_collision(std::pair<int,int>& _current, cons
 	return false;
 }
 
-bool DLAContainer::lattice_boundary_collision(triple<int,int,int>& _current, const triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept {
+bool DLAContainer::lattice_boundary_collision(utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept {
 	// small offset for correction on boundaries
 	const int epsilon = 2;
 	// choose correct boundary collision detection based on type of attractor

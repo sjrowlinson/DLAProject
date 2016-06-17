@@ -10,7 +10,7 @@
  * \brief Implements a hash function object for a triple of generic types.
  */
 struct triple_hash {
-	template<typename _Ty1, typename _Ty2, typename _Ty3> std::size_t operator()(const triple<_Ty1, _Ty2, _Ty3>& _t) const {
+	template<typename _Ty1, typename _Ty2, typename _Ty3> std::size_t operator()(const utl::triple<_Ty1, _Ty2, _Ty3>& _t) const {
 		return 51 + std::hash<_Ty1>()(_t.first) * 51 + std::hash<_Ty2>()(_t.second) + std::hash<_Ty3>()(_t.third);
 	}
 };
@@ -22,7 +22,7 @@ struct triple_hash {
  *        to choose the instance of a triple which has a greater distance from the origin.
  */
 struct distance_comparator_3d {
-	bool operator()(const triple<int, int, int>& _lhs, const triple<int, int, int>& _rhs) {
+	bool operator()(const utl::triple<int, int, int>& _lhs, const utl::triple<int, int, int>& _rhs) {
 		return (_lhs.first*_lhs.first + _lhs.second*_lhs.second + _lhs.third*_lhs.third) <
 			(_rhs.first*_rhs.first + _rhs.second*_rhs.second + _rhs.third*_rhs.third);
 	}
@@ -72,7 +72,7 @@ public:
 	 *
 	 * \return reference to batch_queue of 2d aggregate.
 	 */
-	std::queue<triple<int, int, int>>& batch_queue_handle() noexcept;
+	std::queue<utl::triple<int, int, int>>& batch_queue_handle() noexcept;
 
 	void clear() override;
 
@@ -85,11 +85,11 @@ public:
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
-	std::unordered_map<triple<int, int, int>, size_t, triple_hash> aggregate_map;
+	std::unordered_map<utl::triple<int, int, int>, size_t, triple_hash> aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
-	std::priority_queue<triple<int, int, int>, std::vector<triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
-	std::queue<triple<int, int, int>> batch_queue;
+	std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
+	std::queue<utl::triple<int, int, int>> batch_queue;
 
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
@@ -98,7 +98,7 @@ private:
 	 * \param[out] _spawn_diam Diameter of spawn zone.
 	 * \param[in] _dist Uniform real distribution for probability generation.
 	 */
-	void spawn_particle(triple<int,int,int>& _current, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
+	void spawn_particle(utl::triple<int,int,int>& _current, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
 
 	/**
 	 * \brief Checks for collision of random-walking particle with aggregate structure
@@ -109,6 +109,6 @@ private:
 	 * \param _sticky_pr |coeff_stick - _sticky_pr| = |1 - probability of sticking to aggregate|.
 	 * \param _count Current number of particles generated in aggregate.
 	 */
-	bool aggregate_collision(const triple<int,int,int>& _current, const triple<int,int,int>& _previous, const double& _sticky_pr, size_t& count);
+	bool aggregate_collision(const utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const double& _sticky_pr, size_t& count);
 
 };

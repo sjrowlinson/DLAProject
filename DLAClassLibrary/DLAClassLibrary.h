@@ -310,7 +310,7 @@ namespace DLAClassLibrary {
 			// stores particles in a BlockingQueue configuration
 			BlockingCollection<Tuple<int,int,int>^>^ blocking_queue = gcnew BlockingCollection<Tuple<int,int,int>^>();
 			// get reference to batch_queue of DLA_2d
-			std::queue<triple<int,int,int>>& batch_queue_ref = native_DLA_container_ptr->batch_queue_handle();
+			std::queue<utl::triple<int,int,int>>& batch_queue_ref = native_DLA_container_ptr->batch_queue_handle();
 			// loop over batch_queue transferring particles to blocking_queue
 			while (!batch_queue_ref.empty()) {
 				blocking_queue->Add(gcnew Tuple<int,int,int>(batch_queue_ref.front().first, batch_queue_ref.front().second, batch_queue_ref.front().third));

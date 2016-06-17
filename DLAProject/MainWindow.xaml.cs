@@ -111,7 +111,7 @@ namespace DLAProject {
                     break;
                 case LatticeDimension._3D:
                     if (dla_3d.Size() < _particle_slider_val) {
-                        timer.Elapsed += Aggregate3DUpdateOnTimedEvent;
+                        timer.Elapsed += Aggregate3DUpdateOnTimedEventTest;
                         timer.AutoReset = true;
                         timer.Enabled = true;
                     }
@@ -131,6 +131,22 @@ namespace DLAProject {
                 while (blocking_queue.Count != 0) {
                     KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
                     Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0.0);
+                    comp_manager.AddParticleToComponent(pos, 1.0);
+                    Dispatcher.Invoke(() => {
+                        comp_manager.Update();
+                        DynamicParticleLabel.Content = "Particles: " + current_particles;
+                    });
+                    ++current_particles;
+                }
+            }
+        }
+
+        private void Aggregate3DUpdateOnTimedEventTest(object source, ElapsedEventArgs e) {
+            lock(locker) {
+                BlockingCollection<Tuple<int, int, int>> blocking_queue = dla_3d.ProcessBatchQueue();
+                while (blocking_queue.Count != 0) {
+                    Tuple<int, int, int> agg_tuple = blocking_queue.Take();
+                    Point3D pos = new Point3D(agg_tuple.Item1, agg_tuple.Item2, agg_tuple.Item3);
                     comp_manager.AddParticleToComponent(pos, 1.0);
                     Dispatcher.Invoke(() => {
                         comp_manager.Update();

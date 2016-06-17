@@ -200,7 +200,7 @@ protected:
 	 * \param _movement_choice Double in [0,1] for direction choice.
 	 */
 	void update_particle_position(std::pair<int,int>& _current, const double& _movement_choice) const noexcept;
-	void update_particle_position(triple<int,int,int>& _current, const double& _movement_choice) const noexcept;
+	void update_particle_position(utl::triple<int,int,int>& _current, const double& _movement_choice) const noexcept;
 
 	/**
 	 * \brief Checks for collision with boundary of lattice and reflects.
@@ -210,6 +210,6 @@ protected:
 	 * \param _spawn_diam Current diameter of spawning box.
 	 */
 	bool lattice_boundary_collision(std::pair<int,int>& _current, const std::pair<int,int>& _previous, const int& _spawn_diam) const noexcept;
-	bool lattice_boundary_collision(triple<int,int,int>& _current, const triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept;
+	bool lattice_boundary_collision(utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept;
 
 };

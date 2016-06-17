@@ -116,6 +116,7 @@ double DLA_2d::estimate_fractal_dimension() const {
 }
 
 std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
+	using utl::operator<<;
 	// sort by order particles were added to the aggregate
 	if (_sort_by_map_value) {
 		// std::vector container to store aggregate_map values
