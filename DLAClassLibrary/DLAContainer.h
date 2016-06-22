@@ -21,50 +21,50 @@ enum class AttractorType {
 };
 
 /**
-* \class DLAContainer
-*
-* \brief Abstract class containing data about a diffusion limited aggregate with virtual methods for generating an aggregate, finding
-*        its properties and writing to a stream. This class is overridden by DLA_2d and DLA_3d for generating 2D and 3D aggregates.
-*
-* \author Samuel Rowlinson
-* \date April, 2016
-*/
+ * \class DLAContainer
+ *
+ * \brief Abstract class containing data about a diffusion limited aggregate with virtual methods for generating an aggregate, finding
+ *        its properties and writing to a stream. This class is overridden by DLA_2d and DLA_3d for generating 2D and 3D aggregates.
+ *
+ * \author Samuel Rowlinson
+ * \date April, 2016
+ */
 class DLAContainer {
 
 public:
 
 	/**
-	* \brief Default constructor, initialises empty aggregate with default lattice type
-	*        of LatticeType::SQUARE and attractor type of AttractorType::POINT.
-	*
-	* \param _coeff_stick [= 1.0] Coefficient of stickiness.
-	* \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
-	*/
+	 * \brief Default constructor, initialises empty aggregate with default lattice type
+	 *        of LatticeType::SQUARE and attractor type of AttractorType::POINT.
+	 *
+	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
+	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
+	 */
 	DLAContainer(const double& _coeff_stick = 1.0);
 
 	/**
-	* \brief Constructor with parameters for type of lattice and type of attractor.
-	*
-	* \param _lattice_type Type of lattice for DLA construction.
-	* \param _attractor_type Type of attractor for DLA construction.
-	* \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
-	*/
+	 * \brief Constructor with parameters for type of lattice and type of attractor.
+	 *
+	 * \param _lattice_type Type of lattice for DLA construction.
+	 * \param _attractor_type Type of attractor for DLA construction.
+	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
+	 */
 	DLAContainer(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
 
 	/**
-	* \brief Copy constructor, copies contents of parameterised DLAContainer to this.
-	*
-	* \param _other const reference to DLAContainer instance.
-	*/
+	 * \brief Copy constructor, copies contents of parameterised DLAContainer to this.
+	 *
+	 * \param _other const reference to DLAContainer instance.
+	 */
 	DLAContainer(const DLAContainer& _other);
 
 	/**
-	* \brief Move constructor, uses move-semantics for constructing a DLAContainer 
-	*        from an rvalue reference of a DLAContainer - leaving that container
-	*        in a valid but unspecified state.
-	*
-	* \param _other rvalue reference to DLAContainer instance.
-	*/
+	 * \brief Move constructor, uses move-semantics for constructing a DLAContainer 
+	 *        from an rvalue reference of a DLAContainer - leaving that container
+	 *        in a valid but unspecified state.
+	 *
+ 	 * \param _other rvalue reference to DLAContainer instance.
+	 */
 	DLAContainer(DLAContainer&& _other);
 
 	virtual ~DLAContainer();
@@ -84,11 +84,11 @@ public:
 	double get_coeff_stick() const noexcept;
 
 	/**
-	* \brief Sets the coefficient of stickiness of the aggregrate.
-	*
-	* \param _coeff_stick Coefficient of stickiness to set.
-	* \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
-	*/
+	 * \brief Sets the coefficient of stickiness of the aggregrate.
+	 *
+	 * \param _coeff_stick Coefficient of stickiness to set.
+	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
+	 */
 	void set_coeff_stick(const double& _coeff_stick);
 
 	/**
@@ -145,43 +145,43 @@ public:
 	virtual void generate(size_t n) = 0;
 
 	/**
-	* \brief Computes an estimate of the fractal dimension for the aggregrate.
-	*
-	* \return Estimate of aggregrate fractal dimension.
-	*/
+	 * \brief Computes an estimate of the fractal dimension for the aggregrate.
+	 *
+	 * \return Estimate of aggregrate fractal dimension.
+	 */
 	virtual double estimate_fractal_dimension() const = 0;
 
 	/**
-	* \brief Write aggregate to an output stream std::ostream, defaults to "write-as-is" where
-	*        the aggregate data is written without any sorting.
-	*
-	* Secondary default bool argument allows for sorting of the aggregate by the order in which
-	* particles were added to the aggregate before writing these data to the output stream.
-	*
-	* \param _os Instance of std::ostream for writing to.
-	* \param _sort_by_map_value [= false] Flag to signal sorting of data before writing.
-	*/
+	 * \brief Write aggregate to an output stream std::ostream, defaults to "write-as-is" where
+	 *        the aggregate data is written without any sorting.
+	 *
+	 * Secondary default bool argument allows for sorting of the aggregate by the order in which
+	 * particles were added to the aggregate before writing these data to the output stream.
+	 *
+	 * \param _os Instance of std::ostream for writing to.
+	 * \param _sort_by_map_value [= false] Flag to signal sorting of data before writing.
+	 */
 	virtual std::ostream& write(std::ostream& _os, bool _sort_by_map_value = false) const = 0;
 
 	/**
-	* \brief Writes the bounding radii for a predetermined number of intervals of particles
-	*        in the aggregate to a std::ostream instance.
-	*
-	* Data are written in the following format:
-	*
-	\begin{verbatim}
-	N1	R1
-	N2	R2
-	...	...
-	\end{verbatim}
-	*
-	* where N1 is the number of particles in the aggregate and R1 is the corresponding minimal bounding
-	* radius which contains this aggregate state (written in \t delimited columns). The number of data
-	* points is default set to 50, but can be altered with the method set_bound_radii_npoints.
-	*
-	* \param _os Instance of std::ostream for writing to.
-	* \return modified std::ostream instance _os containing bounding_radii_vec data.
-	*/
+	 * \brief Writes the bounding radii for a predetermined number of intervals of particles
+	 *        in the aggregate to a std::ostream instance.
+	 *
+	 * Data are written in the following format:
+	 *
+	 \begin{verbatim}
+	 N1	R1
+	 N2	R2
+	 ...	...
+	 \end{verbatim}
+	 *
+	 * where N1 is the number of particles in the aggregate and R1 is the corresponding minimal bounding
+	 * radius which contains this aggregate state (written in \t delimited columns). The number of data
+	 * points is default set to 50, but can be altered with the method set_bound_radii_npoints.
+	 *
+	 * \param _os Instance of std::ostream for writing to.
+	 * \return modified std::ostream instance _os containing bounding_radii_vec data.
+	 */
 	std::ostream& write_bounding_radii_data(std::ostream& _os) const;
 
 protected:

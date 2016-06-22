@@ -54,6 +54,9 @@ namespace DLAProject {
             particle_positions = new Point3DCollection();
             triangle_indices = new Int32Collection();
             tex_coords = new PointCollection();
+            ((MeshGeometry3D)particle_model.Geometry).Positions = particle_positions;
+            ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = triangle_indices;
+            ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = tex_coords;
         }
 
         public Model3D AggregateModel => particle_model;
@@ -95,10 +98,7 @@ namespace DLAProject {
             triangle_indices.Add(position_index + 2);
             // set particle_model Geometry model properties 
             rad_brush.GradientStops.Add(new GradientStop(p.colour, 0.0));
-            render_bitmap.Render(ellipse);
-            ((MeshGeometry3D)particle_model.Geometry).Positions = particle_positions;
-            ((MeshGeometry3D)particle_model.Geometry).TriangleIndices = triangle_indices;
-            ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates = tex_coords;
+            render_bitmap.Render(ellipse); 
         }
 
         /// <summary>

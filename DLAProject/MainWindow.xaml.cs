@@ -33,6 +33,7 @@ namespace DLAProject {
     /// </summary>
     public partial class MainWindow : Window {
 
+        #region Fields
         // lock object for multi-threading tasks
         private static readonly object locker = new object();
         // TODO: implement locks around aggregate generation methods for pause functionality
@@ -52,6 +53,7 @@ namespace DLAProject {
         private LatticeDimension lattice_dimension;
 
         private readonly AggregateComponentManager comp_manager;
+        #endregion
 
         public MainWindow() {
             InitializeComponent();
@@ -83,6 +85,29 @@ namespace DLAProject {
             // assign Viewport3D world to trackview viewport slave
             trackview.Viewport = World;
             trackview.Enabled = true;
+        }
+
+        /// <summary>
+        /// Fills the colour_list field with colour instances for 
+        /// each particle to be generated in an aggregate. This 
+        /// method uses a progressive temperature gradient from
+        /// cold to hot for each subsequent particle in the aggregate. 
+        /// </summary>
+        /// <param name="_total_particles">Total number of particles to be generated.</param>
+        private void ComputeColorList(uint _total_particles) {
+            for (uint i = 1; i <= _total_particles; ++i) {
+                Color colour = new Color();
+                colour.ScA = 1;
+                colour.ScR = (float)i / _total_particles;
+                colour.ScB = 1 - (float)i / _total_particles;
+                if (i < _total_particles / 2) {
+                    colour.ScG = 2*(float)i / _total_particles;
+                }
+                else {
+                    colour.ScG = 2*(1 - (float)i / _total_particles);
+                }
+                colour_list.Add(colour);
+            }
         }
 
         /// <summary>
@@ -212,29 +237,6 @@ namespace DLAProject {
         }
 
         /// <summary>
-        /// Fills the colour_list field with colour instances for 
-        /// each particle to be generated in an aggregate. This 
-        /// method uses a progressive temperature gradient from
-        /// cold to hot for each subsequent particle in the aggregate. 
-        /// </summary>
-        /// <param name="_total_particles">Total number of particles to be generated.</param>
-        private void ComputeColorList(uint _total_particles) {
-            for (uint i = 0; i <= _total_particles; ++i) {
-                Color colour = new Color();
-                colour.ScA = 1;
-                colour.ScR = (float)i / _total_particles;
-                colour.ScB = 1 - (float)i / _total_particles;
-                if (i < _total_particles/2) {
-                    colour.ScG = (float)i / _total_particles;
-                }
-                else {
-                    colour.ScG = 1 - (float)i / _total_particles;
-                }
-                colour_list.Add(colour);
-            }
-        }
-
-        /// <summary>
         /// Generates a Diffusion Limited Aggregate with properties initialised by
         /// current values of sliders and combo-boxes in the UI. Should be called
         /// in a separate thread.
@@ -313,6 +315,8 @@ namespace DLAProject {
                     break;
             }
         }
+
+        #region ButtonHandlers
 
         /// <summary>
         /// Handler for generate_button click event. Calls GenerateAggregate() in a separate task factory.
@@ -407,6 +411,8 @@ namespace DLAProject {
                     break;
             }
         }
+
+        #endregion
 
     }
 }

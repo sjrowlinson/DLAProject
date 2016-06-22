@@ -40,17 +40,17 @@ public:
 	 */
 	DLA_3d(const double& _coeff_stick = 1.0);
 	/**
-	 * @brief Initialises empty 3d aggregate with specified lattice and attractor types.
+	 * \brief Initialises empty 3d aggregate with specified lattice and attractor types.
 	 *
-	 * @param _lattice_type Type of lattice for construction.
-	 * @param _attractor_type Type of attractor of initial aggregate.
-	 * @param _coeff_stick [= 1.0] Coefficient of stickiness.
+	 * \param _lattice_type Type of lattice for construction.
+	 * \param _attractor_type Type of attractor of initial aggregate.
+	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
 	 */
 	DLA_3d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
 	/**
-	 * @brief Copy constructor, copies contents of parameterised DLA_3d to this.
+	 * \brief Copy constructor, copies contents of parameterised DLA_3d to this.
 	 *
-	 * @param _other const reference to DLA_3d instance.
+	 * \param _other const reference to DLA_3d instance.
 	 */
 	DLA_3d(const DLA_3d& _other);
 	/**
@@ -76,6 +76,12 @@ public:
 
 	void clear() override;
 
+	/**
+	 * \brief Generates a 3D diffusion limited aggregate consisting of the parameterised
+	 *        number of particles.
+	 *
+	 * \param _n Number of particles to generate in the 3D DLA.
+	 */
 	void generate(size_t _n) override;
 
 	double estimate_fractal_dimension() const override;
