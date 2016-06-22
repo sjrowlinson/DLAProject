@@ -64,7 +64,7 @@ AttractorType DLAContainer::get_attractor_type() const noexcept {
 	return attractor_type;
 }
 
-void DLAContainer::set_attractor_type(AttractorType _attractor_type) noexcept {
+void DLAContainer::set_attractor_type(AttractorType _attractor_type) {
 	attractor_type = _attractor_type;
 }
 

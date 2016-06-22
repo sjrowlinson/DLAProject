@@ -9,15 +9,27 @@
 #include <utility>
 #include <vector>
 
+/**
+ * \enum LatticeType
+ *
+ * \brief Defines several types of lattice applicable to both 2D and 3D DLA systems, for example
+ *        LatticeType::SQUARE will be interpreted as a square lattice in a 2D system and cubic 
+ *        lattice in a 3D system.
+ */
 enum class LatticeType {
-	SQUARE,
-	TRIANGLE,
+	SQUARE, // square for 2D, cubic for 3D
+	TRIANGLE, // triangular for 2D, hexagonal for 3D
 };
 
+/**
+ * \brief Defines several types of attractor geometry applicable to both 2D and 3D DLA systems. Note
+ *        that using some attractor geometries defined for 3D systems (i.e. AttractorType::PLANE) is
+ *        not allowed when applying to a DLA_2d object.
+ */
 enum class AttractorType {
 	POINT,
 	LINE,
-	PLANE,
+	PLANE, // not applicable for 2D
 };
 
 /**
@@ -117,7 +129,7 @@ public:
 	 *
 	 * \param _attractor_type AttractorType to update to.
 	 */
-	void set_attractor_type(AttractorType _attractor_type) noexcept;
+	virtual void set_attractor_type(AttractorType _attractor_type);
 
 	/**
 	 * \brief Sets the number of data points to generate for bounding radii data
@@ -200,6 +212,9 @@ protected:
 	 * \param _movement_choice Double in [0,1] for direction choice.
 	 */
 	void update_particle_position(std::pair<int,int>& _current, const double& _movement_choice) const noexcept;
+	/**
+	 * \copydoc DLAContainer::update_particle_position(std::pair<int,int>,const double&)
+	 */
 	void update_particle_position(utl::triple<int,int,int>& _current, const double& _movement_choice) const noexcept;
 
 	/**
@@ -210,6 +225,9 @@ protected:
 	 * \param _spawn_diam Current diameter of spawning box.
 	 */
 	bool lattice_boundary_collision(std::pair<int,int>& _current, const std::pair<int,int>& _previous, const int& _spawn_diam) const noexcept;
+	/**
+	 * \copydoc DLAContainer::lattice_boundary_collision(std::pair<int,int>&,const std::pair<int,int>&,const int&)
+	 */
 	bool lattice_boundary_collision(utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept;
 
 };

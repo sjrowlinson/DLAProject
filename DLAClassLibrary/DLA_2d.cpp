@@ -1,13 +1,9 @@
 #include "Stdafx.h"
 #include "DLA_2d.h"
 
-DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {
+DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {}
 
-}
-
-DLA_2d::DLA_2d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) : DLAContainer(_lattice_type, _attractor_type, _coeff_stick) {
-
-}
+DLA_2d::DLA_2d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) : DLAContainer(_lattice_type, _attractor_type, _coeff_stick) {}
 
 DLA_2d::DLA_2d(const DLA_2d& _other) : DLAContainer(_other) {
 	// deep copy fields of _other to this
@@ -24,9 +20,7 @@ DLA_2d::DLA_2d(DLA_2d&& _other) : DLAContainer(_other) {
 	_other.aggregate_pq = std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator>();
 }
 
-DLA_2d::~DLA_2d() {
-
-}
+DLA_2d::~DLA_2d() {}
 
 size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
@@ -34,6 +28,13 @@ size_t DLA_2d::size() const noexcept {
 
 std::queue<std::pair<int,int>>& DLA_2d::batch_queue_handle() noexcept {
 	return batch_queue;
+}
+
+void DLA_2d::set_attractor_type(AttractorType _attractor_type) {
+	// invalid attractor type for 2D lattice
+	if (_attractor_type == AttractorType::PLANE)
+		throw std::invalid_argument("Cannot set attractor type of 2D DLA to PLANE.");
+	DLAContainer::set_attractor_type(_attractor_type);
 }
 
 void DLA_2d::clear() {

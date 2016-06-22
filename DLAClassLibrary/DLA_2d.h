@@ -32,6 +32,11 @@ struct distance_comparator {
  *
  * \brief Defines a diffusion limited aggregate on a two-dimensional lattice.
  *
+ * Provides a class which allows for the generation, manipulation and statistical processing
+ * of a Diffusion Limited Aggregate (DLA) on a 2D lattice. This DLA can be produced on a 
+ * variety of 2D lattice types, given by LatticeType enumerated constants, with a choice of
+ * different attractor geometries, given by AttractorType enumerated constants.
+ *
  * \author Samuel Rowlinson
  * \date May, 2016
  */
@@ -74,6 +79,9 @@ public:
 
 	~DLA_2d();
 
+	/**
+	 * \copydoc DLAContainer::size()
+	 */
 	size_t size() const noexcept override;
 
 	/**
@@ -84,6 +92,15 @@ public:
 	 */
 	std::queue<std::pair<int,int>>& batch_queue_handle() noexcept;
 
+	/**
+	 * \copydoc DLAContainer::set_attractor_type(AttractorType)
+	 * \throw Throws std::invalid_argument exception if _attractor_type is invalid for 2D lattice.
+	 */
+	void set_attractor_type(AttractorType _attractor_type) override;
+
+	/**
+	 * \copydoc DLAContainer::clear()
+	 */
 	void clear() override;
 
 	/**
@@ -94,8 +111,14 @@ public:
 	 */
 	void generate(size_t _n) override;
 
+	/**
+	 * \copydoc DLAContainer::estimate_fractal_dimension()
+	 */
 	double estimate_fractal_dimension() const override;
 
+	/**
+	 * \copydoc DLAContainer::write(std::ostream&,bool)
+	 */
 	std::ostream& write(std::ostream& _os, bool _sort_by_map_value = false) const override;
 
 private:

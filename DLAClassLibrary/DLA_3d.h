@@ -28,6 +28,19 @@ struct distance_comparator_3d {
 	}
 };
 
+/**
+ * \class DLA_3d
+ *
+ * \brief Defines a diffusion limited aggregate on a three-dimensional lattice.
+ *
+ * Provides a class which allows for the generation, manipulation and statistical processing
+ * of a Diffusion Limited Aggregate (DLA) on a 3D lattice. This DLA can be produced on a 
+ * variety of 3D lattice types, given by LatticeType enumerated constants, with a choice of
+ * different attractor geometries, given by AttractorType enumerated constants.
+ *
+ * \author Samuel Rowlinson
+ * \date May, 2016
+ */
 class DLA_3d : public DLAContainer {
 
 public:
@@ -64,6 +77,9 @@ public:
 
 	~DLA_3d();
 
+	/**
+	 * \copydoc DLAContainer::size()
+	 */
 	size_t size() const noexcept override;
 
 	/**
@@ -74,6 +90,9 @@ public:
 	 */
 	std::queue<utl::triple<int, int, int>>& batch_queue_handle() noexcept;
 
+	/**
+	 * \copydoc DLAContainer::clear()
+	 */
 	void clear() override;
 
 	/**
@@ -84,8 +103,14 @@ public:
 	 */
 	void generate(size_t _n) override;
 
+	/**
+	 * \copydoc DLAContainer::estimate_fractal_dimension()
+	 */
 	double estimate_fractal_dimension() const override;
 
+	/**
+	 * \copydoc DLAContainer::write(std::ostream&,bool)
+	 */
 	std::ostream& write(std::ostream& _os, bool _sort_by_map_value = false) const override;
 
 private:

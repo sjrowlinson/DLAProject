@@ -1,13 +1,9 @@
 #include "Stdafx.h"
 #include "DLA_3d.h"
 
-DLA_3d::DLA_3d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {
+DLA_3d::DLA_3d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {}
 
-}
-
-DLA_3d::DLA_3d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) : DLAContainer(_lattice_type, _attractor_type, _coeff_stick) {
-
-}
+DLA_3d::DLA_3d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) : DLAContainer(_lattice_type, _attractor_type, _coeff_stick) {}
 
 DLA_3d::DLA_3d(const DLA_3d& _other) : DLAContainer(_other) {
 	// deep copy fields of _other to this
@@ -24,9 +20,7 @@ DLA_3d::DLA_3d(DLA_3d&& _other) : DLAContainer(_other) {
 	_other.aggregate_pq = std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d>();
 }
 
-DLA_3d::~DLA_3d() {
-
-}
+DLA_3d::~DLA_3d() {}
 
 size_t DLA_3d::size() const noexcept {
 	return aggregate_map.size();
