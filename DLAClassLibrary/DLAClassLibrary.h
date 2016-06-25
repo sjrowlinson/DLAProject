@@ -36,20 +36,20 @@ namespace DLAClassLibrary {
 	public ref class ManagedDLA2DContainer {
 
 		// handle to DLA_2d class
-		DLA_2d* native_DLA_container_ptr;
+		DLA_2d* native_dla_2d_ptr;
 
 	public:
 		/**
 		 * \brief Initialises a ManagedDLA2DContainer which has default properties and is initially empty.
 		 */
-		ManagedDLA2DContainer() : native_DLA_container_ptr(new DLA_2d()) {}
+		ManagedDLA2DContainer() : native_dla_2d_ptr(new DLA_2d()) {}
 
 		/**
 		 * \brief Initialises a ManagedDLA2DContainer which has a given stickiness coefficient and is initially empty.
 		 *
 		 * \param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
 		 */
-		ManagedDLA2DContainer(double _coeff_stick) : native_DLA_container_ptr(new DLA_2d(_coeff_stick)) {}
+		ManagedDLA2DContainer(double _coeff_stick) : native_dla_2d_ptr(new DLA_2d(_coeff_stick)) {}
 
 		/**
 		 * \brief Initialises a ManagedDLA2DContainer with given lattice and attractor types and is initially empty.
@@ -57,7 +57,7 @@ namespace DLAClassLibrary {
 		 * \param _lattice_type Type of lattice aggregate is to be built upon.
 		 * \param _attractor_type Type of attractor for initial system seed.
 		 */
-		ManagedDLA2DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type) : native_DLA_container_ptr(new DLA_2d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type))) {}
+		ManagedDLA2DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type) : native_dla_2d_ptr(new DLA_2d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type))) {}
 
 		/**
 		 * \brief Initialises a ManagedDLA2DContainer with given lattice and attractor types and a given stickiness
@@ -68,15 +68,15 @@ namespace DLAClassLibrary {
 		 * \param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
 		 */
 		ManagedDLA2DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type, double _coeff_stick) : 
-			native_DLA_container_ptr(new DLA_2d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type), _coeff_stick)) {}
+			native_dla_2d_ptr(new DLA_2d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type), _coeff_stick)) {}
 
-		ManagedDLA2DContainer(ManagedDLA2DContainer^ _other) : native_DLA_container_ptr(new DLA_2d(*_other->native_DLA_container_ptr)) {}
+		ManagedDLA2DContainer(ManagedDLA2DContainer^ _other) : native_dla_2d_ptr(new DLA_2d(*_other->native_dla_2d_ptr)) {}
 
 		/**
 		 * \brief Destructor, deletes native DLA class handle.
 		 */
 		~ManagedDLA2DContainer() {
-			delete native_DLA_container_ptr;
+			delete native_dla_2d_ptr;
 		}
 
 		/**
@@ -85,7 +85,7 @@ namespace DLAClassLibrary {
 		 * \return Aggregrate stickiness coefficient.
 		 */
 		double GetCoeffStick() {
-			return native_DLA_container_ptr->get_coeff_stick();
+			return native_dla_2d_ptr->get_coeff_stick();
 		}
 
 		/**
@@ -96,7 +96,7 @@ namespace DLAClassLibrary {
 		 */
 		void SetCoeffStick(double _coeff_stick) {
 			try {
-				native_DLA_container_ptr->set_coeff_stick(_coeff_stick);
+				native_dla_2d_ptr->set_coeff_stick(_coeff_stick);
 			}
 			catch (const std::invalid_argument& ex) {
 				String^ err_msg = gcnew String(ex.what());
@@ -110,7 +110,7 @@ namespace DLAClassLibrary {
 		 * \param _lattice_type LatticeType to update to.
 		 */
 		void SetLatticeType(ManagedLatticeType _lattice_type) {
-			native_DLA_container_ptr->set_lattice_type(static_cast<LatticeType>(_lattice_type));
+			native_dla_2d_ptr->set_lattice_type(static_cast<LatticeType>(_lattice_type));
 		}
 
 		/**
@@ -119,7 +119,7 @@ namespace DLAClassLibrary {
 		 * \param _attractor_type AttractorType to update to.
 		 */
 		void SetAttractorType(ManagedAttractorType _attractor_type) {
-			native_DLA_container_ptr->set_attractor_type(static_cast<AttractorType>(_attractor_type));
+			native_dla_2d_ptr->set_attractor_type(static_cast<AttractorType>(_attractor_type));
 		}
 
 		/**
@@ -127,8 +127,8 @@ namespace DLAClassLibrary {
 		 *
 		 * \return Size of the DLA structure.
 		 */
-		size_t Size() {
-			return native_DLA_container_ptr->size();
+		std::size_t Size() {
+			return native_dla_2d_ptr->size();
 		}
 
 		/**
@@ -142,7 +142,7 @@ namespace DLAClassLibrary {
 			// stores particles in a BlockingQueue configuration
 			BlockingCollection<KeyValuePair<int, int>>^ blocking_queue = gcnew BlockingCollection<KeyValuePair<int, int>>();
 			// get reference to batch_queue of DLA_2d
-			std::queue<std::pair<int,int>>& batch_queue_ref = native_DLA_container_ptr->batch_queue_handle();
+			std::queue<std::pair<int,int>>& batch_queue_ref = native_dla_2d_ptr->batch_queue_handle();
 			// loop over batch_queue transferring particles to blocking_queue
 			while (!batch_queue_ref.empty()) {
 				blocking_queue->Add(KeyValuePair<int, int>(batch_queue_ref.front().first, batch_queue_ref.front().second));
@@ -155,14 +155,14 @@ namespace DLAClassLibrary {
 		 * \brief Raises an abort signal stopping any current execution of aggregate generation.
 		 */
 		void RaiseAbortSignal() {
-			native_DLA_container_ptr->raise_abort_signal();
+			native_dla_2d_ptr->raise_abort_signal();
 		}
 
 		/**
 		 * \brief Clears the aggregrate of all particles.
 		 */
 		void Clear() {
-			native_DLA_container_ptr->clear();
+			native_dla_2d_ptr->clear();
 		}
 
 		/**
@@ -170,11 +170,11 @@ namespace DLAClassLibrary {
 		 *
 		 * \param _n Size of aggregrate to produce.
 		 */
-		void Generate(size_t _n) {
-			native_DLA_container_ptr->generate(_n);
+		void Generate(std::size_t _n) {
+			native_dla_2d_ptr->generate(_n);
 			//std::string file_path = "C:/Users/Sam/Documents/MATLAB/NMProject/DLASquare2D.txt";
 			//std::ofstream of(file_path);
-			//native_DLA_container_ptr->write(of, true);
+			//native_dla_2d_ptr->write(of, true);
 			//of.close();
 		}
 
@@ -184,7 +184,7 @@ namespace DLAClassLibrary {
 		 * \return An estimate of fractal dimension of the DLA structure.
 		 */
 		double EstimateFractalDimension() {
-			return native_DLA_container_ptr->estimate_fractal_dimension();
+			return native_dla_2d_ptr->estimate_fractal_dimension();
 		}
 
 	};
@@ -200,20 +200,20 @@ namespace DLAClassLibrary {
 	public ref class ManagedDLA3DContainer {
 
 		// handle to DLAContainer abstract class
-		DLA_3d* native_DLA_container_ptr;
+		DLA_3d* native_dla_3d_ptr;
 
 	public:
 		/**
 		 * \brief Initialises a ManagedDLA3DContainer which has default properties and is initially empty.
 		 */
-		ManagedDLA3DContainer() : native_DLA_container_ptr(new DLA_3d()) {}
+		ManagedDLA3DContainer() : native_dla_3d_ptr(new DLA_3d()) {}
 
 		/**
 		 * \brief Initialises a ManagedDLA3DContainer which has a given stickiness coefficient and is initially empty.
 		 *
 		 * \param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
 		 */
-		ManagedDLA3DContainer(double _coeff_stick) : native_DLA_container_ptr(new DLA_3d(_coeff_stick)) {}
+		ManagedDLA3DContainer(double _coeff_stick) : native_dla_3d_ptr(new DLA_3d(_coeff_stick)) {}
 
 		/**
 		 * \brief Initialises a ManagedDLA3DContainer with given lattice and attractor types and is initially empty.
@@ -221,7 +221,7 @@ namespace DLAClassLibrary {
 		 * \param _lattice_type Type of lattice aggregate is to be built upon.
 		 * \param _attractor_type Type of attractor for initial system seed.
 		 */
-		ManagedDLA3DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type) : native_DLA_container_ptr(new DLA_3d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type))) {}
+		ManagedDLA3DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type) : native_dla_3d_ptr(new DLA_3d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type))) {}
 
 		/**
 		 * \brief Initialises a ManagedDLA3DContainer with given lattice and attractor types and a given stickiness
@@ -232,32 +232,32 @@ namespace DLAClassLibrary {
 		 * \param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
 		 */
 		ManagedDLA3DContainer(ManagedLatticeType _lattice_type, ManagedAttractorType _attractor_type, double _coeff_stick) : 
-			native_DLA_container_ptr(new DLA_3d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type), _coeff_stick)) {}
+			native_dla_3d_ptr(new DLA_3d(static_cast<LatticeType>(_lattice_type), static_cast<AttractorType>(_attractor_type), _coeff_stick)) {}
 
-		ManagedDLA3DContainer(ManagedDLA3DContainer^ _other) : native_DLA_container_ptr(new DLA_3d(*_other->native_DLA_container_ptr)) {}
+		ManagedDLA3DContainer(ManagedDLA3DContainer^ _other) : native_dla_3d_ptr(new DLA_3d(*_other->native_dla_3d_ptr)) {}
 
 		~ManagedDLA3DContainer() {
-			delete native_DLA_container_ptr;
+			delete native_dla_3d_ptr;
 		}
 
 		/**
-		* \brief Gets the coefficient of stickiness of the aggregate.
-		*
-		* \return Aggregrate stickiness coefficient.
-		*/
+		 * \brief Gets the coefficient of stickiness of the aggregate.
+		 *
+		 * \return Aggregrate stickiness coefficient.
+		 */
 		double GetCoeffStick() {
-			return native_DLA_container_ptr->get_coeff_stick();
+			return native_dla_3d_ptr->get_coeff_stick();
 		}
 
 		/**
-		* \brief Sets the coefficient of stickiness of the aggregrate.
-		*
-		* \param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
-		* \throw Throws ArgumentException if _coeff_stick not in (0,1].
-		*/
+		 * \brief Sets the coefficient of stickiness of the aggregrate.
+		 *
+		 * \param _coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
+		 * \throw Throws ArgumentException if _coeff_stick not in (0,1].
+		 */
 		void SetCoeffStick(double _coeff_stick) {
 			try {
-				native_DLA_container_ptr->set_coeff_stick(_coeff_stick);
+				native_dla_3d_ptr->set_coeff_stick(_coeff_stick);
 			}
 			catch (const std::invalid_argument& ex) {
 				String^ err_msg = gcnew String(ex.what());
@@ -266,37 +266,37 @@ namespace DLAClassLibrary {
 		}
 
 		/**
-		* \brief Sets the type of lattice.
-		*
-		* \param _lattice_type LatticeType to update to.
-		*/
+		 * \brief Sets the type of lattice.
+		 *
+		 * \param _lattice_type LatticeType to update to.
+		 */
 		void SetLatticeType(ManagedLatticeType _lattice_type) {
-			native_DLA_container_ptr->set_lattice_type(static_cast<LatticeType>(_lattice_type));
+			native_dla_3d_ptr->set_lattice_type(static_cast<LatticeType>(_lattice_type));
 		}
 
 		/**
-		* \brief Sets the type of attractor.
-		*
-		* \param _attractor_type AttractorType to update to.
-		*/
+		 * \brief Sets the type of attractor.
+		 *
+		 * \param _attractor_type AttractorType to update to.
+		 */
 		void SetAttractorType(ManagedAttractorType _attractor_type) {
-			native_DLA_container_ptr->set_attractor_type(static_cast<AttractorType>(_attractor_type));
+			native_dla_3d_ptr->set_attractor_type(static_cast<AttractorType>(_attractor_type));
 		}
 
 		/**
-		* \brief Gets the size of the aggregrate.
-		*
-		* \return Size of the DLA structure.
-		*/
-		size_t Size() {
-			return native_DLA_container_ptr->size();
+		 * \brief Gets the size of the aggregrate.
+		 *
+		 * \return Size of the DLA structure.
+		 */
+		std::size_t Size() {
+			return native_dla_3d_ptr->size();
 		}
 
 		/**
-		* \brief Clears the aggregrate of all particles.
-		*/
+		 * \brief Clears the aggregrate of all particles.
+		 */
 		void Clear() {
-			native_DLA_container_ptr->clear();
+			native_dla_3d_ptr->clear();
 		}
 
 		/**
@@ -310,7 +310,7 @@ namespace DLAClassLibrary {
 			// stores particles in a BlockingQueue configuration
 			BlockingCollection<Tuple<int,int,int>^>^ blocking_queue = gcnew BlockingCollection<Tuple<int,int,int>^>();
 			// get reference to batch_queue of DLA_2d
-			std::queue<utl::triple<int,int,int>>& batch_queue_ref = native_DLA_container_ptr->batch_queue_handle();
+			std::queue<utl::triple<int,int,int>>& batch_queue_ref = native_dla_3d_ptr->batch_queue_handle();
 			// loop over batch_queue transferring particles to blocking_queue
 			while (!batch_queue_ref.empty()) {
 				blocking_queue->Add(gcnew Tuple<int,int,int>(batch_queue_ref.front().first, batch_queue_ref.front().second, batch_queue_ref.front().third));
@@ -323,25 +323,25 @@ namespace DLAClassLibrary {
 		 * \brief Raises an abort signal stopping any current execution of aggregate generation.
 		 */
 		void RaiseAbortSignal() {
-			native_DLA_container_ptr->raise_abort_signal();
+			native_dla_3d_ptr->raise_abort_signal();
 		}
 
 		/**
-		* \brief Generates an aggregrate structure of size _n.
-		*
-		* \param _n Size of aggregrate to produce.
-		*/
-		void Generate(size_t _n) {
-			native_DLA_container_ptr->generate(_n);
+		 * \brief Generates an aggregrate structure of size _n.
+		 *
+		 * \param _n Size of aggregrate to produce.
+		 */
+		void Generate(std::size_t _n) {
+			native_dla_3d_ptr->generate(_n);
 		}
 
 		/**
-		* \brief Estimates the fractal dimension of the aggregrate.
-		*
-		* \return An estimate of fractal dimension of the DLA structure.
-		*/
+		 * \brief Estimates the fractal dimension of the aggregrate.
+		 *
+		 * \return An estimate of fractal dimension of the DLA structure.
+		 */
 		double EstimateFractalDimension() {
-			return native_DLA_container_ptr->estimate_fractal_dimension();
+			return native_dla_3d_ptr->estimate_fractal_dimension();
 		}
 
 	};

@@ -16,7 +16,7 @@ DLA_3d::DLA_3d(DLA_3d&& _other) : DLAContainer(_other) {
 	aggregate_map = _other.aggregate_map;
 	aggregate_pq = _other.aggregate_pq;
 	// set _other container fields to default values
-	_other.aggregate_map = std::unordered_map<utl::triple<int, int, int>, size_t, triple_hash>();
+	_other.aggregate_map = std::unordered_map<utl::triple<int, int, int>, std::size_t, triple_hash>();
 	_other.aggregate_pq = std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d>();
 }
 
@@ -40,7 +40,7 @@ void DLA_3d::clear() {
 void DLA_3d::generate(size_t _n) {
 	// push original sticky point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (3D)
-	size_t count = 0;
+	std::size_t count = 0;
 	utl::triple<int, int, int> origin_sticky = utl::make_triple(0, 0, 0);
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
@@ -58,13 +58,13 @@ void DLA_3d::generate(size_t _n) {
 	std::uniform_real_distribution<> dist(0.0, 1.0);
 
 	// intervals to record bounding radii data at
-	size_t fractal_data_interval;
+	std::size_t fractal_data_interval;
 	// prevents division by zero in generation loop interval checking
 	if (_n > bound_radii_npoints)
 		fractal_data_interval = _n / bound_radii_npoints;
 	else
 		fractal_data_interval = _n;
-	size_t prev_count_taken = count;
+	std::size_t prev_count_taken = count;
 	// aggregate generation loop
 	while (size() < _n) {
 		if (abort_signal) {
@@ -115,13 +115,13 @@ std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	// sort by order particles were added to the aggregate
 	if (_sort_by_map_value) {
 		// std::vector container to store aggregate map values
-		std::vector<std::pair<size_t, utl::triple<int, int, int>>> agg_vec;
+		std::vector<std::pair<std::size_t, utl::triple<int, int, int>>> agg_vec;
 		// deep copy elements of aggregate_map to agg_vec
 		for (auto it = aggregate_map.cbegin(); it != aggregate_map.cend(); ++it) {
 			agg_vec.push_back(std::make_pair(it->second, it->first));
 		}
 		// lambda for sorting aggregate via order in which particles were generated
-		auto sort_agg = [](const std::pair<size_t, utl::triple<int, int, int>>& _lhs, const std::pair<size_t, utl::triple<int, int, int>>& _rhs) {return _lhs.first < _rhs.first; };
+		auto sort_agg = [](const std::pair<std::size_t, utl::triple<int, int, int>>& _lhs, const std::pair<std::size_t, utl::triple<int, int, int>>& _rhs) {return _lhs.first < _rhs.first; };
 		// sort agg_vec using lambda sort_agg
 		std::sort(agg_vec.begin(), agg_vec.end(), sort_agg);
 		// write sorted data to stream
@@ -183,7 +183,7 @@ void DLA_3d::spawn_particle(utl::triple<int,int,int>& _current, int& _spawn_diam
 	}
 }
 
-bool DLA_3d::aggregate_collision(const utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const double& _sticky_pr, size_t& _count) {
+bool DLA_3d::aggregate_collision(const utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const double& _sticky_pr, std::size_t& _count) {
 	// find the given point in the aggregrete, yields aggregrate_map.end() if not in container
 	auto search = aggregate_map.find(_current);
 	// co-ordinates _x, _y, _z occur in the aggregate, collision occurred

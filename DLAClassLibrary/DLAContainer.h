@@ -136,7 +136,7 @@ public:
 	 *
 	 * \param _npoints Number of data points to generate.
 	 */
-	void set_bound_radii_npoints(size_t _npoints) noexcept;
+	void set_bound_radii_npoints(std::size_t _npoints) noexcept;
 
 	/**
 	 * \brief Raises an abort signal, stopping any current aggregate generation.
@@ -154,7 +154,7 @@ public:
 	 *
 	 * \param _n Number of particles to generate in the DLA.
 	 */
-	virtual void generate(size_t n) = 0;
+	virtual void generate(std::size_t n) = 0;
 
 	/**
 	 * \brief Computes an estimate of the fractal dimension for the aggregrate.
@@ -202,8 +202,8 @@ protected:
 	double coeff_stick;
 	std::mt19937 mt_eng;
 	bool abort_signal = false;
-	std::vector<std::pair<size_t, double>> bounding_radii_vec;
-	size_t bound_radii_npoints = 50;
+	std::vector<std::pair<std::size_t, double>> bounding_radii_vec;
+	std::size_t bound_radii_npoints = 50;
 
 	/**
 	 * \brief Updates position of random walking particle.

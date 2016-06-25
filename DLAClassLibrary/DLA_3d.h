@@ -101,7 +101,7 @@ public:
 	 *
 	 * \param _n Number of particles to generate in the 3D DLA.
 	 */
-	void generate(size_t _n) override;
+	void generate(std::size_t _n) override;
 
 	/**
 	 * \copydoc DLAContainer::estimate_fractal_dimension()
@@ -116,7 +116,7 @@ public:
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
-	std::unordered_map<utl::triple<int, int, int>, size_t, triple_hash> aggregate_map;
+	std::unordered_map<utl::triple<int, int, int>, std::size_t, triple_hash> aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
@@ -140,6 +140,6 @@ private:
 	 * \param _sticky_pr |coeff_stick - _sticky_pr| = |1 - probability of sticking to aggregate|.
 	 * \param _count Current number of particles generated in aggregate.
 	 */
-	bool aggregate_collision(const utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const double& _sticky_pr, size_t& count);
+	bool aggregate_collision(const utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const double& _sticky_pr, std::size_t& count);
 
 };

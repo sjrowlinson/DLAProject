@@ -82,7 +82,7 @@ public:
 	/**
 	 * \copydoc DLAContainer::size()
 	 */
-	size_t size() const noexcept override;
+	std::size_t size() const noexcept override;
 
 	/**
 	 * \brief Gets a non-const reference to the batch_queue of the aggregate, used
@@ -109,7 +109,7 @@ public:
 	 *
 	 * \param _n Number of particles to generate in the 2D DLA.
 	 */
-	void generate(size_t _n) override;
+	void generate(std::size_t _n) override;
 
 	/**
 	 * \copydoc DLAContainer::estimate_fractal_dimension()
@@ -124,7 +124,7 @@ public:
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
-	std::unordered_map<std::pair<int, int>, size_t, pair_hash> aggregate_map;
+	std::unordered_map<std::pair<int, int>, std::size_t, pair_hash> aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
@@ -148,6 +148,6 @@ private:
 	 * \param _sticky_pr |coeff_stick - _sticky_pr| = |1 - probability of sticking to aggregate|.
 	 * \param _count Current number of particles generated in aggregate.
 	 */
-	bool aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, size_t& _count);
+	bool aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, std::size_t& _count);
 
 };

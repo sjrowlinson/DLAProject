@@ -68,7 +68,7 @@ void DLAContainer::set_attractor_type(AttractorType _attractor_type) {
 	attractor_type = _attractor_type;
 }
 
-void DLAContainer::set_bound_radii_npoints(size_t _npoints) noexcept {
+void DLAContainer::set_bound_radii_npoints(std::size_t _npoints) noexcept {
 	bound_radii_npoints = _npoints;
 }
 

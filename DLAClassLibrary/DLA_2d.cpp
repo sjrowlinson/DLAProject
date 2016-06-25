@@ -16,13 +16,13 @@ DLA_2d::DLA_2d(DLA_2d&& _other) : DLAContainer(_other) {
 	aggregate_map = _other.aggregate_map;
 	aggregate_pq = _other.aggregate_pq;
 	// set _other container fields to default values
-	_other.aggregate_map = std::unordered_map<std::pair<int, int>, size_t, pair_hash>();
+	_other.aggregate_map = std::unordered_map<std::pair<int, int>, std::size_t, pair_hash>();
 	_other.aggregate_pq = std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator>();
 }
 
 DLA_2d::~DLA_2d() {}
 
-size_t DLA_2d::size() const noexcept {
+std::size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
 }
 
@@ -47,7 +47,7 @@ void DLA_2d::clear() {
 void DLA_2d::generate(size_t _n) {
 	// push original aggregate point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (2D)
-	size_t count = 0;
+	std::size_t count = 0;
 	std::pair<int, int> origin_sticky = std::make_pair(0, 0);
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
@@ -65,13 +65,13 @@ void DLA_2d::generate(size_t _n) {
 	std::uniform_real_distribution<> dist(0.0, 1.0);
 
 	// intervals to record bounding radii data at
-	size_t fractal_data_interval;
+	std::size_t fractal_data_interval;
 	// prevents division by zero in generation loop interval checking
 	if (_n > bound_radii_npoints)
 		fractal_data_interval = _n / bound_radii_npoints;
 	else
 		fractal_data_interval = _n;
-	size_t prev_count_taken = count;
+	std::size_t prev_count_taken = count;
 	// aggregate generation loop 
 	while (size() < _n) {
 		if (abort_signal) {
@@ -121,13 +121,13 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 	// sort by order particles were added to the aggregate
 	if (_sort_by_map_value) {
 		// std::vector container to store aggregate_map values
-		std::vector<std::pair<size_t, std::pair<int, int>>> agg_vec;
+		std::vector<std::pair<std::size_t, std::pair<int, int>>> agg_vec;
 		// deep copy elements of aggregate_map to agg_vec
 		for (auto it = aggregate_map.cbegin(); it != aggregate_map.cend(); ++it) {
 			agg_vec.push_back(std::make_pair(it->second, it->first));
 		}
 		// lambda for sorting aggregate via order in which particles were generated
-		auto sort_agg = [](const std::pair<size_t, std::pair<int, int>>& _lhs, const std::pair<size_t, std::pair<int, int>>& _rhs) {return _lhs.first < _rhs.first; };
+		auto sort_agg = [](const std::pair<std::size_t, std::pair<int, int>>& _lhs, const std::pair<std::size_t, std::pair<int, int>>& _rhs) {return _lhs.first < _rhs.first; };
 		// sort agg_vec using the lambda sort_agg
 		std::sort(agg_vec.begin(), agg_vec.end(), sort_agg);
         // write sorted data to stream
@@ -173,7 +173,7 @@ void DLA_2d::spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, st
 	}
 }
 
-bool DLA_2d::aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, size_t& _count) {
+bool DLA_2d::aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, std::size_t& _count) {
 	// find the given point in the aggregrete, yields aggregrate_map.end() if not in container
 	auto search = aggregate_map.find(_current);
 	// co-ordinates _x, _y occur in the aggregate, collision occurred
