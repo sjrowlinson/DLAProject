@@ -51,7 +51,12 @@ namespace DLAProject {
         private uint current_particles;
         private List<Color> colour_list;
         private LatticeDimension lattice_dimension;
-
+        private bool lattice_dimension_combo_handle = true;
+        private LatticeDimension current_executing_dimension;
+        private ManagedLatticeType lattice_type;
+        private bool lattice_type_combo_handle = true;
+        private ManagedAttractorType attractor_type;
+        private bool attractor_type_combo_handle = true;
         private readonly AggregateComponentManager comp_manager;
         #endregion
 
@@ -66,8 +71,10 @@ namespace DLAProject {
             current_particles = 0;
             colour_list = new List<Color>();
             lattice_dimension = LatticeDimension._2D;
+            current_executing_dimension = lattice_dimension;
+            lattice_type = ManagedLatticeType.Square;
+            attractor_type = ManagedAttractorType.Point;
             //WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
-
             comp_manager = new AggregateComponentManager();
         }
 
@@ -86,6 +93,129 @@ namespace DLAProject {
             trackview.Viewport = World;
             trackview.Enabled = true;
         }
+
+        #region ComboBoxHandlers
+
+        /// <summary>
+        /// Sets the value of the lattice_dimension field corresponding to 
+        /// selected item in dimension_ComboBox.
+        /// </summary>
+        private void HandleLatticeDimensionComboBox() {
+            // get the selected dimension type
+            ComboBoxItem selected_dimension = (ComboBoxItem)(dimension_ComboBox.SelectedValue);
+            string dimension_str = (string)(selected_dimension.Content);
+            if (dimension_str == null) lattice_dimension = LatticeDimension._2D;
+            else {
+                ComboBoxItem planeItem = (ComboBoxItem)attractorType_ComboBox.FindName("PlaneItem");
+                // set corresponding lattice_dimension
+                switch (dimension_str) {
+                    case "2D":
+                        lattice_dimension = LatticeDimension._2D;
+                        planeItem.IsEnabled = false;
+                        break;
+                    case "3D":
+                        lattice_dimension = LatticeDimension._3D;
+                        planeItem.IsEnabled = true;
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles dimension_ComboBox drop down closed event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLatticeDimensionDropDownClosed(object sender, EventArgs e) {
+            if (lattice_dimension_combo_handle)
+                HandleLatticeDimensionComboBox();
+            lattice_dimension_combo_handle = true;
+        }
+
+        /// <summary>
+        /// Handles dimension_ComboBox selected item changed event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLatticeDimensionSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            ComboBox cb = sender as ComboBox;
+            lattice_dimension_combo_handle = !cb.IsDropDownOpen;
+            HandleLatticeDimensionComboBox();
+        }
+
+        /// <summary>
+        /// Sets the value of the lattice_type field corresponding to
+        /// selected item in latticeType_ComboBox.
+        /// </summary>
+        private void HandleLatticeTypeComboBox() {
+            // get selected lattice type
+            ComboBoxItem selected_lattice_type = (ComboBoxItem)(latticeType_ComboBox.SelectedValue);
+            string lattice_type_str = (string)(selected_lattice_type.Content);
+            // set corresponding lattice_type 
+            if (lattice_type_str == null) lattice_type = ManagedLatticeType.Square;
+            else lattice_type = (ManagedLatticeType)Enum.Parse(typeof(ManagedLatticeType), lattice_type_str);
+        }
+
+        /// <summary>
+        /// Handles latticeType_ComboBox drop down closed event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLatticeTypeDropDownClosed(object sender, EventArgs e) {
+            if (lattice_type_combo_handle)
+                HandleLatticeTypeComboBox();
+            lattice_type_combo_handle = true;
+        }
+
+        /// <summary>
+        /// Handles latticeType_ComboBox selected item changed event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLatticeTypeSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            ComboBox cb = sender as ComboBox;
+            lattice_type_combo_handle = !cb.IsDropDownOpen;
+            HandleLatticeTypeComboBox();
+        }
+
+        /// <summary>
+        /// Sets the value of the attractor_type field corresponding to
+        /// selected item in attractorType_ComboBox.
+        /// </summary>
+        private void HandleAttractorTypeComboBox() {
+            // get selected attractor type
+            ComboBoxItem selected_attractor_type = (ComboBoxItem)(attractorType_ComboBox.SelectedValue);
+            string attractor_type_str = (string)(selected_attractor_type.Content);
+            // set corresponding attractor_type
+            if (attractor_type_str == null) attractor_type = ManagedAttractorType.Point;
+            else attractor_type = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type_str);
+        }
+
+        /// <summary>
+        /// Handles attractorType_ComboBox drop down closed event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnAttractorTypeDropDownClosed(object sender, EventArgs e) {
+            if (attractor_type_combo_handle)
+                HandleAttractorTypeComboBox();
+            attractor_type_combo_handle = true;
+        }
+
+        /// <summary>
+        /// Handles attractorType_ComboBox selected item changed event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnAttractorTypeSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            ComboBox cb = sender as ComboBox;
+            attractor_type_combo_handle = !cb.IsDropDownOpen;
+            HandleAttractorTypeComboBox();
+        }
+
+        #endregion
+
+        #region AggregatePropertySetting
 
         /// <summary>
         /// Fills the colour_list field with colour instances for 
@@ -111,6 +241,30 @@ namespace DLAProject {
         }
 
         /// <summary>
+        /// Sets up all the properties of the aggregate necessary for generation, including 
+        /// lattice type, attractor type and the dimensions of the aggregate.
+        /// </summary>
+        private void SetUpAggregateProperties() {
+            // reset simulation view
+            ResetViewButtonHandler(null, null);
+            // switch on current lattice dimension constant
+            switch (current_executing_dimension) {
+                case LatticeDimension._2D:
+                    dla_2d.SetCoeffStick(stickiness_slider.Value);
+                    dla_2d.SetLatticeType(lattice_type);
+                    dla_2d.SetAttractorType(attractor_type);
+                    break;
+                case LatticeDimension._3D:
+                    dla_3d.SetCoeffStick(stickiness_slider.Value);
+                    dla_3d.SetLatticeType(lattice_type);
+                    dla_3d.SetAttractorType(attractor_type);
+                    break;
+            }
+        }
+
+        #endregion
+
+        /// <summary>
         /// Updates the aggregate using a timer with short interval, calling 
         /// AggregateUpdateOnTimeEvent periodically.
         /// </summary>
@@ -121,7 +275,7 @@ namespace DLAProject {
             // initialise a Timer with a 10ms interval
             System.Timers.Timer timer = new System.Timers.Timer(interval);
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
-            switch (lattice_dimension) {
+            switch (current_executing_dimension) {
                 case LatticeDimension._2D:
                     if (dla_2d.Size() < _particle_slider_val) {
                         timer.Elapsed += Aggregate2DUpdateOnTimedEventTest;
@@ -251,7 +405,7 @@ namespace DLAProject {
             // start asynchronous task calling AggregateUpdateListener to perform rendering
             Task.Factory.StartNew(() => AggregateUpdateListener(particle_slider_val));
             // generate the DLA using value of particle slider
-            switch (lattice_dimension) {
+            switch (current_executing_dimension) {
                 case LatticeDimension._2D:
                     dla_2d.Generate(particle_slider_val);
                     break;
@@ -262,59 +416,7 @@ namespace DLAProject {
             hasFinished = true;
         }
 
-        /// <summary>
-        /// Sets up all the properties of the aggregate necessary for generation, including 
-        /// lattice type, attractor type and the dimensions of the aggregate.
-        /// </summary>
-        private void SetUpAggregateProperties() {
-            // get the selected dimension type
-            ComboBoxItem selected_dimension = (ComboBoxItem)(dimension_ComboBox.SelectedValue);
-            string dimension_str = (string)(selected_dimension.Content);
-            // set corresponding lattice_dimension constant
-            switch (dimension_str) {
-                case "2D":
-                    lattice_dimension = LatticeDimension._2D;
-                    break;
-                case "3D":
-                    lattice_dimension = LatticeDimension._3D;
-                    break;
-            }
-            // reset simulation view
-            ResetViewButtonHandler(null, null);
-            // switch on current lattice dimension constant
-            switch (lattice_dimension) {
-                case LatticeDimension._2D:
-                    dla_2d.SetCoeffStick(stickiness_slider.Value);
-                    // set the lattice type to current selected item
-                    // of latticeType_ComboBox ui element
-                    ComboBoxItem selected_2DlatticeType = (ComboBoxItem)(latticeType_ComboBox.SelectedValue);
-                    string lattice_type2D_str = (string)(selected_2DlatticeType.Content);
-                    ManagedLatticeType lattice_type2D = (ManagedLatticeType)Enum.Parse(typeof(ManagedLatticeType), lattice_type2D_str);
-                    dla_2d.SetLatticeType(lattice_type2D);
-                    // set the attractor type to current selected item
-                    // of attractorType_ComboBox ui element
-                    ComboBoxItem selected_2DAttractorType = (ComboBoxItem)(attractorType_ComboBox.SelectedValue);
-                    string attractor_type2D_str = (string)(selected_2DAttractorType.Content);
-                    ManagedAttractorType attractor_type2D = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type2D_str);
-                    dla_2d.SetAttractorType(attractor_type2D);
-                    break;
-                case LatticeDimension._3D:
-                    dla_3d.SetCoeffStick(stickiness_slider.Value);
-                    // set the lattice type to current selected item
-                    // of latticeType_ComboBox ui element
-                    ComboBoxItem selected_3DlatticeType = (ComboBoxItem)(latticeType_ComboBox.SelectedValue);
-                    string lattice_type3D_str = (string)(selected_3DlatticeType.Content);
-                    ManagedLatticeType lattice_type3D = (ManagedLatticeType)Enum.Parse(typeof(ManagedLatticeType), lattice_type3D_str);
-                    dla_3d.SetLatticeType(lattice_type3D);
-                    // set the attractor type to current selected item
-                    // of attractorType_ComboBox ui element
-                    ComboBoxItem selected_3DAttractorType = (ComboBoxItem)(attractorType_ComboBox.SelectedValue);
-                    string attractor_type3D_str = (string)(selected_3DAttractorType.Content);
-                    ManagedAttractorType attractor_type3D = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type3D_str);
-                    dla_3d.SetAttractorType(attractor_type3D);
-                    break;
-            }
-        }
+        
 
         #region ButtonHandlers
 
@@ -327,6 +429,7 @@ namespace DLAProject {
             // clear any existing aggregate
             if (current_particles > 0)
                 ClearButtonHandler(null, null);
+            current_executing_dimension = lattice_dimension;
             // (re)-initialise aggregate properties
             SetUpAggregateProperties();
             // pre-compute colour_list for each particle in aggregate
@@ -364,7 +467,7 @@ namespace DLAProject {
             // if an aggregate exists, clear it
             if (current_particles > 0) {
                 // switch on dimension of lattice
-                switch (lattice_dimension) {
+                switch (current_executing_dimension) {
                     case LatticeDimension._2D:
                         // if generation process not finished, raise an abort signal
                         if (!hasFinished)
@@ -398,7 +501,7 @@ namespace DLAProject {
             // reset rotational view
             trackview.ResetView();
             // reset orthographic_camera properties
-            switch (lattice_dimension) {
+            switch (current_executing_dimension) {
                 case LatticeDimension._2D:
                     orthograghic_camera.Position = new Point3D(0, 0, 32);
                     orthograghic_camera.LookDirection = new Vector3D(0, 0, -32);

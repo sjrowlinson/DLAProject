@@ -64,22 +64,22 @@
 
         <Grid Visibility="Visible" Margin="735,10,10,3" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" Margin="0,23,333,0" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="135" Height="26" VerticalAlignment="Top"/>
-            <ComboBox x:Name="dimension_ComboBox" Margin="0,23,160,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120">
+            <ComboBox x:Name="dimension_ComboBox" Margin="0,23,160,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" SelectionChanged="OnLatticeDimensionSelectionChanged" DropDownClosed="OnLatticeDimensionDropDownClosed">
                 <ComboBoxItem IsSelected="True" Content="2D"/>
                 <ComboBoxItem Content="3D"/>
             </ComboBox>
 
             <Label x:Name="LatticeType_Label" Content="Lattice Type" Margin="0,72,444,0" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123" Height="26" VerticalAlignment="Top"/>
-            <ComboBox x:Name="latticeType_ComboBox" Margin="0,74,348,0" HorizontalAlignment="Right" Width="120" Height="22" VerticalAlignment="Top">
+            <ComboBox x:Name="latticeType_ComboBox" Margin="0,74,348,0" HorizontalAlignment="Right" Width="120" Height="22" VerticalAlignment="Top" SelectionChanged="OnLatticeTypeSelectionChanged" DropDownClosed="OnLatticeTypeDropDownClosed">
                 <ComboBoxItem IsSelected="True">Square</ComboBoxItem>
                 <ComboBoxItem>Triangle</ComboBoxItem>
             </ComboBox>
 
             <Label x:Name="AttractorType_Label" Content="Attractor Type" Margin="0,74,157,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123"/>
-            <ComboBox x:Name="attractorType_ComboBox" Margin="0,72,32,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120">
-                <ComboBoxItem IsSelected="True" Content="Point"/>
-                <ComboBoxItem Content="Line"/>
-                <ComboBoxItem>Plane</ComboBoxItem>
+            <ComboBox x:Name="attractorType_ComboBox" Margin="0,72,32,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" SelectionChanged="OnAttractorTypeSelectionChanged" DropDownClosed="OnAttractorTypeDropDownClosed">
+                <ComboBoxItem Name="PointItem" IsSelected="True" Content="Point"/>
+                <ComboBoxItem Name="LineItem" Content="Line"/>
+                <ComboBoxItem Name="PlaneItem" Content="Plane"/>
             </ComboBox>
 
             <Slider Maximum="10000" TickPlacement="BottomRight" TickFrequency="200" IsSnapToTickEnabled="True" x:Name="particles_slider" Margin="0,130,82,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
