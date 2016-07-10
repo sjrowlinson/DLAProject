@@ -74,8 +74,8 @@ namespace DLAProject {
             current_executing_dimension = lattice_dimension;
             lattice_type = ManagedLatticeType.Square;
             attractor_type = ManagedAttractorType.Point;
-            //WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
-            comp_manager = new AggregateComponentManager();
+            WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
+            //comp_manager = new AggregateComponentManager();
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace DLAProject {
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
                     if (dla_2d.Size() < _particle_slider_val) {
-                        timer.Elapsed += Aggregate2DUpdateOnTimedEventTest;
+                        timer.Elapsed += Aggregate2DUpdateOnTimedEvent;
                         timer.AutoReset = true;
                         timer.Enabled = true;
                     }
@@ -290,7 +290,7 @@ namespace DLAProject {
                     break;
                 case LatticeDimension._3D:
                     if (dla_3d.Size() < _particle_slider_val) {
-                        timer.Elapsed += Aggregate3DUpdateOnTimedEventTest;
+                        timer.Elapsed += Aggregate3DUpdateOnTimedEvent;
                         timer.AutoReset = true;
                         timer.Enabled = true;
                     }
@@ -314,6 +314,7 @@ namespace DLAProject {
                     Dispatcher.Invoke(() => {
                         comp_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
+                        FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                     });
                     ++current_particles;
                 }
@@ -330,6 +331,7 @@ namespace DLAProject {
                     Dispatcher.Invoke(() => {
                         comp_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
+                        FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                     });
                     ++current_particles;
                 }
@@ -357,6 +359,7 @@ namespace DLAProject {
                     Dispatcher.Invoke(() => {
                         aggregate_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
+                        FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                     });
                     ++current_particles;
                 }
@@ -385,6 +388,7 @@ namespace DLAProject {
                     Dispatcher.Invoke(() => {
                         aggregate_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
+                        FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                     });
                 }
             }
@@ -416,8 +420,6 @@ namespace DLAProject {
             hasFinished = true;
         }
 
-        
-
         #region ButtonHandlers
 
         /// <summary>
@@ -434,9 +436,9 @@ namespace DLAProject {
             SetUpAggregateProperties();
             // pre-compute colour_list for each particle in aggregate
             ComputeColorList((uint)particles_slider.Value);
-            for (int i = 0; i < (int)particles_slider.Value; ++i) {
-                WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
-            }
+            //for (int i = 0; i < (int)particles_slider.Value; ++i) {
+            //    WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
+            //}
             // start asynchronous task calling GenerateAggregate method
             Task.Factory.StartNew(() => GenerateAggregate());
         }
@@ -483,12 +485,13 @@ namespace DLAProject {
                 }
             }
             // clear aggregate from user interface
-            //aggregate_manager.ClearAggregate();
-            WorldModels.Children.Clear();
-            WorldModels.Children.Add(new AmbientLight(Colors.White));
-            comp_manager.Clear();
+            aggregate_manager.ClearAggregate();
+            //WorldModels.Children.Clear();
+            //WorldModels.Children.Add(new AmbientLight(Colors.White));
+            //comp_manager.Clear();
             current_particles = 0;
             DynamicParticleLabel.Content = "Particles: " + current_particles;
+            FracDimLabel.Content = "Est. Fractal Dimension: " + 0.0;
             colour_list.Clear();
         }
 

@@ -58,8 +58,11 @@
                 </Viewport3D.Children>
             </Viewport3D>
         </Grid>
-        <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,0,-10">
+        <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,0,-10" Visibility="Visible">
             <Label Visibility="Visible" Name="DynamicParticleLabel" DockPanel.Dock="Top" Foreground="Red" />
+        </DockPanel>
+        <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,20,0,-10" Visibility="Visible">
+            <Label Visibility="Visible" Name="FracDimLabel" DockPanel.Dock="Top" Foreground="Red" />
         </DockPanel>
 
         <Grid Visibility="Visible" Margin="735,10,10,3" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

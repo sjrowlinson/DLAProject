@@ -42,6 +42,7 @@ namespace DLAProject {
                 Height = 32.0
             };
             rad_brush = new RadialGradientBrush();
+            rad_brush.GradientStops.Add(new GradientStop(Colors.Black, 1.0));
             ellipse.Fill = rad_brush;
             ellipse.Measure(new Size(32, 32));
             ellipse.Arrange(new Rect(0, 0, 32, 32));
@@ -69,26 +70,16 @@ namespace DLAProject {
             // get the most recently added particle
             AggregateParticle p = particle_stack.Peek();
             int position_index = particle_stack.Count*4;
-            // create points according to particle co-ords
-            Point3D p1 = new Point3D(p.position.X, p.position.Y, p.position.Z);
-            Point3D p2 = new Point3D(p.position.X, p.position.Y + p.size, p.position.Z);
-            Point3D p3 = new Point3D(p.position.X + p.size, p.position.Y + p.size, p.position.Z);
-            Point3D p4 = new Point3D(p.position.X + p.size, p.position.Y, p.position.Z);
             // add points to particle positions collection
-            particle_positions.Add(p1);
-            particle_positions.Add(p2);
-            particle_positions.Add(p3);
-            particle_positions.Add(p4);
-            // create points for texture co-ords
-            Point t1 = new Point(0.0, 0.0);
-            Point t2 = new Point(0.0, 1.0);
-            Point t3 = new Point(1.0, 1.0);
-            Point t4 = new Point(1.0, 0.0);
+            particle_positions.Add(new Point3D(p.position.X, p.position.Y, p.position.Z));
+            particle_positions.Add(new Point3D(p.position.X, p.position.Y + p.size, p.position.Z));
+            particle_positions.Add(new Point3D(p.position.X + p.size, p.position.Y + p.size, p.position.Z));
+            particle_positions.Add(new Point3D(p.position.X + p.size, p.position.Y, p.position.Z));
             // add texture co-ords points to texcoords collection
-            tex_coords.Add(t1);
-            tex_coords.Add(t2);
-            tex_coords.Add(t3);
-            tex_coords.Add(t4);
+            tex_coords.Add(new Point(0.0, 0.0));
+            tex_coords.Add(new Point(0.0, 1.0));
+            tex_coords.Add(new Point(1.0, 1.0));
+            tex_coords.Add(new Point(1.0, 0.0));
             // add position indices to indices collection
             triangle_indices.Add(position_index);
             triangle_indices.Add(position_index + 2);
@@ -118,8 +109,8 @@ namespace DLAProject {
             ((MeshGeometry3D)particle_model.Geometry).Positions.Clear();
             ((MeshGeometry3D)particle_model.Geometry).TriangleIndices.Clear();
             ((MeshGeometry3D)particle_model.Geometry).TextureCoordinates.Clear();
-            rad_brush = new RadialGradientBrush();
-            ellipse.Fill = rad_brush;
+            rad_brush.GradientStops.Clear();
+            rad_brush.GradientStops.Add(new GradientStop(Colors.Black, 1.0));
         }
 
         /// <summary>
