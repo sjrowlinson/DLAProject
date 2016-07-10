@@ -61,8 +61,8 @@ void DLAContainer::set_attractor_type(AttractorType _attractor_type) {
 	attractor_type = _attractor_type;
 }
 
-double DLAContainer::aggregate_radius() const noexcept {
-	return aggregate_radius_;
+double DLAContainer::aggregate_radius_sqd() const noexcept {
+	return aggregate_radius_sqd_;
 }
 
 std::size_t DLAContainer::aggregate_misses() const noexcept {

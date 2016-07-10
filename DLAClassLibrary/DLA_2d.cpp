@@ -165,7 +165,7 @@ bool DLA_2d::aggregate_collision(const std::pair<int,int>& _current, const std::
 		aggregate_map.insert(std::make_pair(_previous, ++_count));
 		aggregate_pq.push(_previous);
 		batch_queue.push(_previous);
-		aggregate_radius_ = std::hypot(aggregate_pq.top().first, aggregate_pq.top().second);
+		aggregate_radius_sqd_ = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
 		return true;
 	}
 	return false;

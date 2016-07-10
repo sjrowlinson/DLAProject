@@ -373,7 +373,7 @@ namespace DLAProject {
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
                         if (current_particles % 100 == 0)
-                            nrchart.AddDataPoint(current_particles, dla_2d.GetAggregateRadius());
+                            nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_2d.GetAggregateRadiusSquared()));
                     });
                 }
             }
@@ -404,7 +404,7 @@ namespace DLAProject {
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
                         if (current_particles % 100 == 0)
-                            nrchart.AddDataPoint(current_particles, dla_3d.GetAggregateRadius());
+                            nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_3d.GetAggregateRadiusSquared()));
                     });
                 }
             }

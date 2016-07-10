@@ -176,7 +176,7 @@ bool DLA_3d::aggregate_collision(const utl::triple<int,int,int>& _current, const
 		aggregate_pq.push(_previous);
 		batch_queue.push(_previous);
 		utl::triple<int,int,int> max_dist = aggregate_pq.top();
-		aggregate_radius_ = std::sqrt(max_dist.first*max_dist.first + max_dist.second*max_dist.second + max_dist.third*max_dist.third);
+		aggregate_radius_sqd_ = max_dist.first*max_dist.first + max_dist.second*max_dist.second + max_dist.third*max_dist.third;
 		return true;
 	}
 	return false;

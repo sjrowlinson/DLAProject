@@ -19,7 +19,8 @@ namespace DLAProject {
 
     /// <summary>
     /// Represents a chart which plots the radius of a diffusion limited aggregate against 
-    /// the number of particles in the system.
+    /// the number of particles in the system. Inherits from INotifyPropertyChanged in order
+    /// to notify client when a chart property changed event has been fired.
     /// </summary>
     public class NumberRadiusChart : INotifyPropertyChanged {
         private uint x_axis_min;    // minimum value of x-axis
