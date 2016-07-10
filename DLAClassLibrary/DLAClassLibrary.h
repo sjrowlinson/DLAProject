@@ -131,6 +131,10 @@ namespace DLAClassLibrary {
 			return native_dla_2d_ptr->size();
 		}
 
+		std::size_t GetAggregateMisses() {
+			return native_dla_2d_ptr->aggregate_misses();
+		}
+
 		/**
 		 * \brief Gets the batch_queue from the DLA_2d pointer and processes the data, saving
 		 *        each co-ordinate point to a BlockingCollection and dequeuing the batch_queue
@@ -290,6 +294,10 @@ namespace DLAClassLibrary {
 		 */
 		std::size_t Size() {
 			return native_dla_3d_ptr->size();
+		}
+
+		std::size_t GetAggregateMisses() {
+			return native_dla_3d_ptr->aggregate_misses();
 		}
 
 		/**

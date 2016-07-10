@@ -315,6 +315,7 @@ namespace DLAProject {
                         comp_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
+                        AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
                     });
                     ++current_particles;
                 }
@@ -332,6 +333,7 @@ namespace DLAProject {
                         comp_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
+                        AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
                     });
                     ++current_particles;
                 }
@@ -360,6 +362,7 @@ namespace DLAProject {
                         aggregate_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
+                        AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
                     });
                     ++current_particles;
                 }
@@ -389,6 +392,7 @@ namespace DLAProject {
                         aggregate_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
+                        AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
                     });
                 }
             }
@@ -492,6 +496,7 @@ namespace DLAProject {
             current_particles = 0;
             DynamicParticleLabel.Content = "Particles: " + current_particles;
             FracDimLabel.Content = "Est. Fractal Dimension: " + 0.0;
+            AggMissesLabel.Content = "Aggregate Misses: " + 0;
             colour_list.Clear();
         }
 

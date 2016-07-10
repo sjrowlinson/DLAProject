@@ -174,10 +174,12 @@ void DLA_2d::spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, st
 }
 
 bool DLA_2d::aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, std::size_t& _count) {
-	// find the given point in the aggregrete, yields aggregrate_map.end() if not in container
-	auto search = aggregate_map.find(_current);
-	// co-ordinates _x, _y occur in the aggregate, collision occurred
-	if (search != aggregate_map.end() && _sticky_pr <= coeff_stick) {
+	// particle did not stick to aggregate, increment aggregate_misses counter
+	if (_sticky_pr > coeff_stick)
+		++aggregate_misses_;
+	// else, if current co-ordinates of particle exist in aggregate
+	// then collision and successful sticking occurred
+	else if (aggregate_map.find(_current) != aggregate_map.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		aggregate_map.insert(std::make_pair(_previous, ++_count));
 		aggregate_pq.push(_previous);

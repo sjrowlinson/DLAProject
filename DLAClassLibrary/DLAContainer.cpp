@@ -72,12 +72,17 @@ void DLAContainer::set_bound_radii_npoints(std::size_t _npoints) noexcept {
 	bound_radii_npoints = _npoints;
 }
 
+std::size_t DLAContainer::aggregate_misses() const noexcept {
+	return aggregate_misses_;
+}
+
 void DLAContainer::raise_abort_signal() noexcept {
 	abort_signal = true;
 }
 
 void DLAContainer::clear() {
 	bounding_radii_vec.clear();
+	aggregate_misses_ = 0;
 }
 
 std::ostream& DLAContainer::write_bounding_radii_data(std::ostream& _os) const {

@@ -138,6 +138,8 @@ public:
 	 */
 	void set_bound_radii_npoints(std::size_t _npoints) noexcept;
 
+	std::size_t aggregate_misses() const noexcept;
+
 	/**
 	 * \brief Raises an abort signal, stopping any current aggregate generation.
 	 */
@@ -204,6 +206,7 @@ protected:
 	bool abort_signal = false;
 	std::vector<std::pair<std::size_t, double>> bounding_radii_vec;
 	std::size_t bound_radii_npoints = 50;
+	std::size_t aggregate_misses_ = 0;
 
 	/**
 	 * \brief Updates position of random walking particle.

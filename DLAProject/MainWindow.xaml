@@ -64,7 +64,10 @@
         <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,20,0,-10" Visibility="Visible">
             <Label Visibility="Visible" Name="FracDimLabel" DockPanel.Dock="Top" Foreground="Red" />
         </DockPanel>
-
+        <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,35,0,-10" Visibility="Visible">
+            <Label Visibility="Visible" Name="AggMissesLabel" DockPanel.Dock="Top" Foreground="Red" />
+        </DockPanel>
+        
         <Grid Visibility="Visible" Margin="735,10,10,3" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" Margin="0,23,333,0" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="135" Height="26" VerticalAlignment="Top"/>
             <ComboBox x:Name="dimension_ComboBox" Margin="0,23,160,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" SelectionChanged="OnLatticeDimensionSelectionChanged" DropDownClosed="OnLatticeDimensionDropDownClosed">

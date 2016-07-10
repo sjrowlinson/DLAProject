@@ -184,10 +184,12 @@ void DLA_3d::spawn_particle(utl::triple<int,int,int>& _current, int& _spawn_diam
 }
 
 bool DLA_3d::aggregate_collision(const utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const double& _sticky_pr, std::size_t& _count) {
-	// find the given point in the aggregrete, yields aggregrate_map.end() if not in container
-	auto search = aggregate_map.find(_current);
-	// co-ordinates _x, _y, _z occur in the aggregate, collision occurred
-	if (search != aggregate_map.end() && _sticky_pr <= coeff_stick) {
+	// particle did not stick to aggregate, increment aggregate_misses counter
+	if (_sticky_pr > coeff_stick)
+		++aggregate_misses_;
+	// else, if current co-ordinates of particle exist in aggregate
+	// then collision and successful sticking occurred
+	else if (aggregate_map.find(_current) != aggregate_map.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		aggregate_map.insert(std::make_pair(_previous, ++_count));
 		aggregate_pq.push(_previous);
