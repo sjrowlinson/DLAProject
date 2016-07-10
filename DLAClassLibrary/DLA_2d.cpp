@@ -55,23 +55,12 @@ void DLA_2d::generate(size_t _n) {
 	// initialise current and previous co-ordinate containers
 	std::pair<int, int> current = { 0, 0 };
 	std::pair<int, int> prev = current;
-
 	bool has_next_spawned = false;
 	// variable to store current allowed size of bounding
 	// box spawning zone
 	int spawn_diameter = 0;
-
 	// uniform distribution in [0,1] for probability generation
 	std::uniform_real_distribution<> dist(0.0, 1.0);
-
-	// intervals to record bounding radii data at
-	std::size_t fractal_data_interval;
-	// prevents division by zero in generation loop interval checking
-	if (_n > bound_radii_npoints)
-		fractal_data_interval = _n / bound_radii_npoints;
-	else
-		fractal_data_interval = _n;
-	std::size_t prev_count_taken = count;
 	// aggregate generation loop 
 	while (size() < _n) {
 		if (abort_signal) {
@@ -91,20 +80,12 @@ void DLA_2d::generate(size_t _n) {
 		update_particle_position(current, movement_choice);
 		// check for collision with bounding walls and reflect if true
 		lattice_boundary_collision(current, prev, spawn_diameter);
-
 		double stick_pr = dist(mt_eng);
 		// check for collision with aggregate structure and add particle to 
 		// the aggregate (both to map and pq) if true, set flag ready for
 		// next particle spawn
 		if (aggregate_collision(current, prev, stick_pr, count)) {
 			has_next_spawned = false;
-		}
-		// record no. of particles in aggregate and corresponding minimal
-		// bounding radii to the field bounding_radii_vec
-		if (!(size() % fractal_data_interval) && size() != prev_count_taken) {
-			double rmax_sqd = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
-			bounding_radii_vec.push_back(std::make_pair(aggregate_map.size(), std::sqrt(rmax_sqd)));
-			prev_count_taken = size();
 		}
 	}
 }
@@ -184,6 +165,7 @@ bool DLA_2d::aggregate_collision(const std::pair<int,int>& _current, const std::
 		aggregate_map.insert(std::make_pair(_previous, ++_count));
 		aggregate_pq.push(_previous);
 		batch_queue.push(_previous);
+		aggregate_radius_ = std::hypot(aggregate_pq.top().first, aggregate_pq.top().second);
 		return true;
 	}
 	return false;

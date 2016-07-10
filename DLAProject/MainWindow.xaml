@@ -69,7 +69,7 @@
             <Label Visibility="Visible" Name="AggMissesLabel" DockPanel.Dock="Top" Foreground="Red" />
         </DockPanel>
         
-        <Grid Visibility="Visible" Margin="735,10,10,3" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid Visibility="Visible" Margin="735,10,10,450" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" Margin="0,23,333,0" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="135" Height="26" VerticalAlignment="Top"/>
             <ComboBox x:Name="dimension_ComboBox" Margin="0,23,160,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" SelectionChanged="OnLatticeDimensionSelectionChanged" DropDownClosed="OnLatticeDimensionDropDownClosed">
                 <ComboBoxItem IsSelected="True" Content="2D"/>
@@ -101,6 +101,23 @@
             <Button x:Name="pause_button" Content="Pause" Margin="0,217,393,0" VerticalAlignment="Top" Click="PauseButtonHandler" HorizontalAlignment="Right" Width="75"/>
             <Button x:Name="clear_button" Content="Clear" Margin="0,217,293,0" VerticalAlignment="Top" Click="ClearButtonHandler" HorizontalAlignment="Right" Width="75"/>
             <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="ResetViewButtonHandler" HorizontalAlignment="Right" Width="75" Margin="0,217,194,0"/>
+        </Grid>
+        <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" xmlns:dlaproj="clr-namespace:DLAProject"  d:DataContext="{d:DesignData dlaproj:NumberRadiusChart}">
+            <lvc:CartesianChart Name="NRChart">
+                <lvc:CartesianChart.Series>
+                    <lvc:LineSeries Values="{Binding Values}" PointGeometrySize="5" StrokeThickness="2" Fill="Transparent" />
+                </lvc:CartesianChart.Series>
+                <lvc:CartesianChart.AxisX>
+                    <lvc:Axis Title="Number of Particles" MaxValue="{Binding AxisMax}" MinValue="{Binding AxisMin}">
+                        <lvc:Axis.Separator>
+                            <lvc:Separator Step="{Binding AxisStep}"></lvc:Separator>
+                        </lvc:Axis.Separator>
+                    </lvc:Axis>
+                </lvc:CartesianChart.AxisX>
+                <lvc:CartesianChart.AxisY>
+                    <lvc:Axis Title="Aggregate Radius"></lvc:Axis>
+                </lvc:CartesianChart.AxisY>
+            </lvc:CartesianChart>
         </Grid>
     </Grid>
 </Window>

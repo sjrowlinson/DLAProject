@@ -19,21 +19,14 @@ DLAContainer::DLAContainer(const DLAContainer& _other) {
 	attractor_type = _other.attractor_type;
 	coeff_stick = _other.coeff_stick;
 	mt_eng = _other.mt_eng;
-	std::copy(_other.bounding_radii_vec.begin(), _other.bounding_radii_vec.end(), std::back_inserter(bounding_radii_vec));
 }
 
 DLAContainer::DLAContainer(DLAContainer&& _other) {
-	// deep copy fields of _other to this
-	lattice_type = _other.lattice_type;
-	attractor_type = _other.attractor_type;
-	coeff_stick = _other.coeff_stick;
-	mt_eng = _other.mt_eng;
-	// set _other container fields to default values
-	_other.lattice_type = LatticeType::SQUARE;
-	_other.attractor_type = AttractorType::POINT;
-	_other.coeff_stick = 1.0;
-	_other.mt_eng = std::mt19937();
-	std::move(_other.bounding_radii_vec.begin(), _other.bounding_radii_vec.end(), std::back_inserter(bounding_radii_vec));
+	// move fields of _other to this
+	lattice_type = std::move(_other.lattice_type);
+	attractor_type = std::move(_other.attractor_type);
+	coeff_stick = std::move(_other.coeff_stick);
+	mt_eng = std::move(_other.mt_eng);
 }
 
 DLAContainer::~DLAContainer() {
@@ -68,8 +61,8 @@ void DLAContainer::set_attractor_type(AttractorType _attractor_type) {
 	attractor_type = _attractor_type;
 }
 
-void DLAContainer::set_bound_radii_npoints(std::size_t _npoints) noexcept {
-	bound_radii_npoints = _npoints;
+double DLAContainer::aggregate_radius() const noexcept {
+	return aggregate_radius_;
 }
 
 std::size_t DLAContainer::aggregate_misses() const noexcept {
@@ -81,15 +74,7 @@ void DLAContainer::raise_abort_signal() noexcept {
 }
 
 void DLAContainer::clear() {
-	bounding_radii_vec.clear();
 	aggregate_misses_ = 0;
-}
-
-std::ostream& DLAContainer::write_bounding_radii_data(std::ostream& _os) const {
-	using utl::operator<<;
-	// write bounding_radii_vec to _os using overloaded operator<< for std::vector
-	_os << bounding_radii_vec;
-	return _os;
 }
 
 void DLAContainer::update_particle_position(std::pair<int,int>& _current, const double& _movement_choice) const noexcept {

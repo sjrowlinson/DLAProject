@@ -60,6 +60,7 @@ namespace DLAProject {
         private ManagedAttractorType attractor_type;
         private bool attractor_type_combo_handle = true;
         private readonly AggregateComponentManager comp_manager;
+        private NumberRadiusChart nrchart;
         #endregion
 
         public MainWindow() {
@@ -77,6 +78,8 @@ namespace DLAProject {
             lattice_type = ManagedLatticeType.Square;
             attractor_type = ManagedAttractorType.Point;
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
+            nrchart = new NumberRadiusChart();
+            NRChart.DataContext = nrchart;
             //comp_manager = new AggregateComponentManager();
         }
 
@@ -249,6 +252,9 @@ namespace DLAProject {
         private void SetUpAggregateProperties() {
             // reset simulation view
             ResetViewButtonHandler(null, null);
+            nrchart.SetAxisLimits((uint)particles_slider.Value);
+            nrchart.SetXAxisStep((uint)particles_slider.Value);
+            nrchart.AddDataPoint(0, 0.0);
             // switch on current lattice dimension constant
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
@@ -366,6 +372,8 @@ namespace DLAProject {
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
+                        if (current_particles % 100 == 0)
+                            nrchart.AddDataPoint(current_particles, dla_2d.GetAggregateRadius());
                     });
                 }
             }
@@ -395,6 +403,8 @@ namespace DLAProject {
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
+                        if (current_particles % 100 == 0)
+                            nrchart.AddDataPoint(current_particles, dla_3d.GetAggregateRadius());
                     });
                 }
             }
@@ -492,6 +502,7 @@ namespace DLAProject {
             }
             // clear aggregate from user interface
             aggregate_manager.ClearAggregate();
+            nrchart.ClearAllDataPoints();
             //WorldModels.Children.Clear();
             //WorldModels.Children.Add(new AmbientLight(Colors.White));
             //comp_manager.Clear();

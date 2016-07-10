@@ -131,12 +131,7 @@ public:
 	 */
 	virtual void set_attractor_type(AttractorType _attractor_type);
 
-	/**
-	 * \brief Sets the number of data points to generate for bounding radii data
-	 *
-	 * \param _npoints Number of data points to generate.
-	 */
-	void set_bound_radii_npoints(std::size_t _npoints) noexcept;
+	double aggregate_radius() const noexcept;
 
 	std::size_t aggregate_misses() const noexcept;
 
@@ -177,35 +172,13 @@ public:
 	 */
 	virtual std::ostream& write(std::ostream& _os, bool _sort_by_map_value = false) const = 0;
 
-	/**
-	 * \brief Writes the bounding radii for a predetermined number of intervals of particles
-	 *        in the aggregate to a std::ostream instance.
-	 *
-	 * Data are written in the following format:
-	 *
-	 \begin{verbatim}
-	 N1	R1
-	 N2	R2
-	 ...	...
-	 \end{verbatim}
-	 *
-	 * where N1 is the number of particles in the aggregate and R1 is the corresponding minimal bounding
-	 * radius which contains this aggregate state (written in \t delimited columns). The number of data
-	 * points is default set to 50, but can be altered with the method set_bound_radii_npoints.
-	 *
-	 * \param _os Instance of std::ostream for writing to.
-	 * \return modified std::ostream instance _os containing bounding_radii_vec data.
-	 */
-	std::ostream& write_bounding_radii_data(std::ostream& _os) const;
-
 protected:
 	LatticeType lattice_type;
 	AttractorType attractor_type;
 	double coeff_stick;
 	std::mt19937 mt_eng;
 	bool abort_signal = false;
-	std::vector<std::pair<std::size_t, double>> bounding_radii_vec;
-	std::size_t bound_radii_npoints = 50;
+	double aggregate_radius_ = 0.0;
 	std::size_t aggregate_misses_ = 0;
 
 	/**
