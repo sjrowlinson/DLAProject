@@ -223,7 +223,7 @@ namespace DLAProject {
                 }
                 // else translate the view
                 else {
-                    delta /= 20;
+                    delta /= 10.0;
                     translate_delta.X = -delta.X;
                     translate_delta.Y = delta.Y;
                 }

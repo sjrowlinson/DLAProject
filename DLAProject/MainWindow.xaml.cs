@@ -69,6 +69,7 @@ namespace DLAProject {
             dla_2d = new ManagedDLA2DContainer();
             dla_3d = new ManagedDLA3DContainer();
             aggregate_manager = new AggregateSystemManager();
+            // set initial flag values
             isPaused = false;
             hasFinished = true;
             current_particles = 0;

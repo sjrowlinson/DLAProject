@@ -131,7 +131,7 @@ namespace DLAClassLibrary {
 			return native_dla_2d_ptr->size();
 		}
 
-		double GetAggregateRadiusSquared() {
+		std::size_t GetAggregateRadiusSquared() {
 			return native_dla_2d_ptr->aggregate_radius_sqd();
 		}
 		std::size_t GetAggregateMisses() {
@@ -299,7 +299,7 @@ namespace DLAClassLibrary {
 			return native_dla_3d_ptr->size();
 		}
 
-		double GetAggregateRadiusSquared() {
+		std::size_t GetAggregateRadiusSquared() {
 			return native_dla_3d_ptr->aggregate_radius_sqd();
 		}
 		std::size_t GetAggregateMisses() {

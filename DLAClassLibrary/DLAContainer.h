@@ -131,7 +131,7 @@ public:
 	 */
 	virtual void set_attractor_type(AttractorType _attractor_type);
 
-	double aggregate_radius_sqd() const noexcept;
+	std::size_t aggregate_radius_sqd() const noexcept;
 
 	std::size_t aggregate_misses() const noexcept;
 
@@ -178,7 +178,7 @@ protected:
 	double coeff_stick;
 	std::mt19937 mt_eng;
 	bool abort_signal = false;
-	double aggregate_radius_sqd_ = 0.0;
+	std::size_t aggregate_radius_sqd_ = 0;
 	std::size_t aggregate_misses_ = 0;
 
 	/**
