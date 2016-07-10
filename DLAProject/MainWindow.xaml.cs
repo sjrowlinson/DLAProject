@@ -18,6 +18,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using DLAClassLibrary;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace DLAProject {
     /// <summary>
@@ -357,6 +359,7 @@ namespace DLAProject {
                     KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
                     Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
                     aggregate_manager.AddParticle(pos, colour_list[(int)current_particles], 1.0);
+                    ++current_particles;
                     // dispatch GUI updates to UI thread
                     Dispatcher.Invoke(() => {
                         aggregate_manager.Update();
@@ -364,7 +367,6 @@ namespace DLAProject {
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
                     });
-                    ++current_particles;
                 }
             }
         }
