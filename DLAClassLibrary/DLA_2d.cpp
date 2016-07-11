@@ -11,13 +11,10 @@ DLA_2d::DLA_2d(const DLA_2d& _other) : DLAContainer(_other) {
 	aggregate_pq = _other.aggregate_pq;
 }
 
-DLA_2d::DLA_2d(DLA_2d&& _other) : DLAContainer(_other) {
-	// deep copy fields of _other to this
-	aggregate_map = _other.aggregate_map;
-	aggregate_pq = _other.aggregate_pq;
-	// set _other container fields to default values
-	_other.aggregate_map = std::unordered_map<std::pair<int, int>, std::size_t, pair_hash>();
-	_other.aggregate_pq = std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator>();
+DLA_2d::DLA_2d(DLA_2d&& _other) : DLAContainer(std::move(_other)) {
+	// move fields of _other to this
+	aggregate_map = std::move(_other.aggregate_map);
+	aggregate_pq = std::move(_other.aggregate_pq);
 }
 
 DLA_2d::~DLA_2d() {}

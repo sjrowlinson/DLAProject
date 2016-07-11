@@ -11,13 +11,10 @@ DLA_3d::DLA_3d(const DLA_3d& _other) : DLAContainer(_other) {
 	aggregate_pq = _other.aggregate_pq;
 }
 
-DLA_3d::DLA_3d(DLA_3d&& _other) : DLAContainer(_other) {
+DLA_3d::DLA_3d(DLA_3d&& _other) : DLAContainer(std::move(_other)) {
 	// deep copy fields of _other to this
-	aggregate_map = _other.aggregate_map;
-	aggregate_pq = _other.aggregate_pq;
-	// set _other container fields to default values
-	_other.aggregate_map = std::unordered_map<utl::triple<int, int, int>, std::size_t, triple_hash>();
-	_other.aggregate_pq = std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d>();
+	aggregate_map = std::move(_other.aggregate_map);
+	aggregate_pq = std::move(_other.aggregate_pq);
 }
 
 DLA_3d::~DLA_3d() {}
