@@ -461,7 +461,11 @@ namespace DLAProject {
             // (re)-initialise aggregate properties
             SetUpAggregateProperties();
             // pre-compute colour_list for each particle in aggregate
-            ComputeColorList((uint)particles_slider.Value);
+            if (!isContinuous) ComputeColorList((uint)particles_slider.Value);
+            else {
+                ComputeColorList(50000);
+                // fire event / raise signal via DLAClassLibrary to indicate continuous generation required
+            }
             //for (int i = 0; i < (int)particles_slider.Value; ++i) {
             //    WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
             //}
