@@ -47,6 +47,7 @@ namespace DLAProject {
         // flags for paused and finished states
         private bool isPaused;
         private bool hasFinished;
+        private bool isContinuous;
         // handle to AggregateSystemManager used for updating simulation render
         private readonly AggregateSystemManager aggregate_manager;
         private TrackView trackview;
@@ -72,6 +73,7 @@ namespace DLAProject {
             // set initial flag values
             isPaused = false;
             hasFinished = true;
+            isContinuous = false;
             current_particles = 0;
             colour_list = new List<Color>();
             lattice_dimension = LatticeDimension._2D;
@@ -98,6 +100,13 @@ namespace DLAProject {
             // assign Viewport3D world to trackview viewport slave
             trackview.Viewport = World;
             trackview.Enabled = true;
+        }
+
+        private void OnContinuousCheckboxClicked(object sender, RoutedEventArgs e) {
+            if (!isContinuous)
+                isContinuous = true;
+            else
+                isContinuous = false;
         }
 
         #region ComboBoxHandlers

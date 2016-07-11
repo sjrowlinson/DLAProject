@@ -25,7 +25,7 @@ namespace DLAProject {
     public class NumberRadiusChart : INotifyPropertyChanged {
         private uint x_axis_min;    // minimum value of x-axis
         private uint x_axis_max;    // maximum value of x-axis
-        private uint x_axis_step;
+        private uint x_axis_step;   // incremental step of x-axis
 
         /// <summary>
         /// Initialises a new instance of the NumberRadiusChart class.
@@ -33,7 +33,7 @@ namespace DLAProject {
         public NumberRadiusChart() {
             // create a mapper using NumberRadiusMeasureModel where
             // X co-ord is ParticleNumber and Y co-ord is Radius.
-            var mapper = Mappers.Xy<NumberRadiusMeasureModel>()
+            CartesianMapper<NumberRadiusMeasureModel> mapper = Mappers.Xy<NumberRadiusMeasureModel>()
                  .X(model => model.ParticleNumber)
                  .Y(model => model.AggregateRadius);
             // save the mapper globally
