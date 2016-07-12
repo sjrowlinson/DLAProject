@@ -59,7 +59,7 @@ void DLA_2d::generate(size_t _n) {
 	// uniform distribution in [0,1] for probability generation
 	std::uniform_real_distribution<> dist(0.0, 1.0);
 	// aggregate generation loop 
-	while (size() < _n) {
+	while (size() < _n || continuous) {
 		if (abort_signal) {
 			abort_signal = false;
 			return;

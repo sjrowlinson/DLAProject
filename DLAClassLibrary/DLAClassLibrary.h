@@ -165,6 +165,10 @@ namespace DLAClassLibrary {
 			native_dla_2d_ptr->raise_abort_signal();
 		}
 
+		void ChangeContinuousFlag(bool _continuous) {
+			native_dla_2d_ptr->change_continuous_flag(_continuous);
+		}
+
 		/**
 		 * \brief Clears the aggregrate of all particles.
 		 */
@@ -338,6 +342,10 @@ namespace DLAClassLibrary {
 		 */
 		void RaiseAbortSignal() {
 			native_dla_3d_ptr->raise_abort_signal();
+		}
+
+		void ChangeContinuousFlag(bool _continuous) {
+			native_dla_3d_ptr->change_continuous_flag(_continuous);
 		}
 
 		/**

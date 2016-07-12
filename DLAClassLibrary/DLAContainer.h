@@ -140,6 +140,8 @@ public:
 	 */
 	void raise_abort_signal() noexcept;
 
+	void change_continuous_flag(bool _continuous) noexcept;
+
 	/**
 	 * \brief Clears the aggregrate structure.
 	 */
@@ -178,6 +180,7 @@ protected:
 	double coeff_stick;
 	std::mt19937 mt_eng;
 	bool abort_signal = false;
+	bool continuous = false;
 	std::size_t aggregate_radius_sqd_ = 0;
 	std::size_t aggregate_misses_ = 0;
 

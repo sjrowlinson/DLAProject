@@ -48,6 +48,7 @@ namespace DLAProject {
         private bool isPaused;
         private bool hasFinished;
         private bool isContinuous;
+        private bool saveCurrentChartSeries;
         // handle to AggregateSystemManager used for updating simulation render
         private readonly AggregateSystemManager aggregate_manager;
         private TrackView trackview;
@@ -60,7 +61,7 @@ namespace DLAProject {
         private bool lattice_type_combo_handle = true;
         private ManagedAttractorType attractor_type;
         private bool attractor_type_combo_handle = true;
-        private readonly AggregateComponentManager comp_manager;
+        //private readonly AggregateComponentManager comp_manager;
         private NumberRadiusChart nrchart;
         #endregion
 
@@ -74,6 +75,7 @@ namespace DLAProject {
             isPaused = false;
             hasFinished = true;
             isContinuous = false;
+            saveCurrentChartSeries = true;
             current_particles = 0;
             colour_list = new List<Color>();
             lattice_dimension = LatticeDimension._2D;
@@ -101,12 +103,32 @@ namespace DLAProject {
             trackview.Viewport = World;
             trackview.Enabled = true;
         }
-
+        /// <summary>
+        /// Handler for continuous_checkbox click event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnContinuousCheckboxClicked(object sender, RoutedEventArgs e) {
-            if (!isContinuous)
+            if (!isContinuous) {
                 isContinuous = true;
-            else
+                particles_slider.IsEnabled = false;
+                particle_val.IsEnabled = false;
+            }
+            else {
                 isContinuous = false;
+                particles_slider.IsEnabled = true;
+                particle_val.IsEnabled = true;
+            }
+            if (!hasFinished) {
+                switch (current_executing_dimension) {
+                    case LatticeDimension._2D:
+                        dla_2d.ChangeContinuousFlag(false);
+                        break;
+                    case LatticeDimension._3D:
+                        dla_3d.ChangeContinuousFlag(false);
+                        break;
+                }
+            }
         }
 
         #region ComboBoxHandlers
@@ -259,23 +281,27 @@ namespace DLAProject {
         /// Sets up all the properties of the aggregate necessary for generation, including 
         /// lattice type, attractor type and the dimensions of the aggregate.
         /// </summary>
-        private void SetUpAggregateProperties() {
+        private void SetUpAggregateProperties(uint _nparticles, double _agg_sticky_coeff) {
             // reset simulation view
             ResetViewButtonHandler(null, null);
-            nrchart.SetAxisLimits((uint)particles_slider.Value);
-            nrchart.SetXAxisStep((uint)particles_slider.Value);
+            // pre-compute the color list for all particles
+            if (!isContinuous) ComputeColorList(_nparticles);
+            else ComputeColorList(50000);   // TODO: change this, don't like "magic" number
+            if(saveCurrentChartSeries) nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff);
             nrchart.AddDataPoint(0, 0.0);
-            // switch on current lattice dimension constant
+            // set properties of aggregate corresponding to dimension
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
-                    dla_2d.SetCoeffStick(stickiness_slider.Value);
+                    dla_2d.SetCoeffStick(_agg_sticky_coeff);
                     dla_2d.SetLatticeType(lattice_type);
                     dla_2d.SetAttractorType(attractor_type);
+                    dla_2d.ChangeContinuousFlag(isContinuous);
                     break;
                 case LatticeDimension._3D:
-                    dla_3d.SetCoeffStick(stickiness_slider.Value);
+                    dla_3d.SetCoeffStick(_agg_sticky_coeff);
                     dla_3d.SetLatticeType(lattice_type);
                     dla_3d.SetAttractorType(attractor_type);
+                    dla_3d.ChangeContinuousFlag(isContinuous);
                     break;
             }
         }
@@ -295,8 +321,8 @@ namespace DLAProject {
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
-                    if (dla_2d.Size() < _particle_slider_val) {
-                        timer.Elapsed += Aggregate2DUpdateOnTimedEvent;
+                    if (dla_2d.Size() < _particle_slider_val || isContinuous) {
+                        timer.Elapsed += (source, e) => Aggregate2DUpdateOnTimedEvent(source, e, _particle_slider_val);
                         timer.AutoReset = true;
                         timer.Enabled = true;
                     }
@@ -307,8 +333,8 @@ namespace DLAProject {
                     }
                     break;
                 case LatticeDimension._3D:
-                    if (dla_3d.Size() < _particle_slider_val) {
-                        timer.Elapsed += Aggregate3DUpdateOnTimedEvent;
+                    if (dla_3d.Size() < _particle_slider_val || isContinuous) {
+                        timer.Elapsed += (source, e) => Aggregate3DUpdateOnTimedEvent(source, e, _particle_slider_val);
                         timer.AutoReset = true;
                         timer.Enabled = true;
                     }
@@ -328,9 +354,9 @@ namespace DLAProject {
                 while (blocking_queue.Count != 0) {
                     KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
                     Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0.0);
-                    comp_manager.AddParticleToComponent(pos, 1.0);
+                    //comp_manager.AddParticleToComponent(pos, 1.0);
                     Dispatcher.Invoke(() => {
-                        comp_manager.Update();
+                        //comp_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
@@ -346,9 +372,9 @@ namespace DLAProject {
                 while (blocking_queue.Count != 0) {
                     Tuple<int, int, int> agg_tuple = blocking_queue.Take();
                     Point3D pos = new Point3D(agg_tuple.Item1, agg_tuple.Item2, agg_tuple.Item3);
-                    comp_manager.AddParticleToComponent(pos, 1.0);
+                    //comp_manager.AddParticleToComponent(pos, 1.0);
                     Dispatcher.Invoke(() => {
-                        comp_manager.Update();
+                        //comp_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
@@ -364,7 +390,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        private void Aggregate2DUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
+        private void Aggregate2DUpdateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
@@ -384,6 +410,10 @@ namespace DLAProject {
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
                         if (current_particles % 100 == 0)
                             nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_2d.GetAggregateRadiusSquared()));
+                        if (current_particles % 2000 == 0 && current_particles != total_particles) {
+                            nrchart.AxisStep += 100;
+                            nrchart.AxisMax += 2000;
+                        }
                     });
                 }
             }
@@ -395,7 +425,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        private void Aggregate3DUpdateOnTimedEvent(object source, ElapsedEventArgs e) {
+        private void Aggregate3DUpdateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
@@ -415,6 +445,10 @@ namespace DLAProject {
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
                         if (current_particles % 100 == 0)
                             nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_3d.GetAggregateRadiusSquared()));
+                        if (current_particles % 2000 == 0 && current_particles != total_particles) {
+                            nrchart.AxisStep += 100;
+                            nrchart.AxisMax += 2000;
+                        }
                     });
                 }
             }
@@ -425,25 +459,22 @@ namespace DLAProject {
         /// current values of sliders and combo-boxes in the UI. Should be called
         /// in a separate thread.
         /// </summary>
-        private void GenerateAggregate() {
+        private void GenerateAggregate(uint _nparticles) {
             hasFinished = false;
-            uint particle_slider_val = 0;
-            // dispatch the particles_slider value access code to UI thread
-            Dispatcher.Invoke(() => {
-                particle_slider_val = (uint)particles_slider.Value;
-            });
             // start asynchronous task calling AggregateUpdateListener to perform rendering
-            Task.Factory.StartNew(() => AggregateUpdateListener(particle_slider_val));
+            Task.Factory.StartNew(() => AggregateUpdateListener(_nparticles));
             // generate the DLA using value of particle slider
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
-                    dla_2d.Generate(particle_slider_val);
+                    dla_2d.Generate(_nparticles);
                     break;
                 case LatticeDimension._3D:
-                    dla_3d.Generate(particle_slider_val);
+                    dla_3d.Generate(_nparticles);
                     break;
             }
             hasFinished = true;
+            saveCurrentChartSeries = false;
+            Dispatcher.Invoke(() => { compare_button.IsEnabled = true; });
         }
 
         #region ButtonHandlers
@@ -458,19 +489,15 @@ namespace DLAProject {
             if (current_particles > 0)
                 ClearButtonHandler(null, null);
             current_executing_dimension = lattice_dimension;
+            uint nparticles = (uint)particles_slider.Value;
+            double agg_sticky_coeff = stickiness_slider.Value;
             // (re)-initialise aggregate properties
-            SetUpAggregateProperties();
-            // pre-compute colour_list for each particle in aggregate
-            if (!isContinuous) ComputeColorList((uint)particles_slider.Value);
-            else {
-                ComputeColorList(50000);
-                // fire event / raise signal via DLAClassLibrary to indicate continuous generation required
-            }
+            SetUpAggregateProperties(nparticles, agg_sticky_coeff);
             //for (int i = 0; i < (int)particles_slider.Value; ++i) {
             //    WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
             //}
             // start asynchronous task calling GenerateAggregate method
-            Task.Factory.StartNew(() => GenerateAggregate());
+            Task.Factory.StartNew(() => GenerateAggregate(isContinuous ? 0 : nparticles));
         }
 
         /// <summary>
@@ -516,7 +543,10 @@ namespace DLAProject {
             }
             // clear aggregate from user interface
             aggregate_manager.ClearAggregate();
-            nrchart.ClearAllDataPoints();
+            if (!saveCurrentChartSeries) {
+                nrchart.ClearAllSeriesDataPoints();
+                nrchart.ResetXAxisProperties();
+            }
             //WorldModels.Children.Clear();
             //WorldModels.Children.Add(new AmbientLight(Colors.White));
             //comp_manager.Clear();
@@ -548,6 +578,11 @@ namespace DLAProject {
                     orthograghic_camera.Width = 128.0;
                     break;
             }
+        }
+
+        private void OnCompareButtonClick(object sender, RoutedEventArgs e) {
+            saveCurrentChartSeries = true;
+            compare_button.IsEnabled = false;
         }
 
         #endregion

@@ -13,25 +13,15 @@ DLAContainer::DLAContainer(LatticeType _lattice_type, AttractorType _attractor_t
 	mt_eng = std::mt19937(rd());
 }
 
-DLAContainer::DLAContainer(const DLAContainer& _other) {
-	// deep copy fields of _other to this
-	lattice_type = _other.lattice_type;
-	attractor_type = _other.attractor_type;
-	coeff_stick = _other.coeff_stick;
-	mt_eng = _other.mt_eng;
-}
+DLAContainer::DLAContainer(const DLAContainer& _other)
+	: lattice_type(_other.lattice_type), attractor_type(_other.attractor_type),
+		coeff_stick(_other.coeff_stick), mt_eng(_other.mt_eng) {}
 
-DLAContainer::DLAContainer(DLAContainer&& _other) {
-	// move fields of _other to this
-	lattice_type = std::move(_other.lattice_type);
-	attractor_type = std::move(_other.attractor_type);
-	coeff_stick = std::move(_other.coeff_stick);
-	mt_eng = std::move(_other.mt_eng);
-}
+DLAContainer::DLAContainer(DLAContainer&& _other)
+	: lattice_type(std::move(_other.lattice_type)), attractor_type(std::move(_other.attractor_type)),
+	coeff_stick(std::move(_other.coeff_stick)), mt_eng(std::move(_other.mt_eng)) {}
 
-DLAContainer::~DLAContainer() {
-
-}
+DLAContainer::~DLAContainer() {}
 
 double DLAContainer::get_coeff_stick() const noexcept {
 	return coeff_stick;
@@ -71,6 +61,10 @@ std::size_t DLAContainer::aggregate_misses() const noexcept {
 
 void DLAContainer::raise_abort_signal() noexcept {
 	abort_signal = true;
+}
+
+void DLAContainer::change_continuous_flag(bool _continuous) noexcept {
+	continuous = _continuous;
 }
 
 void DLAContainer::clear() {

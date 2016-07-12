@@ -12,7 +12,7 @@ DLA_3d::DLA_3d(const DLA_3d& _other) : DLAContainer(_other) {
 }
 
 DLA_3d::DLA_3d(DLA_3d&& _other) : DLAContainer(std::move(_other)) {
-	// deep copy fields of _other to this
+	// move fields of _other to this
 	aggregate_map = std::move(_other.aggregate_map);
 	aggregate_pq = std::move(_other.aggregate_pq);
 }
@@ -52,7 +52,7 @@ void DLA_3d::generate(size_t _n) {
 	// uniform distribution in [0,1] for probability generation
 	std::uniform_real_distribution<> dist(0.0, 1.0);
 	// aggregate generation loop
-	while (size() < _n) {
+	while (size() < _n || continuous) {
 		if (abort_signal) {
 			abort_signal = false;
 			return;

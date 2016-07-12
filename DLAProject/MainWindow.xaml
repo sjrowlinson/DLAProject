@@ -22,7 +22,7 @@
                             <Transform3DGroup>
                                 <Transform3DGroup.Children>
                                     <Transform3DCollection>
-                                        
+
                                         <RotateTransform3D>
                                             <RotateTransform3D.Rotation>
                                                 <AxisAngleRotation3D Axis="0 1 0" Angle="0"></AxisAngleRotation3D>
@@ -31,7 +31,7 @@
                                         <ScaleTransform3D ScaleX="1" ScaleY="1" ScaleZ="1">
                                         </ScaleTransform3D>
                                         <TranslateTransform3D OffsetX="0" OffsetY="0" OffsetZ="0"></TranslateTransform3D>
-                                        
+
                                     </Transform3DCollection>
                                 </Transform3DGroup.Children>
                             </Transform3DGroup>
@@ -68,7 +68,7 @@
         <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,35,0,-10" Visibility="Visible">
             <Label Visibility="Visible" Name="AggMissesLabel" DockPanel.Dock="Top" Foreground="Red" />
         </DockPanel>
-        
+
         <Grid Visibility="Visible" Margin="735,10,10,450" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" Margin="0,23,333,0" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="135" Height="26" VerticalAlignment="Top"/>
             <ComboBox x:Name="dimension_ComboBox" Margin="0,23,160,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Right" Width="120" SelectionChanged="OnLatticeDimensionSelectionChanged" DropDownClosed="OnLatticeDimensionDropDownClosed">
@@ -102,12 +102,10 @@
             <Button x:Name="clear_button" Content="Clear" Margin="0,217,293,0" VerticalAlignment="Top" Click="ClearButtonHandler" HorizontalAlignment="Right" Width="75"/>
             <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="ResetViewButtonHandler" HorizontalAlignment="Right" Width="75" Margin="0,217,194,0"/>
             <CheckBox x:Name="continuous_checkbox" Content="Continuous Generation" HorizontalAlignment="Left" Margin="438,217,0,0" VerticalAlignment="Top" Click="OnContinuousCheckboxClicked"/>
+            <Button x:Name="compare_button" Content="Add to Compare" HorizontalAlignment="Left" Margin="497,247,0,0" VerticalAlignment="Top" Width="106" Click="OnCompareButtonClick" IsEnabled="False"/>
         </Grid>
         <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <lvc:CartesianChart Name="NRChart">
-                <lvc:CartesianChart.Series>
-                    <lvc:LineSeries Values="{Binding Values}" PointGeometrySize="5" StrokeThickness="2" Fill="Transparent" />
-                </lvc:CartesianChart.Series>
+            <lvc:CartesianChart Name="NRChart" Series="{Binding NRSeriesCollection}" LegendLocation="Right">
                 <lvc:CartesianChart.AxisX>
                     <lvc:Axis Title="Number of Particles" MaxValue="{Binding AxisMax}" MinValue="{Binding AxisMin}">
                         <lvc:Axis.Separator>
