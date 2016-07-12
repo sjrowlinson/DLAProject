@@ -82,21 +82,32 @@ namespace DLAProject {
             get { return x_axis_max; }
             set { x_axis_max = value; OnPropertyChanged("AxisMax"); }
         }
+        /// <summary>
+        /// Resets the x-axis minimum, maximum values and step-size.
+        /// </summary>
         public void ResetXAxisProperties() {
             AxisMin = 0;
             AxisMax = 2000;
             AxisStep = 100;
         }
+        public int SeriesCount() {
+            return NRSeriesCollection.Count;
+        }
+        /// <summary>
+        /// Adds a new data series to the chart, the new series is a LineSeries added to
+        /// NRSeriesCollection with Title given by nparticles and coeff_stick params.
+        /// </summary>
+        /// <param name="nparticles">Number of particles in current aggregate generation.</param>
+        /// <param name="coeff_stick">Coefficient of stickiness of aggregate structure.</param>
         public void AddDataSeries(uint nparticles, double coeff_stick) {
             NRSeriesCollection.Add(new LineSeries {
-                Title = nparticles + ", " + coeff_stick,
+                Title = nparticles + "/" + coeff_stick,
                 Values = new ChartValues<NumberRadiusMeasureModel>(),
                 PointGeometrySize = 5,
                 Fill = Brushes.Transparent
             });
             ++series_counter;
         }
-
         /// <summary>
         /// Adds a data point to the chart with specified x,y values.
         /// </summary>
@@ -110,12 +121,10 @@ namespace DLAProject {
             OnPropertyChanged("AxisMin");
         }
         /// <summary>
-        /// Clears all data points from the chart.
+        /// Clears all data points from all series on the chart.
         /// </summary>
         public void ClearAllSeriesDataPoints() {
-            foreach (var series in NRSeriesCollection) {
-                series.Values.Clear();
-            }
+            NRSeriesCollection.Clear();
             series_counter = -1;
         }
 

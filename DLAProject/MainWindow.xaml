@@ -105,7 +105,7 @@
             <Button x:Name="compare_button" Content="Add to Compare" HorizontalAlignment="Left" Margin="497,247,0,0" VerticalAlignment="Top" Width="106" Click="OnCompareButtonClick" IsEnabled="False"/>
         </Grid>
         <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <lvc:CartesianChart Name="NRChart" Series="{Binding NRSeriesCollection}" LegendLocation="Right">
+            <lvc:CartesianChart Name="NRChart" Series="{Binding NRSeriesCollection}">
                 <lvc:CartesianChart.AxisX>
                     <lvc:Axis Title="Number of Particles" MaxValue="{Binding AxisMax}" MinValue="{Binding AxisMin}">
                         <lvc:Axis.Separator>
@@ -114,7 +114,7 @@
                     </lvc:Axis>
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="Aggregate Radius"></lvc:Axis>
+                    <lvc:Axis Title="Aggregate Radius" MaxValue="200" MinValue="0"></lvc:Axis>
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
         </Grid>

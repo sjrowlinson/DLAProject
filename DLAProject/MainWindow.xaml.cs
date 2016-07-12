@@ -288,6 +288,7 @@ namespace DLAProject {
             if (!isContinuous) ComputeColorList(_nparticles);
             else ComputeColorList(50000);   // TODO: change this, don't like "magic" number
             if(saveCurrentChartSeries) nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff);
+            NRChart.LegendLocation = LegendLocation.Right;
             nrchart.AddDataPoint(0, 0.0);
             // set properties of aggregate corresponding to dimension
             switch (current_executing_dimension) {
@@ -410,7 +411,7 @@ namespace DLAProject {
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
                         if (current_particles % 100 == 0)
                             nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_2d.GetAggregateRadiusSquared()));
-                        if (current_particles % 2000 == 0 && current_particles != total_particles) {
+                        if (current_particles % 2000 == 0 && current_particles != total_particles && nrchart.SeriesCount() < 2) {
                             nrchart.AxisStep += 100;
                             nrchart.AxisMax += 2000;
                         }
@@ -445,7 +446,7 @@ namespace DLAProject {
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
                         if (current_particles % 100 == 0)
                             nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_3d.GetAggregateRadiusSquared()));
-                        if (current_particles % 2000 == 0 && current_particles != total_particles) {
+                        if (current_particles % 2000 == 0 && current_particles != total_particles && nrchart.SeriesCount() < 2) {
                             nrchart.AxisStep += 100;
                             nrchart.AxisMax += 2000;
                         }
@@ -544,8 +545,9 @@ namespace DLAProject {
             // clear aggregate from user interface
             aggregate_manager.ClearAggregate();
             if (!saveCurrentChartSeries) {
-                nrchart.ClearAllSeriesDataPoints();
                 nrchart.ResetXAxisProperties();
+                nrchart.ClearAllSeriesDataPoints();
+                saveCurrentChartSeries = true;
             }
             //WorldModels.Children.Clear();
             //WorldModels.Children.Add(new AmbientLight(Colors.White));
