@@ -53,6 +53,7 @@ namespace DLAProject {
         private readonly AggregateSystemManager aggregate_manager;
         private TrackView trackview;
         private uint current_particles;
+        private uint prev_max_chart_x_value;
         private List<Color> colour_list;
         private LatticeDimension lattice_dimension;
         private bool lattice_dimension_combo_handle = true;
@@ -77,6 +78,7 @@ namespace DLAProject {
             isContinuous = false;
             saveCurrentChartSeries = true;
             current_particles = 0;
+            prev_max_chart_x_value = 0;
             colour_list = new List<Color>();
             lattice_dimension = LatticeDimension._2D;
             current_executing_dimension = lattice_dimension;
@@ -411,7 +413,7 @@ namespace DLAProject {
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
                         if (current_particles % 100 == 0)
                             nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_2d.GetAggregateRadiusSquared()));
-                        if (current_particles % 2000 == 0 && current_particles != total_particles && nrchart.SeriesCount() < 2) {
+                        if (current_particles % 2000 == 0 && current_particles >= prev_max_chart_x_value && current_particles != total_particles) {
                             nrchart.AxisStep += 100;
                             nrchart.AxisMax += 2000;
                         }
@@ -446,7 +448,7 @@ namespace DLAProject {
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
                         if (current_particles % 100 == 0)
                             nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_3d.GetAggregateRadiusSquared()));
-                        if (current_particles % 2000 == 0 && current_particles != total_particles && nrchart.SeriesCount() < 2) {
+                        if (current_particles % 2000 == 0 && current_particles > prev_max_chart_x_value && current_particles != total_particles) {
                             nrchart.AxisStep += 100;
                             nrchart.AxisMax += 2000;
                         }
@@ -474,6 +476,7 @@ namespace DLAProject {
                     break;
             }
             hasFinished = true;
+            prev_max_chart_x_value = nrchart.AxisMax;
             saveCurrentChartSeries = false;
             Dispatcher.Invoke(() => { compare_button.IsEnabled = true; });
         }
@@ -548,6 +551,7 @@ namespace DLAProject {
                 nrchart.ResetXAxisProperties();
                 nrchart.ClearAllSeriesDataPoints();
                 saveCurrentChartSeries = true;
+                prev_max_chart_x_value = 0;
             }
             //WorldModels.Children.Clear();
             //WorldModels.Children.Add(new AmbientLight(Colors.White));
