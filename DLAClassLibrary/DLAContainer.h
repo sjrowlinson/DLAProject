@@ -42,9 +42,7 @@ enum class AttractorType {
  * \date April, 2016
  */
 class DLAContainer {
-
 public:
-
 	/**
 	 * \brief Default constructor, initialises empty aggregate with default lattice type
 	 *        of LatticeType::SQUARE and attractor type of AttractorType::POINT.
@@ -53,7 +51,6 @@ public:
 	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
 	 */
 	DLAContainer(const double& _coeff_stick = 1.0);
-
 	/**
 	 * \brief Constructor with parameters for type of lattice and type of attractor.
 	 *
@@ -62,14 +59,12 @@ public:
 	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
 	 */
 	DLAContainer(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
-
 	/**
 	 * \brief Copy constructor, copies contents of parameterised DLAContainer to this.
 	 *
 	 * \param _other const reference to DLAContainer instance.
 	 */
 	DLAContainer(const DLAContainer& _other);
-
 	/**
 	 * \brief Move constructor, uses move-semantics for constructing a DLAContainer 
 	 *        from an rvalue reference of a DLAContainer - leaving that container
@@ -78,7 +73,6 @@ public:
  	 * \param _other rvalue reference to DLAContainer instance.
 	 */
 	DLAContainer(DLAContainer&& _other);
-
 	virtual ~DLAContainer();
 
 	/**
@@ -87,14 +81,12 @@ public:
 	 * \return Size of the aggregate.
 	 */
 	virtual std::size_t size() const noexcept = 0;
-
 	/**
 	 * \brief Gets the stickiness coefficient of the aggregate.
 	 *
 	 * \return Coefficient of stickiness of this aggregate.
 	 */
 	double get_coeff_stick() const noexcept;
-
 	/**
 	 * \brief Sets the coefficient of stickiness of the aggregrate.
 	 *
@@ -102,51 +94,41 @@ public:
 	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
 	 */
 	void set_coeff_stick(const double& _coeff_stick);
-
 	/**
 	 * \brief Gets the type of lattice.
 	 *
 	 * \return lattice_type of this instance.
 	 */
 	LatticeType get_lattice_type() const noexcept;
-
 	/**
 	 * \brief Gets the type of attractor.
 	 *
 	 * \return attractor_type of this instance.
 	 */
 	AttractorType get_attractor_type() const noexcept;
-
 	/**
 	 * \brief Sets the type of lattice.
 	 *
 	 * \param _lattice_type LatticeType to update to.
 	 */
 	void set_lattice_type(LatticeType _lattice_type) noexcept;
-
 	/**
 	 * \brief Sets the type of attractor.
 	 *
 	 * \param _attractor_type AttractorType to update to.
 	 */
 	virtual void set_attractor_type(AttractorType _attractor_type);
-
 	std::size_t aggregate_radius_sqd() const noexcept;
-
 	std::size_t aggregate_misses() const noexcept;
-
 	/**
 	 * \brief Raises an abort signal, stopping any current aggregate generation.
 	 */
 	void raise_abort_signal() noexcept;
-
 	void change_continuous_flag(bool _continuous) noexcept;
-
 	/**
 	 * \brief Clears the aggregrate structure.
 	 */
 	virtual void clear();
-
 	/**
 	 * \brief Generates a diffusion limited aggregate consisting of the parameterised
 	 *        number of particles.
@@ -154,14 +136,12 @@ public:
 	 * \param _n Number of particles to generate in the DLA.
 	 */
 	virtual void generate(std::size_t n) = 0;
-
 	/**
 	 * \brief Computes an estimate of the fractal dimension for the aggregrate.
 	 *
 	 * \return Estimate of aggregrate fractal dimension.
 	 */
 	virtual double estimate_fractal_dimension() const = 0;
-
 	/**
 	 * \brief Write aggregate to an output stream std::ostream, defaults to "write-as-is" where
 	 *        the aggregate data is written without any sorting.
@@ -173,7 +153,6 @@ public:
 	 * \param _sort_by_map_value [= false] Flag to signal sorting of data before writing.
 	 */
 	virtual std::ostream& write(std::ostream& _os, bool _sort_by_map_value = false) const = 0;
-
 protected:
 	LatticeType lattice_type;
 	AttractorType attractor_type;
@@ -195,7 +174,6 @@ protected:
 	 * \copydoc DLAContainer::update_particle_position(std::pair<int,int>,const double&)
 	 */
 	void update_particle_position(utl::triple<int,int,int>& _current, const double& _movement_choice) const noexcept;
-
 	/**
 	 * \brief Checks for collision with boundary of lattice and reflects.
 	 *

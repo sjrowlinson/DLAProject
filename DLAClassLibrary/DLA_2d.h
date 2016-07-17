@@ -41,9 +41,7 @@ struct distance_comparator {
  * \date May, 2016
  */
 class DLA_2d : public DLAContainer {
-
 public:
-
 	/**
 	 * \brief Default constructor, initialises empty 2d aggregate with given stickiness coefficient.
 	 *
@@ -51,7 +49,6 @@ public:
 	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
 	 */
 	DLA_2d(const double& _coeff_stick = 1.0);
-
 	/**
 	 * \brief Initialises empty 2d aggregate with specified lattice and attractor types.
 	 *
@@ -60,14 +57,12 @@ public:
 	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
 	 */
 	DLA_2d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
-
 	/**
 	 * \brief Copy constructor, copies contents of parameterised DLA_2d to this.
 	 *
 	 * \param _other const reference to DLA_2d instance.
 	 */
 	DLA_2d(const DLA_2d& _other);
-
 	/**
 	 * \brief Move constructor, uses move-semantics for constructing a DLA_2d.
 	 *        from an rvalue reference of a DLA_2d - leaving that container.
@@ -76,14 +71,12 @@ public:
 	 * \param _other rvalue reference to DLA_2d instance
 	 */
 	DLA_2d(DLA_2d&& _other);
-
 	~DLA_2d();
 
 	/**
 	 * \copydoc DLAContainer::size()
 	 */
 	std::size_t size() const noexcept override;
-
 	/**
 	 * \brief Gets a non-const reference to the batch_queue of the aggregate, used
 	 *        in C++/CLI ManagedDLA2DContainer::ProcessBatchQueue for GUI updating.
@@ -91,18 +84,15 @@ public:
 	 * \return reference to batch_queue of 2d aggregate.
 	 */
 	std::queue<std::pair<int,int>>& batch_queue_handle() noexcept;
-
 	/**
 	 * \copydoc DLAContainer::set_attractor_type(AttractorType)
 	 * \throw Throws std::invalid_argument exception if _attractor_type is invalid for 2D lattice.
 	 */
 	void set_attractor_type(AttractorType _attractor_type) override;
-
 	/**
 	 * \copydoc DLAContainer::clear()
 	 */
 	void clear() override;
-
 	/**
 	 * \brief Generates a 2D diffusion limited aggregate consisting of the parameterised
 	 *        number of particles.
@@ -110,17 +100,14 @@ public:
 	 * \param _n Number of particles to generate in the 2D DLA.
 	 */
 	void generate(std::size_t _n) override;
-
 	/**
 	 * \copydoc DLAContainer::estimate_fractal_dimension()
 	 */
 	double estimate_fractal_dimension() const override;
-
 	/**
 	 * \copydoc DLAContainer::write(std::ostream&,bool)
 	 */
 	std::ostream& write(std::ostream& _os, bool _sort_by_map_value = false) const override;
-
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
@@ -129,7 +116,6 @@ private:
 	// particle furthest from origin in constant time
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
 	std::queue<std::pair<int, int>> batch_queue;
-
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *
@@ -137,8 +123,7 @@ private:
 	 * \param[out] _spawn_diam Diameter of spawn zone.
 	 * \param[in] _dist Uniform real distribution for probability generation.
 	 */
-	void spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
-
+	void spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, std::uniform_real_distribution<>& _prob_dist) noexcept;
 	/**
 	 * \brief Checks for collision of random-walking particle with aggregate structure
 	 *        and adds this particles' previous position to aggregate if collision occurred.
@@ -149,5 +134,4 @@ private:
 	 * \param _count Current number of particles generated in aggregate.
 	 */
 	bool aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, std::size_t& _count);
-
 };

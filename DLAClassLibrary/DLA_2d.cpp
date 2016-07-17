@@ -5,17 +5,11 @@ DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {}
 
 DLA_2d::DLA_2d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) : DLAContainer(_lattice_type, _attractor_type, _coeff_stick) {}
 
-DLA_2d::DLA_2d(const DLA_2d& _other) : DLAContainer(_other) {
-	// deep copy fields of _other to this
-	aggregate_map = _other.aggregate_map;
-	aggregate_pq = _other.aggregate_pq;
-}
+DLA_2d::DLA_2d(const DLA_2d& _other) : DLAContainer(_other),
+	aggregate_map(_other.aggregate_map), aggregate_pq(_other.aggregate_pq), batch_queue(_other.batch_queue) {}
 
-DLA_2d::DLA_2d(DLA_2d&& _other) : DLAContainer(std::move(_other)) {
-	// move fields of _other to this
-	aggregate_map = std::move(_other.aggregate_map);
-	aggregate_pq = std::move(_other.aggregate_pq);
-}
+DLA_2d::DLA_2d(DLA_2d&& _other) : DLAContainer(std::move(_other)),
+	aggregate_map(std::move(_other.aggregate_map)), aggregate_pq(std::move(_other.aggregate_pq)), batch_queue(std::move(_other.batch_queue)) {}
 
 DLA_2d::~DLA_2d() {}
 
@@ -70,20 +64,16 @@ void DLA_2d::generate(size_t _n) {
 			spawn_particle(current, spawn_diameter, dist);
 			has_next_spawned = true;
 		}
-		// generate random double in [0,1] for movement choice direction
-		double movement_choice = dist(mt_eng);
 		prev = current;
 		// update position of particle via unbiased random walk
-		update_particle_position(current, movement_choice);
+		update_particle_position(current, dist(mt_eng));
 		// check for collision with bounding walls and reflect if true
 		lattice_boundary_collision(current, prev, spawn_diameter);
-		double stick_pr = dist(mt_eng);
 		// check for collision with aggregate structure and add particle to 
 		// the aggregate (both to map and pq) if true, set flag ready for
 		// next particle spawn
-		if (aggregate_collision(current, prev, stick_pr, count)) {
+		if (aggregate_collision(current, prev, dist(mt_eng), count))
 			has_next_spawned = false;
-		}
 	}
 }
 
@@ -101,53 +91,48 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		// std::vector container to store aggregate_map values
 		std::vector<std::pair<std::size_t, std::pair<int, int>>> agg_vec;
 		// deep copy elements of aggregate_map to agg_vec
-		for (auto it = aggregate_map.cbegin(); it != aggregate_map.cend(); ++it) {
-			agg_vec.push_back(std::make_pair(it->second, it->first));
-		}
-		// lambda for sorting aggregate via order in which particles were generated
-		auto sort_agg = [](const std::pair<std::size_t, std::pair<int, int>>& _lhs, const std::pair<std::size_t, std::pair<int, int>>& _rhs) {return _lhs.first < _rhs.first; };
-		// sort agg_vec using the lambda sort_agg
-		std::sort(agg_vec.begin(), agg_vec.end(), sort_agg);
+		for (const auto& el : aggregate_map)
+			agg_vec.push_back(std::make_pair(el.second, el.first));
+		// sort agg_vec using a lambda based on order of particle generation
+		std::sort(agg_vec.begin(), agg_vec.end(), [](auto& _lhs, auto& _rhs) {return _lhs.first < _rhs.first; });
         // write sorted data to stream
-		for (auto it = agg_vec.cbegin(); it < agg_vec.cend(); ++it) {
-			_os << it->second << "\n";
-		}
+		for (const auto& el : agg_vec)
+			_os << el.second << '\n';
 	}
 	// output aggregate data "as-is" without sorting
 	else {
-		for (auto it = aggregate_map.cbegin(); it != aggregate_map.cend(); ++it) {
-			_os << it->second << "\t" << it->first << "\n";
-		}
+		for (const auto& el : aggregate_map)
+			_os << el.second << '\t' << el.first << '\n';
 	}
 	return _os;
 }
 
-void DLA_2d::spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept {
+void DLA_2d::spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, std::uniform_real_distribution<>& _prob_dist) noexcept {
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
 	_spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
 	// generate random double in [0,1]
-	double placement_pr = _dist(mt_eng);
+	double placement_pr = _prob_dist(mt_eng);
 	// spawn on upper line of lattice boundary
 	if (placement_pr < 0.25) {
-		_spawn_pos.first = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_spawn_pos.first = static_cast<int>(_spawn_diam*(_prob_dist(mt_eng) - 0.5));
 		_spawn_pos.second = _spawn_diam / 2;
 	}
 	// spawn on lower line of lattice boundary
 	else if (placement_pr >= 0.25 && placement_pr < 0.5) {
-		_spawn_pos.first = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_spawn_pos.first = static_cast<int>(_spawn_diam*(_prob_dist(mt_eng) - 0.5));
 		_spawn_pos.second = -_spawn_diam / 2;
 	}
 	// spawn on right line of lattice boundary
 	else if (placement_pr >= 0.5 && placement_pr < 0.75) {
 		_spawn_pos.first = _spawn_diam / 2;
-		_spawn_pos.second = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_spawn_pos.second = static_cast<int>(_spawn_diam*(_prob_dist(mt_eng) - 0.5));
 	}
 	// spawn on left line of lattice boundary
 	else {
 		_spawn_pos.first = -_spawn_diam / 2;
-		_spawn_pos.second = static_cast<int>(_spawn_diam*(_dist(mt_eng) - 0.5));
+		_spawn_pos.second = static_cast<int>(_spawn_diam*(_prob_dist(mt_eng) - 0.5));
 	}
 }
 
