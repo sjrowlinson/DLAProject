@@ -101,11 +101,11 @@
             <Button x:Name="pause_button" Content="Pause" Margin="0,217,393,0" VerticalAlignment="Top" Click="PauseButtonHandler" HorizontalAlignment="Right" Width="75"/>
             <Button x:Name="clear_button" Content="Clear" Margin="0,217,293,0" VerticalAlignment="Top" Click="ClearButtonHandler" HorizontalAlignment="Right" Width="75"/>
             <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="ResetViewButtonHandler" HorizontalAlignment="Right" Width="75" Margin="0,217,194,0"/>
-            <CheckBox x:Name="continuous_checkbox" Content="Continuous Generation" HorizontalAlignment="Left" Margin="438,217,0,0" VerticalAlignment="Top" Click="OnContinuousCheckboxClicked"/>
-            <Button x:Name="compare_button" Content="Add to Compare" HorizontalAlignment="Left" Margin="497,247,0,0" VerticalAlignment="Top" Width="106" Click="OnCompareButtonClick" IsEnabled="False"/>
+            <CheckBox x:Name="continuous_checkbox" Content="Continuous Generation" HorizontalAlignment="Right" Margin="0,217,32,0" VerticalAlignment="Top" Click="OnContinuousCheckboxClicked"/>
+            <Button x:Name="compare_button" Content="Add to Compare" HorizontalAlignment="Right" Margin="0,247,10,0" VerticalAlignment="Top" Width="106" Click="OnCompareButtonClick" IsEnabled="False"/>
         </Grid>
         <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <lvc:CartesianChart Name="NRChart" Series="{Binding NRSeriesCollection}">
+            <lvc:CartesianChart Name="NRChart" Series="{Binding NRSeriesCollection}" HorizontalAlignment="Right" Width="613" Height="450" VerticalAlignment="Top">
                 <lvc:CartesianChart.AxisX>
                     <lvc:Axis Title="Number of Particles" MaxValue="{Binding AxisMax}" MinValue="{Binding AxisMin}">
                         <lvc:Axis.Separator>
