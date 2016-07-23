@@ -561,6 +561,7 @@ namespace DLAProject {
             FracDimLabel.Content = "Est. Fractal Dimension: " + 0.0;
             AggMissesLabel.Content = "Aggregate Misses: " + 0;
             colour_list.Clear();
+            compare_button.IsEnabled = false;
         }
 
         /// <summary>
