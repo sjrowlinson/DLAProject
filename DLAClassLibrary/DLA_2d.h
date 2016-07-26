@@ -21,8 +21,10 @@ struct pair_hash {
  * \brief Implements a comparator function object for std::pair<int,int> objects which can be used to
  *        to choose the instance of a std::pair which has a greater distance from the origin.
  */
-struct distance_comparator {
-	bool operator()(const std::pair<int, int>& _lhs, const std::pair<int, int>& _rhs) const {
+template<typename _Ty1, 
+	typename _Ty2
+> struct distance_comparator {
+	bool operator()(const std::pair<_Ty1, _Ty2>& _lhs, const std::pair<_Ty1, _Ty2>& _rhs) const {
 		return (_lhs.first*_lhs.first + _lhs.second*_lhs.second) < (_rhs.first*_rhs.first + _rhs.second*_rhs.second);
 	}
 };
@@ -114,7 +116,9 @@ private:
 	std::unordered_map<std::pair<int, int>, std::size_t, pair_hash> aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
-	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator> aggregate_pq;
+	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator<int,int>> aggregate_pq;
+	// queue for multi-thread batching - holds a buffer of aggregate
+	// points to be consumed by aggregate listening thread
 	std::queue<std::pair<int, int>> batch_queue;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.

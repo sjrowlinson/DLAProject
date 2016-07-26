@@ -24,7 +24,7 @@ std::queue<utl::triple<int, int, int>>& DLA_3d::batch_queue_handle() noexcept {
 void DLA_3d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
-	aggregate_pq = std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d>();
+	aggregate_pq = std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d<int,int,int>>();
 	batch_queue = std::queue<utl::triple<int, int, int>>();
 }
 

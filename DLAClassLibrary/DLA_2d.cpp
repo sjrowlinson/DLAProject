@@ -31,7 +31,7 @@ void DLA_2d::set_attractor_type(AttractorType _attractor_type) {
 void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
-	aggregate_pq = std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator>();
+	aggregate_pq = std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator<int,int>>();
 	batch_queue = std::queue<std::pair<int, int>>();
 }
 
