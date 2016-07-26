@@ -43,6 +43,7 @@ enum class AttractorType {
  */
 class DLAContainer {
 public:
+	// CONSTRUCTION/ASSIGNMENT
 	/**
 	 * \brief Default constructor, initialises empty aggregate with default lattice type
 	 *        of LatticeType::SQUARE and attractor type of AttractorType::POINT.
@@ -73,8 +74,11 @@ public:
  	 * \param _other rvalue reference to DLAContainer instance.
 	 */
 	DLAContainer(DLAContainer&& _other);
+	/**
+	 * \brief Destructs the container.
+	 */
 	virtual ~DLAContainer();
-
+	// AGGREGATE PROPERTIES
 	/**
 	 * \brief Gets the size of the aggregate.
 	 *
@@ -118,12 +122,30 @@ public:
 	 * \param _attractor_type AttractorType to update to.
 	 */
 	virtual void set_attractor_type(AttractorType _attractor_type);
+	/**
+	 * \brief Gets the radial distance squared of the aggregate from its origin.
+	 *
+	 * \return Radial distance squared of the aggregate.
+	 */
 	std::size_t aggregate_radius_sqd() const noexcept;
+	/**
+	 * \brief Gets the number of misses corresponding to when a particle collides with
+	 *        the aggregate but fails to stick to it. If `_coeff_stick = 1.0` then this
+	 *        will always return zero.
+	 *
+	 * \return Number of aggregate misses.
+	 */
 	std::size_t aggregate_misses() const noexcept;
+	// MODIFIERS
 	/**
 	 * \brief Raises an abort signal, stopping any current aggregate generation.
 	 */
 	void raise_abort_signal() noexcept;
+	/**
+	 * \brief Changes the value of the continous_flag field to specified argument.
+	 *
+	 * \param _continuous Boolean value to change `continuous_flag` to.
+	 */
 	void change_continuous_flag(bool _continuous) noexcept;
 	/**
 	 * \brief Clears the aggregrate structure.

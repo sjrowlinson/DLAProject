@@ -480,7 +480,7 @@ namespace DLAProject {
             saveCurrentChartSeries = false;
             Dispatcher.Invoke(() => { compare_button.IsEnabled = true; });
         }
-
+        
         #region ButtonHandlers
 
         /// <summary>
