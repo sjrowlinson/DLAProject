@@ -1,6 +1,7 @@
 #pragma once
 #include "utilities.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <iterator>
 #include <ostream>
@@ -136,6 +137,13 @@ public:
 	 * \return Number of aggregate misses.
 	 */
 	std::size_t aggregate_misses() const noexcept;
+	/**
+	 * \briefs Returns the rate at which particles are being added to the aggregate structure
+	 *         in units of particles per second.
+	 *
+	 * \return Rate of aggregrate generation.
+	 */
+	std::size_t generation_rate() const noexcept;
 	// MODIFIERS
 	/**
 	 * \brief Raises an abort signal, stopping any current aggregate generation.
@@ -184,7 +192,7 @@ protected:
 	bool continuous = false;
 	std::size_t aggregate_radius_sqd_ = 0;
 	std::size_t aggregate_misses_ = 0;
-
+	std::size_t gen_rate = 0;
 	/**
 	 * \brief Updates position of random walking particle.
 	 *

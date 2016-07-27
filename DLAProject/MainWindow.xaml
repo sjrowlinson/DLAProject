@@ -60,13 +60,13 @@
             </Viewport3D>
         </Grid>
         <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,0,-10" Visibility="Visible">
-            <Label Visibility="Visible" Name="DynamicParticleLabel" DockPanel.Dock="Top" Foreground="Red" />
+            <Label Visibility="Visible" Name="DynamicParticleLabel" Content="Particles: 0" DockPanel.Dock="Top" Foreground="Red" />
         </DockPanel>
         <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,20,0,-10" Visibility="Visible">
-            <Label Visibility="Visible" Name="FracDimLabel" DockPanel.Dock="Top" Foreground="Red" />
+            <Label Visibility="Visible" Name="FracDimLabel" Content="Est. Fractal Dimension = 0.00" DockPanel.Dock="Top" Foreground="Red" />
         </DockPanel>
         <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,35,0,-10" Visibility="Visible">
-            <Label Visibility="Visible" Name="AggMissesLabel" DockPanel.Dock="Top" Foreground="Red" />
+            <Label Visibility="Visible" Name="AggMissesLabel" Content="Aggregate Misses: 0" DockPanel.Dock="Top" Foreground="Red" />
         </DockPanel>
 
         <Grid Visibility="Visible" Margin="735,10,10,450" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -103,6 +103,11 @@
             <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="ResetViewButtonHandler" HorizontalAlignment="Right" Width="75" Margin="0,217,194,0"/>
             <CheckBox x:Name="continuous_checkbox" Content="Continuous Generation" HorizontalAlignment="Right" Margin="0,217,32,0" VerticalAlignment="Top" Click="OnContinuousCheckboxClicked"/>
             <Button x:Name="compare_button" Content="Add to Compare" HorizontalAlignment="Right" Margin="0,247,10,0" VerticalAlignment="Top" Width="106" Click="OnCompareButtonClick" IsEnabled="False"/>
+            <ComboBox x:Name="chartSelectorComboBox" HorizontalAlignment="Right" Width="114" Height="22" VerticalAlignment="Top" SelectionChanged="OnLatticeTypeSelectionChanged" DropDownClosed="OnLatticeTypeDropDownClosed" Margin="0,247,189,0">
+                <ComboBoxItem IsSelected="True" Content="Number-Radius"/>
+                <ComboBoxItem Content="Generation Rate"/>
+            </ComboBox>
+            <Label x:Name="chartSelectorLabel" Content="Select Chart to Plot" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123" Height="26" VerticalAlignment="Top" Margin="0,246,303,0"/>
         </Grid>
         <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <lvc:CartesianChart Name="NRChart" Series="{Binding NRSeriesCollection}" HorizontalAlignment="Right" Width="613" Height="450" VerticalAlignment="Top">

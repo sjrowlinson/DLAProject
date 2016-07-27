@@ -137,6 +137,9 @@ namespace DLAClassLibrary {
 		std::size_t GetAggregateMisses() {
 			return native_dla_2d_ptr->aggregate_misses();
 		}
+		std::size_t GenerationRate() {
+			return native_dla_2d_ptr->generation_rate();
+		}
 
 		/**
 		 * \brief Gets the batch_queue from the DLA_2d pointer and processes the data, saving

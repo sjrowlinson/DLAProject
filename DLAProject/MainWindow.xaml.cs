@@ -29,6 +29,10 @@ namespace DLAProject {
         _2D,
         _3D
     }
+    public enum ChartType {
+        NUMBERRADIUS,
+        RATEGENERATION
+    }
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -62,6 +66,8 @@ namespace DLAProject {
         private bool lattice_type_combo_handle = true;
         private ManagedAttractorType attractor_type;
         private bool attractor_type_combo_handle = true;
+        private ChartType chart_type;
+        private bool chart_type_combo_handle = true;
         //private readonly AggregateComponentManager comp_manager;
         private NumberRadiusChart nrchart;
         #endregion
@@ -84,6 +90,7 @@ namespace DLAProject {
             current_executing_dimension = lattice_dimension;
             lattice_type = ManagedLatticeType.Square;
             attractor_type = ManagedAttractorType.Point;
+            chart_type = ChartType.NUMBERRADIUS;
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
             nrchart = new NumberRadiusChart();
             NRChart.DataContext = nrchart;
@@ -250,6 +257,34 @@ namespace DLAProject {
             ComboBox cb = sender as ComboBox;
             attractor_type_combo_handle = !cb.IsDropDownOpen;
             HandleAttractorTypeComboBox();
+        }
+
+        private void HandleChartSelectorComboBox() {
+            ComboBoxItem selected_chart = (ComboBoxItem)(chartSelectorComboBox.SelectedValue);
+            string selected_chart_str = (string)(selected_chart.Content);
+            if (selected_chart_str == null) chart_type = ChartType.NUMBERRADIUS;
+            else {
+                switch (selected_chart_str) {
+                    case "Number-Radius":
+                        chart_type = ChartType.NUMBERRADIUS;
+                        break;
+                    case "Generation Rate":
+                        chart_type = ChartType.RATEGENERATION;
+                        break;
+                }
+            }
+        }
+
+        private void OnChartSelectorDropDownClosed(object sender, EventArgs e) {
+            if (chart_type_combo_handle)
+                HandleChartSelectorComboBox();
+            chart_type_combo_handle = true;
+        }
+
+        private void OnChartSelectorSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            ComboBox cb = sender as ComboBox;
+            chart_type_combo_handle = !cb.IsDropDownOpen;
+            HandleChartSelectorComboBox();
         }
 
         #endregion

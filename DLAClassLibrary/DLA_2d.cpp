@@ -52,6 +52,9 @@ void DLA_2d::generate(size_t _n) {
 	int spawn_diameter = 0;
 	// uniform distribution in [0,1] for probability generation
 	std::uniform_real_distribution<> dist(0.0, 1.0);
+	std::chrono::time_point<std::chrono::system_clock> start, next_measurement_start, next_measurement_end;
+	start = std::chrono::system_clock::now();
+	next_measurement_start = std::chrono::system_clock::now();
 	// aggregate generation loop 
 	while (size() < _n || continuous) {
 		if (abort_signal) {
@@ -74,6 +77,12 @@ void DLA_2d::generate(size_t _n) {
 		// next particle spawn
 		if (aggregate_collision(current, prev, dist(mt_eng), count))
 			has_next_spawned = false;
+		next_measurement_end = std::chrono::system_clock::now();
+		if ((next_measurement_end - next_measurement_start) >= static_cast<std::chrono::duration<double>>(1.0)) {
+			std::chrono::duration<double> elapsed = next_measurement_end - start;
+			gen_rate = static_cast<std::size_t>(size() / elapsed.count());
+			next_measurement_start = std::chrono::system_clock::now();
+		}
 	}
 }
 

@@ -65,6 +65,7 @@
     </ApplicationDefinition>
     <Compile Include="AggregateComponent.cs" />
     <Compile Include="AggregateComponentManager.cs" />
+    <Compile Include="GenerationRateChart.cs" />
     <Compile Include="NumberRadiusChart.cs" />
     <Compile Include="TrackView.cs" />
     <Page Include="MainWindow.xaml">
