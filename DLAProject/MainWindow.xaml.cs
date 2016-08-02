@@ -70,6 +70,7 @@ namespace DLAProject {
         private bool chart_type_combo_handle = true;
         //private readonly AggregateComponentManager comp_manager;
         private NumberRadiusChart nrchart;
+        private GenerationRateChart ratechart;
         #endregion
 
         public MainWindow() {
@@ -93,7 +94,8 @@ namespace DLAProject {
             chart_type = ChartType.NUMBERRADIUS;
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
             nrchart = new NumberRadiusChart();
-            NRChart.DataContext = nrchart;
+            ratechart = new GenerationRateChart();
+            Chart.DataContext = nrchart;
             //comp_manager = new AggregateComponentManager();
         }
 
@@ -259,6 +261,11 @@ namespace DLAProject {
             HandleAttractorTypeComboBox();
         }
 
+        /// <summary>
+        /// Sets the value of the chart_type field corresponding to
+        /// selected item in chartSelectorComboBox and assigns 
+        /// Chart.DataContext to relevant type of chart.
+        /// </summary>
         private void HandleChartSelectorComboBox() {
             ComboBoxItem selected_chart = (ComboBoxItem)(chartSelectorComboBox.SelectedValue);
             string selected_chart_str = (string)(selected_chart.Content);
@@ -267,20 +274,32 @@ namespace DLAProject {
                 switch (selected_chart_str) {
                     case "Number-Radius":
                         chart_type = ChartType.NUMBERRADIUS;
+                        Chart.DataContext = nrchart;
                         break;
                     case "Generation Rate":
                         chart_type = ChartType.RATEGENERATION;
+                        Chart.DataContext = ratechart;
                         break;
                 }
             }
         }
 
+        /// <summary>
+        /// Handles chartSelectorComboBox drop down closed event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnChartSelectorDropDownClosed(object sender, EventArgs e) {
             if (chart_type_combo_handle)
                 HandleChartSelectorComboBox();
             chart_type_combo_handle = true;
         }
 
+        /// <summary>
+        /// Handles chartSelectorComboBox selected item changed event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnChartSelectorSelectionChanged(object sender, SelectionChangedEventArgs e) {
             ComboBox cb = sender as ComboBox;
             chart_type_combo_handle = !cb.IsDropDownOpen;
@@ -324,8 +343,17 @@ namespace DLAProject {
             // pre-compute the color list for all particles
             if (!isContinuous) ComputeColorList(_nparticles);
             else ComputeColorList(50000);   // TODO: change this, don't like "magic" number
-            if(saveCurrentChartSeries) nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff);
-            NRChart.LegendLocation = LegendLocation.Right;
+            if (saveCurrentChartSeries) {
+                switch (chart_type) {
+                    case ChartType.NUMBERRADIUS:
+                        nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff);
+                        break;
+                    case ChartType.RATEGENERATION:
+                        // TODO
+                        break;
+                }
+            }
+            Chart.LegendLocation = LegendLocation.Right;
             nrchart.AddDataPoint(0, 0.0);
             // set properties of aggregate corresponding to dimension
             switch (current_executing_dimension) {
@@ -346,6 +374,8 @@ namespace DLAProject {
 
         #endregion
 
+        #region AggregateSimulationViewUpdating
+
         /// <summary>
         /// Updates the aggregate using a timer with short interval, calling 
         /// AggregateUpdateOnTimeEvent periodically.
@@ -359,31 +389,16 @@ namespace DLAProject {
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
-                    if (dla_2d.Size() < _particle_slider_val || isContinuous) {
-                        timer.Elapsed += (source, e) => Aggregate2DUpdateOnTimedEvent(source, e, _particle_slider_val);
-                        timer.AutoReset = true;
-                        timer.Enabled = true;
-                    }
-                    // stop timer and dispose all attached resources
-                    else {
-                        timer.Stop();
-                        timer.Dispose();
-                    }
+                    timer.Elapsed += (source, e) => Aggregate2DUpdateOnTimedEvent(source, e, _particle_slider_val);
+                    timer.AutoReset = true;
+                    timer.Enabled = true;
                     break;
                 case LatticeDimension._3D:
-                    if (dla_3d.Size() < _particle_slider_val || isContinuous) {
-                        timer.Elapsed += (source, e) => Aggregate3DUpdateOnTimedEvent(source, e, _particle_slider_val);
-                        timer.AutoReset = true;
-                        timer.Enabled = true;
-                    }
-                    // stop timer and dispose all attached resources
-                    else {
-                        timer.Stop();
-                        timer.Dispose();
-                    }
+                    timer.Elapsed += (source, e) => Aggregate3DUpdateOnTimedEvent(source, e, _particle_slider_val);
+                    timer.AutoReset = true;
+                    timer.Enabled = true;
                     break;
             }
-            
         }
 
         private void Aggregate2DUpdateOnTimedEventTest(object source, ElapsedEventArgs e) {
@@ -492,6 +507,8 @@ namespace DLAProject {
             }
         }
 
+        #endregion
+
         /// <summary>
         /// Generates a Diffusion Limited Aggregate with properties initialised by
         /// current values of sliders and combo-boxes in the UI. Should be called
@@ -500,7 +517,7 @@ namespace DLAProject {
         private void GenerateAggregate(uint _nparticles) {
             hasFinished = false;
             // start asynchronous task calling AggregateUpdateListener to perform rendering
-            Task.Factory.StartNew(() => AggregateUpdateListener(_nparticles));
+            var agg_listen_task = Task.Run(() => AggregateUpdateListener(_nparticles));
             // generate the DLA using value of particle slider
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
@@ -510,6 +527,7 @@ namespace DLAProject {
                     dla_3d.Generate(_nparticles);
                     break;
             }
+            agg_listen_task.Dispose();  // dispose all resources used by agg_listen_task
             hasFinished = true;
             prev_max_chart_x_value = nrchart.AxisMax;
             saveCurrentChartSeries = false;
@@ -536,7 +554,7 @@ namespace DLAProject {
             //    WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
             //}
             // start asynchronous task calling GenerateAggregate method
-            Task.Factory.StartNew(() => GenerateAggregate(isContinuous ? 0 : nparticles));
+            Task.Run(() => GenerateAggregate(isContinuous ? 0 : nparticles));
         }
 
         /// <summary>
@@ -622,6 +640,12 @@ namespace DLAProject {
             }
         }
 
+        /// <summary>
+        /// Handler for compare_button click event. Caches current graph such that the plot
+        /// appears on next simulation run.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnCompareButtonClick(object sender, RoutedEventArgs e) {
             saveCurrentChartSeries = true;
             compare_button.IsEnabled = false;

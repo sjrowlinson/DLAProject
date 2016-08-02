@@ -24,14 +24,18 @@ namespace DLAProject {
     /// to notify client when a chart property changed event has been fired.
     /// </summary>
     public class GenerationRateChart : INotifyPropertyChanged {
-        private TimeSpan x_axis_min;    // min-value of x-axis
-        private TimeSpan x_axis_step;   // incremental step of x-axis
+        private long x_axis_min;    // min-value of x-axis
+        private long x_axis_max;    // max-value of x-axis
+        private long x_axis_step;   // incremental step of x-axis
         private int series_counter;
-
+        private string x_axis_title;
+        private string y_axis_title;
         /// <summary>
         /// Initialises a new instance of the GenerationRateChart class.
         /// </summary>
         public GenerationRateChart() {
+            x_axis_title = "Time (s)";
+            y_axis_title = "Rate of Generation (/s)";
             // create a mapper using RateGenerationMeasureModel where X co-ord is
             // time-span and Y co-ord is the rate of aggregate generation
             CartesianMapper<RateGenerationMeasureModel> mapper = Mappers.Xy<RateGenerationMeasureModel>()
@@ -39,10 +43,13 @@ namespace DLAProject {
                 .Y(model => model.Rate);
             // save mapper globally
             Charting.For<RateGenerationMeasureModel>(mapper);
+            TimeSpanFormatter = value => new TimeSpan(value).ToString("mm:ss");
             SeriesCollection = new SeriesCollection();
             series_counter = -1;
             ResetXAxisProperties();
         }
+
+        public Func<long, string> TimeSpanFormatter { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         /// <summary>
@@ -57,22 +64,45 @@ namespace DLAProject {
         public SeriesCollection SeriesCollection { get; set; }
 
         /// <summary>
+        /// Title of chart x-axis, readonly.
+        /// </summary>
+        public string XAxisTitle {
+            get { return x_axis_title; }
+        }
+        /// <summary>
+        /// Title of chart y-axis readonly.
+        /// </summary>
+        public string YAxisTitle {
+            get { return y_axis_title; }
+        }
+        /// <summary>
         /// Minimum value of x-axis.
         /// </summary>
-        public TimeSpan AxisMin {
-           get { return x_axis_min; }
-           set { x_axis_min = value; OnPropertyChanged("AxisMin"); }
+        public long AxisMin {
+            get { return x_axis_min; }
+            set { x_axis_min = value; OnPropertyChanged("AxisMin"); }
         }
-        public TimeSpan AxisStep {
+        /// <summary>
+        /// Maximum value of x-axis.
+        /// </summary>
+        public long AxisMax {
+            get { return x_axis_max; }
+            set { x_axis_max = value; OnPropertyChanged("AxisMax"); }
+        }
+        /// <summary>
+        /// Incremental step value of x-axis.
+        /// </summary>
+        public long AxisStep {
             get { return x_axis_step; }
             set { x_axis_step = value; OnPropertyChanged("AxisStep"); }
         }
         /// <summary>
-        /// Resets the x-axis minimum and step-size values.
+        /// Resets the x-axis minimum, maximum and step-size values.
         /// </summary>
         public void ResetXAxisProperties() {
-            AxisMin = TimeSpan.Zero;
-            AxisStep = TimeSpan.FromSeconds(1);
+            AxisMin = TimeSpan.Zero.Ticks;
+            AxisMax = TimeSpan.FromSeconds(60).Ticks;
+            AxisStep = TimeSpan.FromSeconds(1).Ticks;
         }
 
         public int SeriesCount() {

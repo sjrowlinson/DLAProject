@@ -110,16 +110,16 @@
             <Label x:Name="chartSelectorLabel" Content="Select Chart to Plot" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123" Height="26" VerticalAlignment="Top" Margin="0,246,303,0"/>
         </Grid>
         <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <lvc:CartesianChart Name="NRChart" Series="{Binding NRSeriesCollection}" HorizontalAlignment="Right" Width="613" Height="450" VerticalAlignment="Top">
+            <lvc:CartesianChart Name="Chart" Series="{Binding SeriesCollection}" HorizontalAlignment="Right" Width="613" Height="450" VerticalAlignment="Top">
                 <lvc:CartesianChart.AxisX>
-                    <lvc:Axis Title="Number of Particles" MaxValue="{Binding AxisMax}" MinValue="{Binding AxisMin}">
+                    <lvc:Axis Title="{Binding XAxisTitle}" MaxValue="{Binding AxisMax}" MinValue="{Binding AxisMin}">
                         <lvc:Axis.Separator>
                             <lvc:Separator Step="{Binding AxisStep}"></lvc:Separator>
                         </lvc:Axis.Separator>
                     </lvc:Axis>
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="Aggregate Radius" MaxValue="200" MinValue="0"></lvc:Axis>
+                    <lvc:Axis Title="{Binding YAxisTitle}" MaxValue="200" MinValue="0"></lvc:Axis>
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
         </Grid>

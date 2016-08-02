@@ -28,11 +28,15 @@ namespace DLAProject {
         private uint x_axis_max;    // maximum value of x-axis
         private uint x_axis_step;   // incremental step of x-axis
         private int series_counter;
+        private string x_axis_title;
+        private string y_axis_title;
 
         /// <summary>
         /// Initialises a new instance of the NumberRadiusChart class.
         /// </summary>
         public NumberRadiusChart() {
+            x_axis_title = "Number of Particles";
+            y_axis_title = "Aggregate Radius";
             // create a mapper using NumberRadiusMeasureModel where
             // X co-ord is ParticleNumber and Y co-ord is Radius.
             CartesianMapper<NumberRadiusMeasureModel> mapper = Mappers.Xy<NumberRadiusMeasureModel>()
@@ -40,7 +44,7 @@ namespace DLAProject {
                  .Y(model => model.AggregateRadius);
             // save the mapper globally
             Charting.For<NumberRadiusMeasureModel>(mapper);
-            NRSeriesCollection = new SeriesCollection();
+            SeriesCollection = new SeriesCollection();
             series_counter = -1;
             // initialise the ChartValues instance
             //Values = new ChartValues<NumberRadiusMeasureModel>();
@@ -58,8 +62,20 @@ namespace DLAProject {
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public SeriesCollection NRSeriesCollection { get; set; }
+        public SeriesCollection SeriesCollection { get; set; }
 
+        /// <summary>
+        /// Title of chart x-axis, readonly.
+        /// </summary>
+        public string XAxisTitle {
+            get { return x_axis_title; }
+        }
+        /// <summary>
+        /// Title of chart y-axis, readonly.
+        /// </summary>
+        public string YAxisTitle {
+            get { return y_axis_title; }
+        }
         /// <summary>
         /// Incremental step of x-axis.
         /// </summary>
@@ -91,7 +107,7 @@ namespace DLAProject {
             AxisStep = 100;
         }
         public int SeriesCount() {
-            return NRSeriesCollection.Count;
+            return SeriesCollection.Count;
         }
         /// <summary>
         /// Adds a new data series to the chart, the new series is a LineSeries added to
@@ -100,7 +116,7 @@ namespace DLAProject {
         /// <param name="nparticles">Number of particles in current aggregate generation.</param>
         /// <param name="coeff_stick">Coefficient of stickiness of aggregate structure.</param>
         public void AddDataSeries(uint nparticles, double coeff_stick) {
-            NRSeriesCollection.Add(new LineSeries {
+            SeriesCollection.Add(new LineSeries {
                 Title = nparticles + "/" + coeff_stick,
                 Values = new ChartValues<NumberRadiusMeasureModel>(),
                 PointGeometrySize = 5,
@@ -114,7 +130,7 @@ namespace DLAProject {
         /// <param name="_particles">Number of particles (x co-ordinate).</param>
         /// <param name="_radius">Radius of aggregate (y co-ordinate).</param>
         public void AddDataPoint(uint _particles, double _radius) {
-            NRSeriesCollection[series_counter].Values.Add(new NumberRadiusMeasureModel {
+            SeriesCollection[series_counter].Values.Add(new NumberRadiusMeasureModel {
                 ParticleNumber = _particles,
                 AggregateRadius = _radius
             });
@@ -124,7 +140,7 @@ namespace DLAProject {
         /// Clears all data points from all series on the chart.
         /// </summary>
         public void ClearAllSeriesDataPoints() {
-            NRSeriesCollection.Clear();
+            SeriesCollection.Clear();
             series_counter = -1;
         }
 
