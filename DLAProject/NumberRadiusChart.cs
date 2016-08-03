@@ -1,13 +1,9 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows.Media;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LiveCharts;
 using LiveCharts.Wpf;
 using LiveCharts.Configurations;
+using DLAClassLibrary;
 
 namespace DLAProject {
     /// <summary>
@@ -27,7 +23,7 @@ namespace DLAProject {
         private uint x_axis_min;    // minimum value of x-axis
         private uint x_axis_max;    // maximum value of x-axis
         private uint x_axis_step;   // incremental step of x-axis
-        private int series_counter;
+        private int series_counter; // number of series plotted, zero-indexed
         private string x_axis_title;
         private string y_axis_title;
 
@@ -46,9 +42,6 @@ namespace DLAProject {
             Charting.For<NumberRadiusMeasureModel>(mapper);
             SeriesCollection = new SeriesCollection();
             series_counter = -1;
-            // initialise the ChartValues instance
-            //Values = new ChartValues<NumberRadiusMeasureModel>();
-            //ValuesSecond = new ChartValues<NumberRadiusMeasureModel>();
             ResetXAxisProperties();
         }
 
@@ -115,12 +108,27 @@ namespace DLAProject {
         /// </summary>
         /// <param name="nparticles">Number of particles in current aggregate generation.</param>
         /// <param name="coeff_stick">Coefficient of stickiness of aggregate structure.</param>
-        public void AddDataSeries(uint nparticles, double coeff_stick) {
+        public void AddDataSeries(uint nparticles, double coeff_stick, ManagedLatticeType lattice_type) {
+            string title = nparticles + "/" + coeff_stick + "/";
+            // set appropriate title based on aggregate lattice type
+            switch (lattice_type) {
+                case ManagedLatticeType.Square:
+                    title += "S";
+                    break;
+                case ManagedLatticeType.Triangle:
+                    title += "T";
+                    break;
+            }
+            // reduce opacity of each previously plotted series
+            foreach (LineSeries s in SeriesCollection) {
+                s.Stroke.Opacity = 0.25;
+            }
+            // add new series to collection, with opacity at default 1.0 for focus
             SeriesCollection.Add(new LineSeries {
-                Title = nparticles + "/" + coeff_stick,
+                Title = title,
                 Values = new ChartValues<NumberRadiusMeasureModel>(),
                 PointGeometrySize = 5,
-                Fill = Brushes.Transparent
+                Fill = Brushes.Transparent,
             });
             ++series_counter;
         }

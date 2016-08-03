@@ -9,7 +9,7 @@
         Title="Diffusion Limited Aggregation" Height="768" Width="1366"
         Loaded="OnLoaded">
     <Grid>
-        <Grid Background="Black" Visibility="Visible" Width ="Auto" Height="Auto" Margin="5,3,623,10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid Background="Black" Visibility="Visible" Width ="730" Height="724" Margin="0,3,623,0" HorizontalAlignment="Right" VerticalAlignment="Top">
             <Viewport3D Name="World" Focusable="True">
                 <Viewport3D.Camera>
                     <OrthographicCamera x:Name="orthograghic_camera" Position="0,0,32" LookDirection="0,0,-32" UpDirection="0,1,0" Width="256"/>
@@ -58,16 +58,18 @@
                     </ModelVisual3D>
                 </Viewport3D.Children>
             </Viewport3D>
+            <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,0,693" Visibility="Visible">
+                <Label Visibility="Visible" Name="DynamicParticleLabel" Content="Particles: 0" DockPanel.Dock="Top" Foreground="Red" Margin="0,0,388,0" Height="38" />
+            </DockPanel>
+            <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,20,0,677" Visibility="Visible">
+                <Label Visibility="Visible" Name="FracDimLabel" Content="Est. Fractal Dimension = 0.00" DockPanel.Dock="Top" Foreground="Red" Margin="0,0,386,0" Height="40" />
+            </DockPanel>
+            <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,36,0,662" Visibility="Visible">
+                <Label Visibility="Visible" Name="AggMissesLabel" Content="Aggregate Misses: 0" DockPanel.Dock="Top" Foreground="Red" Margin="0,0,396,0" Height="44" />
+            </DockPanel>
+            <Label Visibility="Visible" x:Name="SimulationTimerLabel" Content="Elapsed Time: 00:00.000" Foreground="Red" Margin="584,5,0,681" />
         </Grid>
-        <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,0,-10" Visibility="Visible">
-            <Label Visibility="Visible" Name="DynamicParticleLabel" Content="Particles: 0" DockPanel.Dock="Top" Foreground="Red" />
-        </DockPanel>
-        <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,20,0,-10" Visibility="Visible">
-            <Label Visibility="Visible" Name="FracDimLabel" Content="Est. Fractal Dimension = 0.00" DockPanel.Dock="Top" Foreground="Red" />
-        </DockPanel>
-        <DockPanel Background="#01000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,35,0,-10" Visibility="Visible">
-            <Label Visibility="Visible" Name="AggMissesLabel" Content="Aggregate Misses: 0" DockPanel.Dock="Top" Foreground="Red" />
-        </DockPanel>
+
 
         <Grid Visibility="Visible" Margin="735,10,10,450" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label x:Name="Dimension_Label" Content="Aggregate Dimensions" Margin="0,23,333,0" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="135" Height="26" VerticalAlignment="Top"/>
@@ -97,12 +99,12 @@
             <Slider Minimum="0.01" Maximum="1.0" TickPlacement="BottomRight" TickFrequency="0.01" IsSnapToTickEnabled="True" x:Name="stickiness_slider" Margin="0,160,82,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
             <TextBox Text="{Binding Value, ElementName=stickiness_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="sticky_val" Height="23" Margin="0,160,32,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" RenderTransformOrigin="0.496,3.33" HorizontalAlignment="Right" Width="40"/>
 
-            <Button x:Name="generate_button" Content="Generate" Margin="0,217,492,0" VerticalAlignment="Top" Click="GenerateButtonHandler" HorizontalAlignment="Right" Width="75"/>
-            <Button x:Name="pause_button" Content="Pause" Margin="0,217,393,0" VerticalAlignment="Top" Click="PauseButtonHandler" HorizontalAlignment="Right" Width="75"/>
-            <Button x:Name="clear_button" Content="Clear" Margin="0,217,293,0" VerticalAlignment="Top" Click="ClearButtonHandler" HorizontalAlignment="Right" Width="75"/>
-            <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="ResetViewButtonHandler" HorizontalAlignment="Right" Width="75" Margin="0,217,194,0"/>
+            <Button x:Name="generate_button" Content="Generate" Margin="0,217,492,0" VerticalAlignment="Top" Click="OnGenerateButtonClicked" HorizontalAlignment="Right" Width="75"/>
+            <Button x:Name="pause_button" Content="Pause" Margin="0,217,393,0" VerticalAlignment="Top" Click="OnPauseButtonClicked" HorizontalAlignment="Right" Width="75"/>
+            <Button x:Name="clear_button" Content="Clear" Margin="0,217,293,0" VerticalAlignment="Top" Click="OnClearButtonClicked" HorizontalAlignment="Right" Width="75"/>
+            <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="OnResetViewButtonClicked" HorizontalAlignment="Right" Width="75" Margin="0,217,194,0"/>
             <CheckBox x:Name="continuous_checkbox" Content="Continuous Generation" HorizontalAlignment="Right" Margin="0,217,32,0" VerticalAlignment="Top" Click="OnContinuousCheckboxClicked"/>
-            <Button x:Name="compare_button" Content="Add to Compare" HorizontalAlignment="Right" Margin="0,247,10,0" VerticalAlignment="Top" Width="106" Click="OnCompareButtonClick" IsEnabled="False"/>
+            <Button x:Name="compare_button" Content="Add to Compare" HorizontalAlignment="Right" Margin="0,247,10,0" VerticalAlignment="Top" Width="106" Click="OnCompareButtonClicked" IsEnabled="False"/>
             <ComboBox x:Name="chartSelectorComboBox" HorizontalAlignment="Right" Width="114" Height="22" VerticalAlignment="Top" SelectionChanged="OnLatticeTypeSelectionChanged" DropDownClosed="OnLatticeTypeDropDownClosed" Margin="0,247,189,0">
                 <ComboBoxItem IsSelected="True" Content="Number-Radius"/>
                 <ComboBoxItem Content="Generation Rate"/>
@@ -110,7 +112,7 @@
             <Label x:Name="chartSelectorLabel" Content="Select Chart to Plot" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123" Height="26" VerticalAlignment="Top" Margin="0,246,303,0"/>
         </Grid>
         <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <lvc:CartesianChart Name="Chart" Series="{Binding SeriesCollection}" HorizontalAlignment="Right" Width="613" Height="450" VerticalAlignment="Top">
+            <lvc:CartesianChart Name="Chart" Series="{Binding SeriesCollection}" HorizontalAlignment="Right" Width="603" Height="450" VerticalAlignment="Top">
                 <lvc:CartesianChart.AxisX>
                     <lvc:Axis Title="{Binding XAxisTitle}" MaxValue="{Binding AxisMax}" MinValue="{Binding AxisMin}">
                         <lvc:Axis.Separator>

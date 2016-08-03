@@ -1,25 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
 using System.Timers;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using DLAClassLibrary;
 using LiveCharts;
-using LiveCharts.Wpf;
 
 namespace DLAProject {
     /// <summary>
@@ -339,14 +329,14 @@ namespace DLAProject {
         /// </summary>
         private void SetUpAggregateProperties(uint _nparticles, double _agg_sticky_coeff) {
             // reset simulation view
-            ResetViewButtonHandler(null, null);
+            OnResetViewButtonClicked(null, null);
             // pre-compute the color list for all particles
             if (!isContinuous) ComputeColorList(_nparticles);
             else ComputeColorList(50000);   // TODO: change this, don't like "magic" number
             if (saveCurrentChartSeries) {
                 switch (chart_type) {
                     case ChartType.NUMBERRADIUS:
-                        nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff);
+                        nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff, lattice_type);
                         break;
                     case ChartType.RATEGENERATION:
                         // TODO
@@ -385,7 +375,7 @@ namespace DLAProject {
             // interval of timer for refreshing aggregate in ms
             const double interval = 10.0;
             // initialise a Timer with a 10ms interval
-            System.Timers.Timer timer = new System.Timers.Timer(interval);
+            Timer timer = new Timer(interval);
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
@@ -516,6 +506,11 @@ namespace DLAProject {
         /// </summary>
         private void GenerateAggregate(uint _nparticles) {
             hasFinished = false;
+            Timer simulation_timer = new Timer(25);
+            DateTime startDT = DateTime.Now;
+            simulation_timer.Elapsed += (source, e) => OnSimulationTimerUpdateEvent(source, e, startDT);
+            simulation_timer.AutoReset = true;
+            simulation_timer.Enabled = true;
             // start asynchronous task calling AggregateUpdateListener to perform rendering
             var agg_listen_task = Task.Run(() => AggregateUpdateListener(_nparticles));
             // generate the DLA using value of particle slider
@@ -529,11 +524,23 @@ namespace DLAProject {
             }
             agg_listen_task.Dispose();  // dispose all resources used by agg_listen_task
             hasFinished = true;
+            simulation_timer.Stop();
             prev_max_chart_x_value = nrchart.AxisMax;
             saveCurrentChartSeries = false;
             Dispatcher.Invoke(() => { compare_button.IsEnabled = true; });
         }
-        
+        /// <summary>
+        /// Handles updating of simulation timer.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        /// <param name="start"></param>
+        private void OnSimulationTimerUpdateEvent(object source, ElapsedEventArgs e, DateTime start) {
+            Dispatcher.Invoke(() => {
+                SimulationTimerLabel.Content = "Elapsed Time: " + (e.SignalTime - start).ToString(@"mm\:ss\:fff");
+            });
+        }
+
         #region ButtonHandlers
 
         /// <summary>
@@ -541,10 +548,10 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
-        private void GenerateButtonHandler(object sender, RoutedEventArgs e) {
+        private void OnGenerateButtonClicked(object sender, RoutedEventArgs e) {
             // clear any existing aggregate
             if (current_particles > 0)
-                ClearButtonHandler(null, null);
+                OnClearButtonClicked(null, null);
             current_executing_dimension = lattice_dimension;
             uint nparticles = (uint)particles_slider.Value;
             double agg_sticky_coeff = stickiness_slider.Value;
@@ -562,7 +569,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
-        private void PauseButtonHandler(object sender, RoutedEventArgs e) {
+        private void OnPauseButtonClicked(object sender, RoutedEventArgs e) {
             // TODO: implement pause functionality
             if (!isPaused) {
                 pause_button.Content = "Resume";
@@ -579,7 +586,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
-        private void ClearButtonHandler(object sender, RoutedEventArgs e) {
+        private void OnClearButtonClicked(object sender, RoutedEventArgs e) {
             // if an aggregate exists, clear it
             if (current_particles > 0) {
                 // switch on dimension of lattice
@@ -613,6 +620,7 @@ namespace DLAProject {
             DynamicParticleLabel.Content = "Particles: " + current_particles;
             FracDimLabel.Content = "Est. Fractal Dimension: " + 0.0;
             AggMissesLabel.Content = "Aggregate Misses: " + 0;
+            SimulationTimerLabel.Content = "Elapsed Time: 00:00.000";
             colour_list.Clear();
             compare_button.IsEnabled = false;
         }
@@ -622,7 +630,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ResetViewButtonHandler(object sender, RoutedEventArgs e) {
+        private void OnResetViewButtonClicked(object sender, RoutedEventArgs e) {
             // reset rotational view
             trackview.ResetView();
             // reset orthographic_camera properties
@@ -646,7 +654,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnCompareButtonClick(object sender, RoutedEventArgs e) {
+        private void OnCompareButtonClicked(object sender, RoutedEventArgs e) {
             saveCurrentChartSeries = true;
             compare_button.IsEnabled = false;
         }
