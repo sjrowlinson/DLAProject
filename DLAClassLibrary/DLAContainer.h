@@ -216,5 +216,4 @@ protected:
 	 * \copydoc DLAContainer::lattice_boundary_collision(std::pair<int,int>&,const std::pair<int,int>&,const int&)
 	 */
 	bool lattice_boundary_collision(utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept;
-
 };
