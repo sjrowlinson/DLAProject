@@ -28,7 +28,6 @@ namespace DLAProject {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
-
         #region Fields
         // lock object for multi-threading tasks
         private static readonly object locker = new object();
@@ -88,7 +87,6 @@ namespace DLAProject {
             Chart.DataContext = nrchart;
             //comp_manager = new AggregateComponentManager();
         }
-
         /// <summary>
         /// Method called on loading MainWindow. Initialises trackview ready for 
         /// transforming simulation viewport.
@@ -96,7 +94,7 @@ namespace DLAProject {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OnLoaded(object sender, EventArgs e) {
-            // create trackview instance for rotating simulation view
+            // create trackview instance for rotating, translating and scaling view
             trackview = new TrackView();
             // attach main window to trackview mouse handlers
             trackview.Attach(this);
@@ -110,12 +108,12 @@ namespace DLAProject {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OnContinuousCheckboxClicked(object sender, RoutedEventArgs e) {
-            if (!isContinuous) {
+            if (!isContinuous) {    // set continuous flag to true, disable particle slider
                 isContinuous = true;
                 particles_slider.IsEnabled = false;
                 particle_val.IsEnabled = false;
             }
-            else {
+            else {  // set continuous flag to false, re-enable particle slider
                 isContinuous = false;
                 particles_slider.IsEnabled = true;
                 particle_val.IsEnabled = true;
@@ -131,7 +129,7 @@ namespace DLAProject {
                 }
             }
         }
-
+  
         #region ComboBoxHandlers
 
         /// <summary>
@@ -329,22 +327,20 @@ namespace DLAProject {
         /// </summary>
         private void SetUpAggregateProperties(uint _nparticles, double _agg_sticky_coeff) {
             // reset simulation view
-            OnResetViewButtonClicked(null, null);
+            ResetView();
             // pre-compute the color list for all particles
             if (!isContinuous) ComputeColorList(_nparticles);
             else ComputeColorList(50000);   // TODO: change this, don't like "magic" number
-            if (saveCurrentChartSeries) {
-                switch (chart_type) {
-                    case ChartType.NUMBERRADIUS:
-                        nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff, lattice_type);
-                        break;
-                    case ChartType.RATEGENERATION:
-                        // TODO
-                        break;
-                }
+            switch (chart_type) {   // add new data series to focused chart type
+                case ChartType.NUMBERRADIUS:
+                    nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff, lattice_type);
+                    nrchart.AddDataPoint(0, 0.0); // set initial chart data point to origin
+                    break;
+                case ChartType.RATEGENERATION:
+                    // TODO
+                    break;
             }
             Chart.LegendLocation = LegendLocation.Right;
-            nrchart.AddDataPoint(0, 0.0);
             // set properties of aggregate corresponding to dimension
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
@@ -489,7 +485,7 @@ namespace DLAProject {
                         if (current_particles % 100 == 0)
                             nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_3d.GetAggregateRadiusSquared()));
                         if (current_particles % 2000 == 0 && current_particles > prev_max_chart_x_value && current_particles != total_particles) {
-                            nrchart.AxisStep += 100;
+                            nrchart.AxisStep += 200;
                             nrchart.AxisMax += 2000;
                         }
                     });
@@ -550,8 +546,7 @@ namespace DLAProject {
         /// <param name="e">Variable containing state information associated with event</param>
         private void OnGenerateButtonClicked(object sender, RoutedEventArgs e) {
             // clear any existing aggregate
-            if (current_particles > 0)
-                OnClearButtonClicked(null, null);
+            ClearAggregate();
             current_executing_dimension = lattice_dimension;
             uint nparticles = (uint)particles_slider.Value;
             double agg_sticky_coeff = stickiness_slider.Value;
@@ -582,58 +577,60 @@ namespace DLAProject {
         }
 
         /// <summary>
+        /// Auxiliary method for clearing aggregate and all related properties/instances.
+        /// </summary>
+        private void ClearAggregate() {
+            // switch on dimension of lattice previously generated
+            switch (current_executing_dimension) {
+                case LatticeDimension._2D:
+                    // if generation process not finished, raise abort signal
+                    if (!hasFinished) dla_2d.RaiseAbortSignal();
+                    dla_2d.Clear(); // clear aggregate data structure
+                    break;
+                case LatticeDimension._3D:
+                    // if generation process not finished, raise abort signal
+                    if (!hasFinished) dla_3d.RaiseAbortSignal();
+                    dla_3d.Clear(); // clear aggregate data structure
+                    break;
+            }
+            aggregate_manager.ClearAggregate(); // clear aggregate from user interface
+            colour_list.Clear();
+            current_particles = 0;
+            compare_button.IsEnabled = false;   // grey out compare_button
+            if (!saveCurrentChartSeries) {  // clear the NumberRadiusChart
+                nrchart.ResetXAxisProperties();
+                nrchart.ClearAllSeriesDataPoints();
+                prev_max_chart_x_value = 0;
+                saveCurrentChartSeries = true;
+            }
+            // reset labels to initial values
+            DynamicParticleLabel.Content = "Particles: " + current_particles;
+            FracDimLabel.Content = "Est. Fractal Dimension: 0.00";
+            AggMissesLabel.Content = "Aggregate Misses: 0";
+            SimulationTimerLabel.Content = "Elapsed Time: 00:00.000";
+            // WORK IN PROGRESS, USED FOR MULTI-COLOUR AGGREGATE VERSION
+            // WorldModels.Children.Clear();
+            // WorldModels.Children.Add(new AmbientLight(Colors.White));
+            // comp_manager.Clear();
+        }
+
+        /// <summary>
         /// Handler for clear_button click event. Clears the current aggregate data and simulation view.
         /// </summary>
         /// <param name="sender">Sender identification</param>
         /// <param name="e">Variable containing state information associated with event</param>
         private void OnClearButtonClicked(object sender, RoutedEventArgs e) {
             // if an aggregate exists, clear it
-            if (current_particles > 0) {
-                // switch on dimension of lattice
-                switch (current_executing_dimension) {
-                    case LatticeDimension._2D:
-                        // if generation process not finished, raise an abort signal
-                        if (!hasFinished)
-                            dla_2d.RaiseAbortSignal();
-                        dla_2d.Clear();
-                        break;
-                    case LatticeDimension._3D:
-                        // if generation process not finished, raise an abort signal
-                        if (!hasFinished)
-                            dla_3d.RaiseAbortSignal();
-                        dla_3d.Clear();
-                        break;
-                }
-            }
-            // clear aggregate from user interface
-            aggregate_manager.ClearAggregate();
-            if (!saveCurrentChartSeries) {
-                nrchart.ResetXAxisProperties();
-                nrchart.ClearAllSeriesDataPoints();
-                saveCurrentChartSeries = true;
-                prev_max_chart_x_value = 0;
-            }
-            //WorldModels.Children.Clear();
-            //WorldModels.Children.Add(new AmbientLight(Colors.White));
-            //comp_manager.Clear();
-            current_particles = 0;
-            DynamicParticleLabel.Content = "Particles: " + current_particles;
-            FracDimLabel.Content = "Est. Fractal Dimension: " + 0.0;
-            AggMissesLabel.Content = "Aggregate Misses: " + 0;
-            SimulationTimerLabel.Content = "Elapsed Time: 00:00.000";
-            colour_list.Clear();
-            compare_button.IsEnabled = false;
+            if (current_particles > 0) ClearAggregate();
         }
 
         /// <summary>
-        /// Handler for reset_view_button click event. Resets the viewport to initial state.
+        /// Auxiliary method for resetting aggregate view properties.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnResetViewButtonClicked(object sender, RoutedEventArgs e) {
-            // reset rotational view
+        private void ResetView() {
+            // reset rotational, translational and scalar view
             trackview.ResetView();
-            // reset orthographic_camera properties
+            // set orthographic_camera properties according to dimension of lattice
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
                     orthograghic_camera.Position = new Point3D(0, 0, 32);
@@ -649,6 +646,15 @@ namespace DLAProject {
         }
 
         /// <summary>
+        /// Handler for reset_view_button click event. Resets the viewport to initial state.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnResetViewButtonClicked(object sender, RoutedEventArgs e) {
+            ResetView();
+        }
+
+        /// <summary>
         /// Handler for compare_button click event. Caches current graph such that the plot
         /// appears on next simulation run.
         /// </summary>
@@ -660,6 +666,5 @@ namespace DLAProject {
         }
 
         #endregion
-
     }
 }
