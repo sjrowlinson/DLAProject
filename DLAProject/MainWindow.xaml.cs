@@ -454,7 +454,7 @@ namespace DLAProject {
                         if (current_particles % 100 == 0)
                             nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_2d.GetAggregateRadiusSquared()));
                         if (current_particles % 2000 == 0 && current_particles >= prev_max_chart_x_value && current_particles != total_particles) {
-                            nrchart.AxisStep += 100;
+                            nrchart.AxisStep += 200;
                             nrchart.AxisMax += 2000;
                         }
                     });

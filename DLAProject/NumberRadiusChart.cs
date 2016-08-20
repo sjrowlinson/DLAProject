@@ -97,7 +97,7 @@ namespace DLAProject {
         public void ResetXAxisProperties() {
             AxisMin = 0;
             AxisMax = 2000;
-            AxisStep = 100;
+            AxisStep = 200;
         }
         public int SeriesCount() {
             return SeriesCollection.Count;
