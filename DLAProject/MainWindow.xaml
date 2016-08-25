@@ -114,14 +114,18 @@
         <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <lvc:CartesianChart Name="Chart" Series="{Binding SeriesCollection}" HorizontalAlignment="Right" Width="603" Height="450" VerticalAlignment="Top">
                 <lvc:CartesianChart.AxisX>
-                    <lvc:Axis Title="{Binding XAxisTitle}" MaxValue="{Binding AxisMax}" MinValue="{Binding AxisMin}">
+                    <lvc:Axis Title="{Binding XAxisTitle}" MaxValue="{Binding XAxisMax}" MinValue="{Binding XAxisMin}">
                         <lvc:Axis.Separator>
-                            <lvc:Separator Step="{Binding AxisStep}"></lvc:Separator>
+                            <lvc:Separator Step="{Binding XAxisStep}"></lvc:Separator>
                         </lvc:Axis.Separator>
                     </lvc:Axis>
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="{Binding YAxisTitle}" MaxValue="200" MinValue="0"></lvc:Axis>
+                    <lvc:Axis Title="{Binding YAxisTitle}" MaxValue="{Binding YAxisMax}" MinValue="{Binding YAxisMin}">
+                        <lvc:Axis.Separator>
+                            <lvc:Separator Step="{Binding YAxisStep}"></lvc:Separator>
+                        </lvc:Axis.Separator>
+                    </lvc:Axis>
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
         </Grid>

@@ -20,12 +20,15 @@ namespace DLAProject {
     /// to notify client when a chart property changed event has been fired.
     /// </summary>
     public class NumberRadiusChart : INotifyPropertyChanged {
-        private uint x_axis_min;    // minimum value of x-axis
-        private uint x_axis_max;    // maximum value of x-axis
-        private uint x_axis_step;   // incremental step of x-axis
-        private int series_counter; // number of series plotted, zero-indexed
         private string x_axis_title;
         private string y_axis_title;
+        private uint x_axis_min;    // minimum value of x-axis
+        private uint x_axis_max;    // maximum value of x-axis
+        private double y_axis_min;
+        private double y_axis_max;
+        private uint x_axis_step;   // incremental step of x-axis
+        private double y_axis_step;
+        private int series_counter; // number of series plotted, zero-indexed
 
         /// <summary>
         /// Initialises a new instance of the NumberRadiusChart class.
@@ -42,7 +45,7 @@ namespace DLAProject {
             Charting.For<NumberRadiusMeasureModel>(mapper);
             SeriesCollection = new SeriesCollection();
             series_counter = -1;
-            ResetXAxisProperties();
+            ResetAxisProperties();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -72,32 +75,47 @@ namespace DLAProject {
         /// <summary>
         /// Incremental step of x-axis.
         /// </summary>
-        public uint AxisStep {
+        public uint XAxisStep {
             get { return x_axis_step; }
-            set { x_axis_step = value; OnPropertyChanged("AxisStep"); }
+            set { x_axis_step = value; OnPropertyChanged("XAxisStep"); }
         }
 
         /// <summary>
         /// Minimum value of x-axis.
         /// </summary>
-        public uint AxisMin {
+        public uint XAxisMin {
             get { return x_axis_min; }
-            set { x_axis_min = value; OnPropertyChanged("AxisMin"); }
+            set { x_axis_min = value; OnPropertyChanged("XAxisMin"); }
         }
         /// <summary>
         /// Maximum value of x-axis.
         /// </summary>
-        public uint AxisMax {
+        public uint XAxisMax {
             get { return x_axis_max; }
-            set { x_axis_max = value; OnPropertyChanged("AxisMax"); }
+            set { x_axis_max = value; OnPropertyChanged("XAxisMax"); }
+        }
+        public double YAxisStep {
+            get { return y_axis_step; }
+            set { y_axis_step = value; OnPropertyChanged("YAxisStep"); }
+        }
+        public double YAxisMin {
+            get { return y_axis_min; }
+            set { y_axis_min = value; OnPropertyChanged("YAxisMin"); }
+        }
+        public double YAxisMax {
+            get { return y_axis_max; }
+            set { y_axis_max = value; OnPropertyChanged("YAxisMax"); }
         }
         /// <summary>
-        /// Resets the x-axis minimum, maximum values and step-size.
+        /// Resets the axes' minimum, maximum values and step-size.
         /// </summary>
-        public void ResetXAxisProperties() {
-            AxisMin = 0;
-            AxisMax = 2000;
-            AxisStep = 200;
+        public void ResetAxisProperties() {
+            XAxisMin = 0;
+            XAxisMax = 2000;
+            XAxisStep = 200;
+            YAxisMin = 0;
+            YAxisMax = 20;
+            YAxisStep = 5;
         }
         public int SeriesCount() {
             return SeriesCollection.Count;

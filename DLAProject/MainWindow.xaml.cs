@@ -34,20 +34,10 @@ namespace DLAProject {
         // TODO: implement locks around aggregate generation methods for pause functionality
         // whilst using Monitor.Enter(pause_obj) and Monitor.Exit(pause_obj) in pause handler
         private static readonly object pause_obj = new object();
-        // handles to ManagedDLAContainer objects
+        // handles to ManagedDLAContainer objects and related properties
         private readonly ManagedDLA2DContainer dla_2d;
         private readonly ManagedDLA3DContainer dla_3d;
-        // flags for paused and finished states
-        private bool isPaused;
-        private bool hasFinished;
-        private bool isContinuous;
-        private bool saveCurrentChartSeries;
-        // handle to AggregateSystemManager used for updating simulation render
-        private readonly AggregateSystemManager aggregate_manager;
-        private TrackView trackview;
         private uint current_particles;
-        private uint prev_max_chart_x_value;
-        private List<Color> colour_list;
         private LatticeDimension lattice_dimension;
         private bool lattice_dimension_combo_handle = true;
         private LatticeDimension current_executing_dimension;
@@ -55,36 +45,42 @@ namespace DLAProject {
         private bool lattice_type_combo_handle = true;
         private ManagedAttractorType attractor_type;
         private bool attractor_type_combo_handle = true;
+        // flags for paused and finished states
+        private bool isPaused = false;
+        private bool hasFinished = true;
+        private bool isContinuous = false;
+        private bool saveCurrentChartSeries = true;
+        // simulation view related properties/handles
+        private readonly AggregateSystemManager aggregate_manager;
+        private TrackView trackview;
+        private List<Color> colour_list;
+        // chart related properties/handles
+        private NumberRadiusChart nrchart;
+        private GenerationRateChart ratechart;
         private ChartType chart_type;
         private bool chart_type_combo_handle = true;
         //private readonly AggregateComponentManager comp_manager;
-        private NumberRadiusChart nrchart;
-        private GenerationRateChart ratechart;
         #endregion
 
         public MainWindow() {
             InitializeComponent();
-            // initalise aggregate containers
+            // initalise aggregate containers and related properties
             dla_2d = new ManagedDLA2DContainer();
             dla_3d = new ManagedDLA3DContainer();
-            aggregate_manager = new AggregateSystemManager();
-            // set initial flag values
-            isPaused = false;
-            hasFinished = true;
-            isContinuous = false;
-            saveCurrentChartSeries = true;
             current_particles = 0;
-            prev_max_chart_x_value = 0;
-            colour_list = new List<Color>();
             lattice_dimension = LatticeDimension._2D;
             current_executing_dimension = lattice_dimension;
             lattice_type = ManagedLatticeType.Square;
             attractor_type = ManagedAttractorType.Point;
-            chart_type = ChartType.NUMBERRADIUS;
-            WorldModels.Children.Add(aggregate_manager.AggregateSystemModel());
+            // initialise simulation view properties/handles
+            aggregate_manager = new AggregateSystemManager();
+            WorldModels.Children.Add(aggregate_manager.AggregateSystemModel()); // add model to view
+            colour_list = new List<Color>();
+            // initialise chart related properties/handles
             nrchart = new NumberRadiusChart();
             ratechart = new GenerationRateChart();
-            Chart.DataContext = nrchart;
+            chart_type = ChartType.NUMBERRADIUS;
+            Chart.DataContext = nrchart; // default chart data context to Number-Radius chart
             //comp_manager = new AggregateComponentManager();
         }
         /// <summary>
@@ -447,11 +443,15 @@ namespace DLAProject {
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
+                        double agg_radius = Math.Sqrt(dla_2d.GetAggregateRadiusSquared());
                         if (current_particles % 100 == 0)
-                            nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_2d.GetAggregateRadiusSquared()));
-                        if (current_particles % 2000 == 0 && current_particles >= prev_max_chart_x_value && current_particles != total_particles) {
-                            nrchart.AxisStep += 200;
-                            nrchart.AxisMax += 2000;
+                            nrchart.AddDataPoint(current_particles, agg_radius);
+                        if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
+                            nrchart.XAxisStep += 200;
+                            nrchart.XAxisMax += 2000;
+                        }
+                        if (agg_radius >= nrchart.YAxisMax) {
+                            nrchart.YAxisMax += 20.0;
                         }
                     });
                 }
@@ -482,11 +482,15 @@ namespace DLAProject {
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
+                        double agg_radius = Math.Sqrt(dla_3d.GetAggregateRadiusSquared());
                         if (current_particles % 100 == 0)
-                            nrchart.AddDataPoint(current_particles, Math.Sqrt(dla_3d.GetAggregateRadiusSquared()));
-                        if (current_particles % 2000 == 0 && current_particles > prev_max_chart_x_value && current_particles != total_particles) {
-                            nrchart.AxisStep += 200;
-                            nrchart.AxisMax += 2000;
+                            nrchart.AddDataPoint(current_particles, agg_radius);
+                        if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
+                            nrchart.XAxisStep += 200;
+                            nrchart.XAxisMax += 2000;
+                        }
+                        if (agg_radius >= nrchart.YAxisMax) {
+                            nrchart.YAxisMax += 20.0;
                         }
                     });
                 }
@@ -521,7 +525,6 @@ namespace DLAProject {
             agg_listen_task.Dispose();  // dispose all resources used by agg_listen_task
             hasFinished = true;
             simulation_timer.Stop();
-            prev_max_chart_x_value = nrchart.AxisMax;
             saveCurrentChartSeries = false;
             Dispatcher.Invoke(() => { compare_button.IsEnabled = true; });
         }
@@ -598,9 +601,8 @@ namespace DLAProject {
             current_particles = 0;
             compare_button.IsEnabled = false;   // grey out compare_button
             if (!saveCurrentChartSeries) {  // clear the NumberRadiusChart
-                nrchart.ResetXAxisProperties();
+                nrchart.ResetAxisProperties();
                 nrchart.ClearAllSeriesDataPoints();
-                prev_max_chart_x_value = 0;
                 saveCurrentChartSeries = true;
             }
             // reset labels to initial values
