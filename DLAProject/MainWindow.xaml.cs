@@ -441,17 +441,19 @@ namespace DLAProject {
                     Dispatcher.Invoke(() => {
                         aggregate_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
-                        FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
+                        if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);                       
                         switch (chart_type) {
                             case ChartType.NUMBERRADIUS:
-                                double agg_radius = Math.Sqrt(dla_2d.GetAggregateRadiusSquared());
-                                if (current_particles % 100 == 0) nrchart.AddDataPoint(current_particles, agg_radius);
+                                if (current_particles % 100 == 0) {
+                                    double agg_radius = Math.Sqrt(dla_2d.GetAggregateRadiusSquared());
+                                    if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
+                                    nrchart.AddDataPoint(current_particles, agg_radius);
+                                }
                                 if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
                                     nrchart.XAxisStep += 200;
                                     nrchart.XAxisMax += 2000;
-                                }
-                                if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
+                                }                               
                                 break;
                             case ChartType.RATEGENERATION:
                                 // TODO: rate generation chart updating
@@ -484,17 +486,19 @@ namespace DLAProject {
                     Dispatcher.Invoke(() => {
                         aggregate_manager.Update();
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
-                        FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
+                        if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                         switch (chart_type) {
                             case ChartType.NUMBERRADIUS:
-                                double agg_radius = Math.Sqrt(dla_3d.GetAggregateRadiusSquared());
-                                if (current_particles % 100 == 0) nrchart.AddDataPoint(current_particles, agg_radius);
+                                if (current_particles % 100 == 0) {
+                                    double agg_radius = Math.Sqrt(dla_3d.GetAggregateRadiusSquared());
+                                    if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
+                                    nrchart.AddDataPoint(current_particles, agg_radius);
+                                }
                                 if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
                                     nrchart.XAxisStep += 200;
                                     nrchart.XAxisMax += 2000;
-                                }
-                                if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
+                                }                               
                                 break;
                             case ChartType.RATEGENERATION:
                                 // TODO: rate generation chart updating
