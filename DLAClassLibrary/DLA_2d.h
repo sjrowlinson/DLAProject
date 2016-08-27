@@ -10,25 +10,23 @@
  * \brief Implements a hash function object for a std::pair of generic types.
  */
 struct pair_hash {
-	template<typename _Ty1, typename _Ty2> std::size_t operator()(const std::pair<_Ty1, _Ty2>& _p) const {
-		return 51 + std::hash<_Ty1>()(_p.first) * 51 + std::hash<_Ty2>()(_p.second);
+	template<typename Ty1, typename Ty2> 
+	std::size_t operator()(const std::pair<Ty1, Ty2>& p) const {
+		return 51 + std::hash<Ty1>()(p.first) * 51 + std::hash<Ty2>()(p.second);
 	}
 };
-
 /**
  * \struct distance_comparator
  *
  * \brief Implements a comparator function object for std::pair<int,int> objects which can be used to
  *        to choose the instance of a std::pair which has a greater distance from the origin.
  */
-template<typename _Ty1, 
-	typename _Ty2
-> struct distance_comparator {
-	bool operator()(const std::pair<_Ty1, _Ty2>& _lhs, const std::pair<_Ty1, _Ty2>& _rhs) const {
-		return (_lhs.first*_lhs.first + _lhs.second*_lhs.second) < (_rhs.first*_rhs.first + _rhs.second*_rhs.second);
+struct distance_comparator_2d {
+	template<typename Ty1, typename Ty2>
+	bool operator()(const std::pair<Ty1, Ty2>& lhs, const std::pair<Ty1, Ty2>& rhs) const {
+		return (lhs.first*lhs.first + lhs.second*lhs.second) < (rhs.first*rhs.first + rhs.second*rhs.second);
 	}
 };
-
 /**
  * \class DLA_2d
  *
@@ -116,16 +114,16 @@ private:
 	std::unordered_map<std::pair<int, int>, std::size_t, pair_hash> aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
-	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator<int,int>> aggregate_pq;
+	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator_2d> aggregate_pq;
 	// queue for multi-thread batching - holds a buffer of aggregate
 	// points to be consumed by aggregate listening thread
 	std::queue<std::pair<int, int>> batch_queue;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *
-	 * \param[out] _spawn_pos Position of spawn.
-	 * \param[out] _spawn_diam Diameter of spawn zone.
-	 * \param[in] _dist Uniform real distribution for probability generation.
+	 * \param _spawn_pos Position of spawn.
+	 * \param _spawn_diam Diameter of spawn zone.
+	 * \param _dist Uniform real distribution for probability generation.
 	 */
 	void spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam, std::uniform_real_distribution<>& _prob_dist) noexcept;
 	/**

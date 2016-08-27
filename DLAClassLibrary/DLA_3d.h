@@ -10,27 +10,24 @@
  * \brief Implements a hash function object for a triple of generic types.
  */
 struct triple_hash {
-	template<typename _Ty1, typename _Ty2, typename _Ty3> std::size_t operator()(const utl::triple<_Ty1, _Ty2, _Ty3>& _t) const {
-		return 51 + std::hash<_Ty1>()(_t.first) * 51 + std::hash<_Ty2>()(_t.second) + std::hash<_Ty3>()(_t.third);
+	template<typename Ty1, typename Ty2, typename Ty3> 
+	std::size_t operator()(const utl::triple<Ty1, Ty2, Ty3>& t) const {
+		return 51 + std::hash<Ty1>()(t.first) * 51 + std::hash<Ty2>()(t.second) + std::hash<Ty3>()(t.third);
 	}
 };
-
 /**
  * \struct distance_comparator_3d
  *
  * \brief Implements a comparator function object for triple<int,int,int> objects which can be used to
  *        to choose the instance of a triple which has a greater distance from the origin.
  */
-template<typename _Ty1,
-	typename _Ty2,
-	typename _Ty3
-> struct distance_comparator_3d {
-	bool operator()(const utl::triple<_Ty1, _Ty2, _Ty3>& _lhs, const utl::triple<_Ty1, _Ty2, _Ty3>& _rhs) {
-		return (_lhs.first*_lhs.first + _lhs.second*_lhs.second + _lhs.third*_lhs.third) <
-			(_rhs.first*_rhs.first + _rhs.second*_rhs.second + _rhs.third*_rhs.third);
+struct distance_comparator_3d {
+	template<typename Ty1, typename Ty2, typename Ty3>
+	bool operator()(const utl::triple<Ty1, Ty2, Ty3>& lhs, const utl::triple<Ty1, Ty2, Ty3>& rhs) const {
+		return (lhs.first*lhs.first + lhs.second*lhs.second + lhs.third*lhs.third) <
+			(rhs.first*rhs.first + rhs.second*rhs.second + rhs.third*rhs.third);
 	}
 };
-
 /**
  * \class DLA_3d
  *
@@ -113,16 +110,16 @@ private:
 	std::unordered_map<utl::triple<int, int, int>, std::size_t, triple_hash> aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
-	std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d<int,int,int>> aggregate_pq;
+	std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
 	// queue for multi-thread batching - holds a buffer of aggregate
 	// points to be consumed by aggregate listening thread
 	std::queue<utl::triple<int, int, int>> batch_queue;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *
-	 * \param[out] _current Position of spawn.
-	 * \param[out] _spawn_diam Diameter of spawn zone.
-	 * \param[in] _dist Uniform real distribution for probability generation.
+	 * \param _current Position of spawn.
+	 * \param _spawn_diam Diameter of spawn zone.
+	 * \param _dist Uniform real distribution for probability generation.
 	 */
 	void spawn_particle(utl::triple<int,int,int>& _current, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
 	/**
