@@ -330,6 +330,7 @@ namespace DLAProject {
             switch (chart_type) {   // add new data series to focused chart type
                 case ChartType.NUMBERRADIUS:
                     nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff, lattice_type, isContinuous);
+                    nrchart.PollingInterval = 100U;
                     nrchart.AddDataPoint(0, 0.0); // set initial chart data point to origin
                     break;
                 case ChartType.RATEGENERATION:
@@ -445,7 +446,7 @@ namespace DLAProject {
                         if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);                       
                         switch (chart_type) {
                             case ChartType.NUMBERRADIUS:
-                                if (current_particles % 100 == 0) {
+                                if (current_particles % nrchart.PollingInterval == 0) {
                                     double agg_radius = Math.Sqrt(dla_2d.GetAggregateRadiusSquared());
                                     if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
                                     nrchart.AddDataPoint(current_particles, agg_radius);
@@ -490,7 +491,7 @@ namespace DLAProject {
                         if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                         switch (chart_type) {
                             case ChartType.NUMBERRADIUS:
-                                if (current_particles % 100 == 0) {
+                                if (current_particles % nrchart.PollingInterval == 0) {
                                     double agg_radius = Math.Sqrt(dla_3d.GetAggregateRadiusSquared());
                                     if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
                                     nrchart.AddDataPoint(current_particles, agg_radius);

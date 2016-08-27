@@ -46,6 +46,7 @@ namespace DLAProject {
             SeriesCollection = new SeriesCollection();
             series_counter = -1;
             ResetAxisProperties();
+            PollingInterval = 100U;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -106,6 +107,7 @@ namespace DLAProject {
             get { return y_axis_max; }
             set { y_axis_max = value; OnPropertyChanged("YAxisMax"); }
         }
+        public uint PollingInterval { get; set; }
         /// <summary>
         /// Resets the axes' minimum, maximum values and step-size.
         /// </summary>
