@@ -329,7 +329,7 @@ namespace DLAProject {
             else ComputeColorList(50000);   // TODO: change this, don't like "magic" number
             switch (chart_type) {   // add new data series to focused chart type
                 case ChartType.NUMBERRADIUS:
-                    nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff, lattice_type);
+                    nrchart.AddDataSeries(_nparticles, _agg_sticky_coeff, lattice_type, isContinuous);
                     nrchart.AddDataPoint(0, 0.0); // set initial chart data point to origin
                     break;
                 case ChartType.RATEGENERATION:
@@ -443,15 +443,19 @@ namespace DLAProject {
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
-                        double agg_radius = Math.Sqrt(dla_2d.GetAggregateRadiusSquared());
-                        if (current_particles % 100 == 0)
-                            nrchart.AddDataPoint(current_particles, agg_radius);
-                        if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
-                            nrchart.XAxisStep += 200;
-                            nrchart.XAxisMax += 2000;
-                        }
-                        if (agg_radius >= nrchart.YAxisMax) {
-                            nrchart.YAxisMax += 20.0;
+                        switch (chart_type) {
+                            case ChartType.NUMBERRADIUS:
+                                double agg_radius = Math.Sqrt(dla_2d.GetAggregateRadiusSquared());
+                                if (current_particles % 100 == 0) nrchart.AddDataPoint(current_particles, agg_radius);
+                                if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
+                                    nrchart.XAxisStep += 200;
+                                    nrchart.XAxisMax += 2000;
+                                }
+                                if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
+                                break;
+                            case ChartType.RATEGENERATION:
+                                // TODO: rate generation chart updating
+                                break;
                         }
                     });
                 }
@@ -482,15 +486,19 @@ namespace DLAProject {
                         DynamicParticleLabel.Content = "Particles: " + current_particles;
                         FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
-                        double agg_radius = Math.Sqrt(dla_3d.GetAggregateRadiusSquared());
-                        if (current_particles % 100 == 0)
-                            nrchart.AddDataPoint(current_particles, agg_radius);
-                        if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
-                            nrchart.XAxisStep += 200;
-                            nrchart.XAxisMax += 2000;
-                        }
-                        if (agg_radius >= nrchart.YAxisMax) {
-                            nrchart.YAxisMax += 20.0;
+                        switch (chart_type) {
+                            case ChartType.NUMBERRADIUS:
+                                double agg_radius = Math.Sqrt(dla_3d.GetAggregateRadiusSquared());
+                                if (current_particles % 100 == 0) nrchart.AddDataPoint(current_particles, agg_radius);
+                                if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
+                                    nrchart.XAxisStep += 200;
+                                    nrchart.XAxisMax += 2000;
+                                }
+                                if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
+                                break;
+                            case ChartType.RATEGENERATION:
+                                // TODO: rate generation chart updating
+                                break;
                         }
                     });
                 }

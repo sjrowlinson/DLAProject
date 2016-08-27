@@ -126,8 +126,8 @@ namespace DLAProject {
         /// </summary>
         /// <param name="nparticles">Number of particles in current aggregate generation.</param>
         /// <param name="coeff_stick">Coefficient of stickiness of aggregate structure.</param>
-        public void AddDataSeries(uint nparticles, double coeff_stick, ManagedLatticeType lattice_type) {
-            string title = nparticles + "/" + coeff_stick + "/";
+        public void AddDataSeries(uint nparticles, double coeff_stick, ManagedLatticeType lattice_type, bool isContinuous) {
+            string title =  (isContinuous ? "inf" : nparticles+"") + "/" + coeff_stick + "/";
             // set appropriate title based on aggregate lattice type
             switch (lattice_type) {
                 case ManagedLatticeType.Square:
