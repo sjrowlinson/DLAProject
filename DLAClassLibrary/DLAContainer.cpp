@@ -124,71 +124,55 @@ void DLAContainer::update_particle_position(std::pair<int,int>& _current, const 
 	}
 }
 
-void DLAContainer::update_particle_position(utl::triple<int,int,int>& _current, const double& _movement_choice) const noexcept {
+void DLAContainer::update_particle_position(std::tuple<int,int,int>& current, const double& _movement_choice) const noexcept {
 	// perform different translations dependent upon type of lattice
 	switch (lattice_type) {
 	case LatticeType::SQUARE:
 		// translate (+1,0,0)
-		if (_movement_choice < 1.0 / 6.0) {
-			++_current.first;
-		}
+		if (_movement_choice < 1.0 / 6.0) ++std::get<0>(current);
 		// translate (-1,0,0)
-		else if (_movement_choice >= 1.0 / 6.0 && _movement_choice < 2.0 / 6.0) {
-			--_current.first;
-		}
+		else if (_movement_choice >= 1.0 / 6.0 && _movement_choice < 2.0 / 6.0) --std::get<0>(current);
 		// translate (0,+1,0)
-		else if (_movement_choice >= 2.0 / 6.0 && _movement_choice < 3.0 / 6.0) {
-			++_current.second;
-		}
+		else if (_movement_choice >= 2.0 / 6.0 && _movement_choice < 3.0 / 6.0) ++std::get<1>(current);
 		// translate (0,-1,0)
-		else if (_movement_choice >= 3.0 / 6.0 && _movement_choice < 4.0 / 6.0) {
-			--_current.second;
-		}
+		else if (_movement_choice >= 3.0 / 6.0 && _movement_choice < 4.0 / 6.0) --std::get<1>(current);
 		// translate (0,0,+1)
-		else if (_movement_choice >= 4.0 / 6.0 && _movement_choice < 5.0 / 6.0) {
-			++_current.third;
-		}
+		else if (_movement_choice >= 4.0 / 6.0 && _movement_choice < 5.0 / 6.0) ++std::get<2>(current);
 		// translate (0,0,-1)
-		else if (_movement_choice >= 5.0 / 6.0 && _movement_choice < 1.0) {
-			--_current.third;
-		}
+		else if (_movement_choice >= 5.0 / 6.0 && _movement_choice < 1.0) --std::get<2>(current);
 		break;
 	case LatticeType::TRIANGLE:
 		// translate (+1,0,0)
-		if (_movement_choice < 1.0 / 8.0) {
-			++_current.first;
-		}
+		if (_movement_choice < 1.0 / 8.0) ++std::get<0>(current);
 		// translate (-1,0,0)
-		else if (_movement_choice >= 1.0 / 8.0 && _movement_choice < 2.0 / 8.0) {
-			--_current.first;
-		}
+		else if (_movement_choice >= 1.0 / 8.0 && _movement_choice < 2.0 / 8.0) --std::get<0>(current);
 		// translate (+1,+1,0)
 		else if (_movement_choice >= 2.0 / 8.0 && _movement_choice < 3.0 / 8.0) {
-			++_current.first;
-			++_current.second;
+			++std::get<0>(current);
+			++std::get<1>(current);
 		}
 		// translate (+1,-1,0)
 		else if (_movement_choice >= 3.0 / 8.0 && _movement_choice < 4.0 / 8.0) {
-			++_current.first;
-			--_current.second;
+			++std::get<0>(current);
+			--std::get<1>(current);
 		}
 		// translate (-1,+1,0)
 		else if (_movement_choice >= 4.0 / 8.0 && _movement_choice < 5.0 / 8.0) {
-			--_current.first;
-			++_current.second;
+			--std::get<0>(current);
+			++std::get<1>(current);
 		}
 		// translate (-1,-1,0)
 		else if (_movement_choice >= 5.0 / 8.0 && _movement_choice < 6.0 / 8.0) {
-			--_current.first;
-			--_current.second;
+			--std::get<0>(current);
+			--std::get<1>(current);
 		}
 		// translate (0,0,1)
 		else if (_movement_choice >= 6.0 / 8.0 && _movement_choice < 7.0 / 8.0) {
-			++_current.third;
+			++std::get<2>(current);
 		}
 		// translate (0,0,-1)
 		else if (_movement_choice >= 7.0 / 8.0 && _movement_choice < 1.0) {
-			--_current.third;
+			--std::get<2>(current);
 		}
 		break;
 		// TODO: add extra cases for different LatticeType constants
@@ -214,15 +198,15 @@ bool DLAContainer::lattice_boundary_collision(std::pair<int,int>& _current, cons
 	return false;
 }
 
-bool DLAContainer::lattice_boundary_collision(utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept {
+bool DLAContainer::lattice_boundary_collision(std::tuple<int,int,int>& current, const std::tuple<int,int,int>& _previous, const int& _spawn_diam) const noexcept {
 	// small offset for correction on boundaries
 	const int epsilon = 2;
 	// choose correct boundary collision detection based on type of attractor
 	switch (attractor_type) {
 	case AttractorType::POINT:
 		// reflect particle from boundary
-		if (std::abs(_current.first) > ((_spawn_diam / 2) + epsilon) || std::abs(_current.second) > ((_spawn_diam / 2) + epsilon) || std::abs(_current.third) > ((_spawn_diam / 2) + epsilon)) {
-			_current = _previous;
+		if (std::abs(std::get<0>(current)) > ((_spawn_diam / 2) + epsilon) || std::abs(std::get<1>(current)) > ((_spawn_diam / 2) + epsilon) || std::abs(std::get<2>(current)) > ((_spawn_diam / 2) + epsilon)) {
+			current = _previous;
 			return true;
 		}
 		break;

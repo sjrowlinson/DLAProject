@@ -84,7 +84,7 @@ public:
 	 *
 	 * \return reference to batch_queue of 2d aggregate.
 	 */
-	std::queue<utl::triple<int, int, int>>& batch_queue_handle() noexcept;
+	std::queue<std::tuple<int, int, int>>& batch_queue_handle() noexcept;
 	/**
 	 * \copydoc DLAContainer::clear()
 	 */
@@ -107,13 +107,13 @@ public:
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
-	std::unordered_map<utl::triple<int, int, int>, std::size_t, triple_hash> aggregate_map;
+	std::unordered_map<std::tuple<int, int, int>, std::size_t, utl::tuple_hash> aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
-	std::priority_queue<utl::triple<int, int, int>, std::vector<utl::triple<int, int, int>>, distance_comparator_3d> aggregate_pq;
+	std::priority_queue<std::tuple<int, int, int>, std::vector<std::tuple<int, int, int>>, utl::distance_comparator> aggregate_pq;
 	// queue for multi-thread batching - holds a buffer of aggregate
 	// points to be consumed by aggregate listening thread
-	std::queue<utl::triple<int, int, int>> batch_queue;
+	std::queue<std::tuple<int, int, int>> batch_queue;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *
@@ -121,7 +121,7 @@ private:
 	 * \param _spawn_diam Diameter of spawn zone.
 	 * \param _dist Uniform real distribution for probability generation.
 	 */
-	void spawn_particle(utl::triple<int,int,int>& _current, int& _spawn_diam) noexcept;
+	void spawn_particle(std::tuple<int,int,int>& _current, int& _spawn_diam) noexcept;
 	/**
 	 * \brief Checks for collision of random-walking particle with aggregate structure
 	 *        and adds this particles' previous position to aggregate if collision occurred.
@@ -131,5 +131,5 @@ private:
 	 * \param _sticky_pr |coeff_stick - _sticky_pr| = |1 - probability of sticking to aggregate|.
 	 * \param _count Current number of particles generated in aggregate.
 	 */
-	bool aggregate_collision(const utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const double& _sticky_pr, std::size_t& count);
+	bool aggregate_collision(const std::tuple<int,int,int>& _current, const std::tuple<int,int,int>& _previous, const double& _sticky_pr, std::size_t& count);
 };

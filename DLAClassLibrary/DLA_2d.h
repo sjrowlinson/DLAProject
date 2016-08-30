@@ -111,10 +111,10 @@ public:
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
-	std::unordered_map<std::pair<int, int>, std::size_t, pair_hash> aggregate_map;
+	std::unordered_map<std::pair<int, int>, std::size_t, utl::tuple_hash> aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
-	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, distance_comparator_2d> aggregate_pq;
+	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, utl::distance_comparator> aggregate_pq;
 	// queue for multi-thread batching - holds a buffer of aggregate
 	// points to be consumed by aggregate listening thread
 	std::queue<std::pair<int, int>> batch_queue;

@@ -202,7 +202,7 @@ protected:
 	/**
 	 * \copydoc DLAContainer::update_particle_position(std::pair<int,int>,const double&)
 	 */
-	void update_particle_position(utl::triple<int,int,int>& _current, const double& _movement_choice) const noexcept;
+	void update_particle_position(std::tuple<int,int,int>& _current, const double& _movement_choice) const noexcept;
 	/**
 	 * \brief Checks for collision with boundary of lattice and reflects.
 	 *
@@ -214,5 +214,5 @@ protected:
 	/**
 	 * \copydoc DLAContainer::lattice_boundary_collision(std::pair<int,int>&,const std::pair<int,int>&,const int&)
 	 */
-	bool lattice_boundary_collision(utl::triple<int,int,int>& _current, const utl::triple<int,int,int>& _previous, const int& _spawn_diam) const noexcept;
+	bool lattice_boundary_collision(std::tuple<int,int,int>& _current, const std::tuple<int,int,int>& _previous, const int& _spawn_diam) const noexcept;
 };

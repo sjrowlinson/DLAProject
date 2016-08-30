@@ -2,10 +2,85 @@
 #include <ostream>
 #include <random>
 #include <type_traits>
+#include <tuple>
 #include <utility>
 #include <vector>
 
 namespace utl {
+	/**
+	 * \struct tuple_distance_compute
+	 *
+	 * \brief Helper function object for computing squared radius of a tuple
+	 *        co-ordinate from the origin.
+	 */
+	template<class Tuple, std::size_t N>
+	struct tuple_distance_compute {
+		static auto distance_sqd(const Tuple& t) {
+			return tuple_distance_compute<Tuple, N - 1>::distance_sqd(t)
+				+ std::get<N - 1>(t)*std::get<N - 1>(t);
+		}
+	};
+	template<class Tuple>
+	struct tuple_distance_compute<Tuple, 1> {
+		static auto distance_sqd(const Tuple& t) {
+			return std::get<0>(t)*std::get<0>(t);
+		}
+	};
+	/**
+	 * \struct distance_comparator
+	 *
+	 * \brief Defines a distance comparator function object for a `std::tuple` (incl. `std::pair`)
+	 *        of generic types, used for determining tuple which has greater distance from origin.
+	 */
+	struct distance_comparator {
+		template<class... Types>
+		bool operator()(const std::tuple<Types...>& lhs, const std::tuple<Types...>& rhs) const {
+			return tuple_distance_compute<decltype(lhs), sizeof...(Types)>::distance_sqd(lhs)
+				< tuple_distance_compute<decltype(rhs), sizeof...(Types)>::distance_sqd(rhs);
+		}
+		template<class Ty1, class Ty2>
+		bool operator()(const std::pair<Ty1, Ty2>& lhs, const std::pair<Ty1, Ty2>& rhs) const {
+			return tuple_distance_compute<decltype(lhs), 2>::distance_sqd(lhs)
+				< tuple_distance_compute<decltype(rhs), 2>::distance_sqd(rhs);
+		}
+	};
+	/**
+	 * \struct tuple_hash_compute
+	 *
+	 * \brief Helper function object for computing hash function of a tuple instance.
+	 */
+	template<class Tuple, std::size_t N>
+	struct tuple_hash_compute {
+		static std::size_t hash_compute(const Tuple& t) {
+			//return tuple_hash_compute<Tuple, N - 1>::hash_compute(t) + std::hash<std::tuple_element<N-1, decltype(t)>::type>()(std::get<N - 1>(t));
+			return tuple_hash_compute<Tuple, N - 1>::hash_compute(t) + std::hash<int>()(std::get<N - 1>(t));
+		}
+	};
+	template<class Tuple>
+	struct tuple_hash_compute<Tuple, 1> {
+		static std::size_t hash_compute(const Tuple& t) {
+			//return 51 + std::hash<std::tuple_element<N - 1, decltype(t)>::type>()(std::get<0>(t)) * 51;
+			return 51 + std::hash<int>()(std::get<0>(t)) * 51;
+		}
+	};
+	/**
+	 * \struct triple_hash
+	 *
+	 * \brief Defines a hash function object for a `std::tuple` (incl. `std::pair`)
+	 *        of generic types.
+	 */
+	struct tuple_hash {
+		template<class... Types>
+		std::size_t operator()(const std::tuple<Types...>& t) const {
+			return tuple_hash_compute<decltype(t), sizeof...(Types)>::hash_compute(t);
+		}
+		template<class Ty1, class Ty2>
+		std::size_t operator()(const std::pair<Ty1, Ty2>& p) const {
+			return 51 + std::hash<Ty1>()(p.first) * 51 + std::hash<Ty2>()(p.second);
+		}
+	};
+
+
 	// utl::triple
 	/**
 	 * \struct triple
