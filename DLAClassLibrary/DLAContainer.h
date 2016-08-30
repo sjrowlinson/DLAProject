@@ -5,7 +5,6 @@
 #include <cmath>
 #include <iterator>
 #include <ostream>
-#include <random>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -187,7 +186,7 @@ protected:
 	LatticeType lattice_type;
 	AttractorType attractor_type;
 	double coeff_stick;
-	std::mt19937 mt_eng;
+	utl::uniform_random_probability_generator<> pr_gen;
 	bool abort_signal = false;
 	bool continuous = false;
 	std::size_t aggregate_radius_sqd_ = 0;

@@ -121,7 +121,7 @@ private:
 	 * \param _spawn_diam Diameter of spawn zone.
 	 * \param _dist Uniform real distribution for probability generation.
 	 */
-	void spawn_particle(utl::triple<int,int,int>& _current, int& _spawn_diam, std::uniform_real_distribution<>& _dist) noexcept;
+	void spawn_particle(utl::triple<int,int,int>& _current, int& _spawn_diam) noexcept;
 	/**
 	 * \brief Checks for collision of random-walking particle with aggregate structure
 	 *        and adds this particles' previous position to aggregate if collision occurred.

@@ -2,18 +2,18 @@
 #include "DLAContainer.h"
 
 DLAContainer::DLAContainer(const double& _coeff_stick) 
-	: lattice_type(LatticeType::SQUARE), attractor_type(AttractorType::POINT), mt_eng{ std::random_device{}() } { set_coeff_stick(_coeff_stick); }
+	: lattice_type(LatticeType::SQUARE), attractor_type(AttractorType::POINT), pr_gen() { set_coeff_stick(_coeff_stick); }
 
 DLAContainer::DLAContainer(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) 
-	: lattice_type(_lattice_type), attractor_type(_attractor_type), mt_eng{ std::random_device{}() } { set_coeff_stick(_coeff_stick); }
+	: lattice_type(_lattice_type), attractor_type(_attractor_type), pr_gen() { set_coeff_stick(_coeff_stick); }
 
 DLAContainer::DLAContainer(const DLAContainer& _other)
 	: lattice_type(_other.lattice_type), attractor_type(_other.attractor_type),
-		coeff_stick(_other.coeff_stick), mt_eng(_other.mt_eng) {}
+		coeff_stick(_other.coeff_stick), pr_gen(_other.pr_gen) {}
 
 DLAContainer::DLAContainer(DLAContainer&& _other)
 	: lattice_type(std::move(_other.lattice_type)), attractor_type(std::move(_other.attractor_type)),
-	coeff_stick(std::move(_other.coeff_stick)), mt_eng(std::move(_other.mt_eng)) {}
+	coeff_stick(std::move(_other.coeff_stick)), pr_gen(std::move(_other.pr_gen)) {}
 
 DLAContainer::~DLAContainer() {}
 
