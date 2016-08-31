@@ -4,14 +4,14 @@
 #include <type_traits>
 #include <tuple>
 #include <utility>
-#include <vector>
 
 namespace utl {
+	// DISTANCE_COMPARATOR
 	/**
 	 * \struct tuple_distance_compute
 	 *
-	 * \brief Helper function object for computing squared radius of a tuple
-	 *        co-ordinate from the origin.
+	 * \brief Helper recersive function-object for computing squared radius
+	 *        of a `std::tuple` co-ordinate from the origin.
 	 */
 	template<class Tuple, std::size_t N>
 	struct tuple_distance_compute {
@@ -20,6 +20,7 @@ namespace utl {
 				+ std::get<N - 1>(t)*std::get<N - 1>(t);
 		}
 	};
+	// base-helper
 	template<class Tuple>
 	struct tuple_distance_compute<Tuple, 1> {
 		static auto distance_sqd(const Tuple& t) {
@@ -33,10 +34,10 @@ namespace utl {
 	 *        of generic types, used for determining tuple which has greater distance from origin.
 	 */
 	struct distance_comparator {
-		template<class... Types>
-		bool operator()(const std::tuple<Types...>& lhs, const std::tuple<Types...>& rhs) const {
-			return tuple_distance_compute<decltype(lhs), sizeof...(Types)>::distance_sqd(lhs)
-				< tuple_distance_compute<decltype(rhs), sizeof...(Types)>::distance_sqd(rhs);
+		template<class... Args>
+		bool operator()(const std::tuple<Args...>& lhs, const std::tuple<Args...>& rhs) const {
+			return tuple_distance_compute<decltype(lhs), sizeof...(Args)>::distance_sqd(lhs)
+				< tuple_distance_compute<decltype(rhs), sizeof...(Args)>::distance_sqd(rhs);
 		}
 		template<class Ty1, class Ty2>
 		bool operator()(const std::pair<Ty1, Ty2>& lhs, const std::pair<Ty1, Ty2>& rhs) const {
@@ -44,156 +45,87 @@ namespace utl {
 				< tuple_distance_compute<decltype(rhs), 2>::distance_sqd(rhs);
 		}
 	};
+	// TUPLE_HASH
 	/**
 	 * \struct tuple_hash_compute
 	 *
-	 * \brief Helper function object for computing hash function of a tuple instance.
+	 * \brief Helper recersive function-object for computing hash function of a `std::tuple` instance.
 	 */
 	template<class Tuple, std::size_t N>
 	struct tuple_hash_compute {
 		static std::size_t hash_compute(const Tuple& t) {
-			//return tuple_hash_compute<Tuple, N - 1>::hash_compute(t) + std::hash<std::tuple_element<N-1, decltype(t)>::type>()(std::get<N - 1>(t));
-			return tuple_hash_compute<Tuple, N - 1>::hash_compute(t) + std::hash<int>()(std::get<N - 1>(t));
+			using type = typename std::tuple_element<N - 1, Tuple>::type;
+			return tuple_hash_compute<Tuple, N - 1>::hash_compute(t) + std::hash<type>()(std::get<N - 1>(t));
 		}
 	};
+	// base-helper
 	template<class Tuple>
 	struct tuple_hash_compute<Tuple, 1> {
 		static std::size_t hash_compute(const Tuple& t) {
-			//return 51 + std::hash<std::tuple_element<N - 1, decltype(t)>::type>()(std::get<0>(t)) * 51;
-			return 51 + std::hash<int>()(std::get<0>(t)) * 51;
+			using type = typename std::tuple_element<0, Tuple>::type;
+			return 51 + std::hash<type>()(std::get<0>(t)) * 51;
 		}
 	};
 	/**
-	 * \struct triple_hash
+	 * \struct tuple_hash
 	 *
 	 * \brief Defines a hash function object for a `std::tuple` (incl. `std::pair`)
 	 *        of generic types.
 	 */
 	struct tuple_hash {
-		template<class... Types>
-		std::size_t operator()(const std::tuple<Types...>& t) const {
-			return tuple_hash_compute<decltype(t), sizeof...(Types)>::hash_compute(t);
+		template<class... Args>
+		std::size_t operator()(const std::tuple<Args...>& t) const {
+			return tuple_hash_compute<std::tuple<Args...> , sizeof...(Args) > ::hash_compute(t);
 		}
 		template<class Ty1, class Ty2>
 		std::size_t operator()(const std::pair<Ty1, Ty2>& p) const {
-			return 51 + std::hash<Ty1>()(p.first) * 51 + std::hash<Ty2>()(p.second);
+			return tuple_hash_compute<std::pair<Ty1, Ty2>, 2>::hash_compute(p);
 		}
 	};
-
-
-	// utl::triple
-	/**
-	 * \struct triple
-	 *
-	 * \brief Defines a triplet of generic types.
-	 */
-	template<typename _Ty1, typename _Ty2, typename _Ty3> struct triple {
-		_Ty1 first;
-		_Ty2 second;
-		_Ty3 third;
-		/**
-		 * \brief Default constructor, initialises the container with default-constructed values.
-		 */
-		template<class _Uty1 = _Ty1,
-			class _Uty2 = _Ty2,
-			class _Uty3 = _Ty3,
-			class = std::enable_if_t<std::is_default_constructible<_Uty1>::value
-				&& std::is_default_constructible<_Uty2>::value
-				&& std::is_default_constructible<_Uty3>::value> 
-		> constexpr triple() : first(), second(), third() {}
-		/**
-		 * \brief Construct a `triple` object from specified values using copy construction.
-		 */
-		template<class _Uty1 = _Ty1,
-			class _Uty2 = _Ty2,
-			class _Uty3 = _Ty3,
-			class = std::enable_if_t<std::is_copy_constructible<_Uty1>::value
-				&& std::is_copy_constructible<_Uty2>::value
-				&& std::is_copy_constructible<_Uty3>::value> 
-		> triple(const _Ty1& _first, const _Ty2& _second, const _Ty3& _third) : first(_first), second(_second), third(_third) {}
-		/**
-		 * \brief Construct a `triple` object from specified values using move construction.
-		 */
-		template<class _Uty1 = _Ty1,
-			class _Uty2 = _Ty2,
-			class _Uty3 = _Ty3,
-			class = std::enable_if_t<std::is_move_constructible<_Uty1>::value
-				&& std::is_move_constructible<_Uty2>::value
-				&& std::is_move_constructible<_Uty3>::value> 
-		> triple(_Ty1&& _first, _Ty2&& _second, _Ty3&& _third) : first(std::move(_first)), second(std::move(_second)), third(std::move(_third)) {}
-	};
-	/**
-	 * \brief Makes a `triple` object with given values.
-	 *
-	 * \param _val1 Value with which to initialise first field of `triple`.
-	 * \param _val2 Value with which to initialise second field of `triple`.
-	 * \param _val3 Value with which to initialise third field of `triple`.
-	 * \return `triple` object comprised of specified parameters.
-	 */
-	template<typename _Ty1, typename _Ty2, typename _Ty3> 
-	inline constexpr triple<typename std::_Unrefwrap<_Ty1>::type, typename std::_Unrefwrap<_Ty2>::type, typename std::_Unrefwrap<_Ty3>::type> make_triple(_Ty1&& _val1, _Ty2&& _val2, _Ty3&& _val3) {
-		typedef triple<typename std::_Unrefwrap<_Ty1>::type, typename std::_Unrefwrap<_Ty2>::type, typename std::_Unrefwrap<_Ty3>::type> _ret_triple;
-		return _ret_triple(std::forward<_Ty1>(_val1), std::forward<_Ty2>(_val2), std::forward<_Ty3>(_val3));
-	}
-	/**
-	 * \brief Equality operator for `triple`.
-	 *
-	 * \param lhs First instance of `triple`.
-	 * \param rhs Second instance of `triple`.
-	 * \return `true` if `lhs == rhs`, `false` otherwise.
-	 */
-	template<typename _Ty1, typename _Ty2, typename _Ty3> 
-	bool operator==(const triple<_Ty1, _Ty2, _Ty3>& lhs, const triple<_Ty1, _Ty2, _Ty3>& rhs) {
-		return lhs.first == rhs.first && lhs.second == rhs.second && lhs.third == rhs.third;
-	}
-	/**
-	 * \brief Inequality operator for `triple`.
-	 *
-	 * \param lhs First instance of `triple`.
-	 * \param rhs Second instance of `triple`.
-	 * \return `true` if `lhs != rhs`, `false` otherwise.
-	 */
-	template<typename _Ty1, typename _Ty2, typename _Ty3> 
-	bool operator!=(const triple<_Ty1, _Ty2, _Ty3>& lhs, const triple<_Ty1, _Ty2, _Ty3>& rhs) {
-		return !(lhs == rhs);
-	}
-	/**
-	 * \brief Stream insertion operator for `triple`.
-	 *
-	 * \param os Instance of stream type to insert to.
-	 * \param trp `triple` instance to insert to data stream.
-	 * \return Modified `std::ostream` instance `os` containing data of `trp`.
-	 */
-	template<typename _Ty1, typename _Ty2, typename _Ty3> 
-	std::ostream& operator<<(std::ostream& os, const triple<_Ty1, _Ty2, _Ty3>& trp) {
-		os << trp.first << "\t" << trp.second << "\t" << trp.third;
-		return os;
-	}
 	// std::pair INSERTION OPERATOR
 	/**
-	 * \brief Stream insertion operator for `std::pair`.
+	 * \brief Writes a `std::pair` to an output stream `os`.
 	 *
-	 * \param os Instance of stream type to insert to.
-	 * \param p `std::pair` instance to insert to data stream.
-	 * \return Modified `std::ostream` instance `os` containing data of `p`.
+	 * \param os Instance of output stream to write to.
+	 * \param p `std::pair` instance to write to `os`.
+	 * \return `os`.
 	 */
 	template<typename _Ty1, typename _Ty2> 
 	std::ostream& operator<<(std::ostream& os, const std::pair<_Ty1, _Ty2>& p) {
 		os << p.first << "\t" << p.second;
 		return os;
 	}
-	/*************** std::vector INSERTION OPERATOR ***************/
+	// std::tuple INSERTION OPERATOR 
 	/**
-	 * \brief Stream insertion operator for `std::vector`.
+	 * \struct tuple_write_t
 	 *
-	 * \param os Instance of stream type to insert to.
-	 * \param vec `std::vector` instance to insert to data stream.
-	 * \return Modified `std::ostream` instance `os` containing data of `vec`.
+	 * \brief Recursive function-object for printing a generic `std::tuple`
+	 *        type to a `std::ostream` instance.
 	 */
-	template<typename _Ty1, typename _Ty2> 
-	std::ostream& operator<<(std::ostream& os, const std::vector<std::pair<_Ty1, _Ty2>>& vec) {
-		for (const auto& it : vec)
-			os << it << '\n';
+	template<class Tuple, std::size_t N>
+	struct tuple_write_t {
+		static void tuple_write(std::ostream& os, const Tuple& t) {
+			tuple_write_t<Tuple, N - 1>::tuple_write(os, t);
+			os << std::get<N - 1>(t);
+		}
+	};
+	// base-helper
+	template<class Tuple>
+	struct tuple_write_t<Tuple, 1> {
+		static void tuple_write(std::ostream& os, const Tuple& t) {
+			os << std::get<0>(t);
+		}
+	};
+	/**
+	 * \brief Writes a `std::tuple` to an output stream `os`.
+	 *
+	 * \param os Instance of output stream to write to.
+	 * \param t `std::tuple` instance to write to `os`.
+	 * \return `os`.
+	 */
+	template<class... Args>
+	std::ostream& operator<<(std::ostream& os, const std::tuple<Args...>& t) {
+		tuple_write_t<std::tuple<Args...>, sizeof...(Args)>::tuple_write(os, t);
 		return os;
 	}
 #ifndef RANDOM_NUMBER_GENERATOR_H

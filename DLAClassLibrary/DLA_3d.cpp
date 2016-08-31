@@ -32,12 +32,12 @@ void DLA_3d::generate(size_t _n) {
 	// push original sticky point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (3D)
 	std::size_t count = 0;
-	std::tuple<int, int, int> origin_sticky(0, 0, 0);
+	std::tuple<int, int, int> origin_sticky = std::make_tuple(0, 0 ,0);
 	aggregate_map.insert(std::make_pair(origin_sticky, count));
 	aggregate_pq.push(origin_sticky);
 	batch_queue.push(origin_sticky);
 	// initialise current and previous co-ordinate containers
-	std::tuple<int, int, int> current(0, 0, 0);
+	std::tuple<int, int, int> current = std::make_tuple(0,0,0);
 	std::tuple<int, int, int> prev = current;
 	bool has_next_spawned = false;
 	// variable to store current allowed size of bounding
@@ -89,13 +89,13 @@ std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		// sort agg_vec using a lambda based on order of particle generation
 		std::sort(agg_vec.begin(), agg_vec.end(), [](auto& _lhs, auto& _rhs) {return _lhs.first < _rhs.first; });
 		// write sorted data to stream
-		//for (const auto& el : agg_vec)
-			//_os << el.second << '\n';
+		for (const auto& el : agg_vec)
+			_os << el.second << '\n';
 	}
 	// output aggregate data "as-is" without sorting
 	else {
-		//for (const auto& el : aggregate_map)
-			//_os << el.second << '\t' << el.first << '\n';
+		for (const auto& el : aggregate_map)
+			_os << el.second << '\t' << el.first << '\n';
 	}
 	return _os;
 }

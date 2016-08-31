@@ -5,29 +5,6 @@
 #include <vector>
 
 /**
- * \struct pair_hash
- *
- * \brief Implements a hash function object for a std::pair of generic types.
- */
-struct pair_hash {
-	template<typename Ty1, typename Ty2> 
-	std::size_t operator()(const std::pair<Ty1, Ty2>& p) const {
-		return 51 + std::hash<Ty1>()(p.first) * 51 + std::hash<Ty2>()(p.second);
-	}
-};
-/**
- * \struct distance_comparator
- *
- * \brief Implements a comparator function object for std::pair<int,int> objects which can be used to
- *        to choose the instance of a std::pair which has a greater distance from the origin.
- */
-struct distance_comparator_2d {
-	template<typename Ty1, typename Ty2>
-	bool operator()(const std::pair<Ty1, Ty2>& lhs, const std::pair<Ty1, Ty2>& rhs) const {
-		return (lhs.first*lhs.first + lhs.second*lhs.second) < (rhs.first*rhs.first + rhs.second*rhs.second);
-	}
-};
-/**
  * \class DLA_2d
  *
  * \brief Defines a diffusion limited aggregate on a two-dimensional lattice.

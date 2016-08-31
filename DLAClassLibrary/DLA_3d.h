@@ -5,30 +5,6 @@
 #include <vector>
 
 /**
- * \struct triple_hash
- *
- * \brief Implements a hash function object for a triple of generic types.
- */
-struct triple_hash {
-	template<typename Ty1, typename Ty2, typename Ty3> 
-	std::size_t operator()(const utl::triple<Ty1, Ty2, Ty3>& t) const {
-		return 51 + std::hash<Ty1>()(t.first) * 51 + std::hash<Ty2>()(t.second) + std::hash<Ty3>()(t.third);
-	}
-};
-/**
- * \struct distance_comparator_3d
- *
- * \brief Implements a comparator function object for triple<int,int,int> objects which can be used to
- *        to choose the instance of a triple which has a greater distance from the origin.
- */
-struct distance_comparator_3d {
-	template<typename Ty1, typename Ty2, typename Ty3>
-	bool operator()(const utl::triple<Ty1, Ty2, Ty3>& lhs, const utl::triple<Ty1, Ty2, Ty3>& rhs) const {
-		return (lhs.first*lhs.first + lhs.second*lhs.second + lhs.third*lhs.third) <
-			(rhs.first*rhs.first + rhs.second*rhs.second + rhs.third*rhs.third);
-	}
-};
-/**
  * \class DLA_3d
  *
  * \brief Defines a diffusion limited aggregate on a three-dimensional lattice.
