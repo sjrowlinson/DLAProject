@@ -178,10 +178,11 @@ public:
 	 * Secondary default bool argument allows for sorting of the aggregate by the order in which
 	 * particles were added to the aggregate before writing these data to the output stream.
 	 *
-	 * \param _os Instance of std::ostream for writing to.
-	 * \param _sort_by_map_value [= false] Flag to signal sorting of data before writing.
+	 * \param os Instance of std::ostream for writing to.
+	 * \param sort_by_gen_order [= false] Flag to signal sorting of data 
+	 *        by order of generation before writing.
 	 */
-	virtual std::ostream& write(std::ostream& _os, bool _sort_by_map_value = false) const = 0;
+	virtual std::ostream& write(std::ostream& os, bool sort_by_gen_order = false) const = 0;
 protected:
 	LatticeType lattice_type;
 	AttractorType attractor_type;
@@ -198,11 +199,11 @@ protected:
 	 * \param _current Current position, to be updated.
 	 * \param _movement_choice Double in [0,1] for direction choice.
 	 */
-	void update_particle_position(std::pair<int,int>& _current, const double& _movement_choice) const noexcept;
+	void update_particle_position(std::pair<int,int>& current, const double& movement_choice) const noexcept;
 	/**
 	 * \copydoc DLAContainer::update_particle_position(std::pair<int,int>,const double&)
 	 */
-	void update_particle_position(std::tuple<int,int,int>& _current, const double& _movement_choice) const noexcept;
+	void update_particle_position(std::tuple<int,int,int>& current, const double& movement_choice) const noexcept;
 	/**
 	 * \brief Checks for collision with boundary of lattice and reflects.
 	 *
@@ -210,9 +211,9 @@ protected:
 	 * \param _previous Previous position.
 	 * \param _spawn_diam Current diameter of spawning box.
 	 */
-	bool lattice_boundary_collision(std::pair<int,int>& _current, const std::pair<int,int>& _previous, const int& _spawn_diam) const noexcept;
+	bool lattice_boundary_collision(std::pair<int,int>& current, const std::pair<int,int>& previous, const int& spawn_diam) const noexcept;
 	/**
 	 * \copydoc DLAContainer::lattice_boundary_collision(std::pair<int,int>&,const std::pair<int,int>&,const int&)
 	 */
-	bool lattice_boundary_collision(std::tuple<int,int,int>& _current, const std::tuple<int,int,int>& _previous, const int& _spawn_diam) const noexcept;
+	bool lattice_boundary_collision(std::tuple<int,int,int>& current, const std::tuple<int,int,int>& previous, const int& spawn_diam) const noexcept;
 };

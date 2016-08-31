@@ -28,7 +28,7 @@ void DLA_3d::clear() {
 	batch_queue = std::queue<std::tuple<int, int, int>>();
 }
 
-void DLA_3d::generate(size_t _n) {
+void DLA_3d::generate(size_t n) {
 	// push original sticky point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (3D)
 	std::size_t count = 0;
@@ -44,7 +44,7 @@ void DLA_3d::generate(size_t _n) {
 	// box spawning zone
 	int spawn_diameter = 0;
 	// aggregate generation loop
-	while (size() < _n || continuous) {
+	while (size() < n || continuous) {
 		if (abort_signal) {
 			abort_signal = false;
 			return;
@@ -63,8 +63,7 @@ void DLA_3d::generate(size_t _n) {
 		// check for collision with aggregate structure and add particle to 
 		// the aggregate (both to map and pq) if true, set flag ready for
 		// next particle spawn
-		if (aggregate_collision(current, prev, pr_gen(), count)) 
-			has_next_spawned = false;
+		if (aggregate_collision(current, prev, pr_gen(), count)) has_next_spawned = false;
 	}
 }
 
@@ -77,10 +76,10 @@ double DLA_3d::estimate_fractal_dimension() const {
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
 
-std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
+std::ostream& DLA_3d::write(std::ostream& os, bool sort_by_gen_order) const {
 	using utl::operator<<;
 	// sort by order particles were added to the aggregate
-	if (_sort_by_map_value) {
+	if (sort_by_gen_order) {
 		// std::vector container to store aggregate map values
 		std::vector<std::pair<std::size_t, std::tuple<int, int, int>>> agg_vec;
 		// deep copy elements of aggregate_map to agg_vec
@@ -90,71 +89,71 @@ std::ostream& DLA_3d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		std::sort(agg_vec.begin(), agg_vec.end(), [](auto& _lhs, auto& _rhs) {return _lhs.first < _rhs.first; });
 		// write sorted data to stream
 		for (const auto& el : agg_vec)
-			_os << el.second << '\n';
+			os << el.second << '\n';
 	}
 	// output aggregate data "as-is" without sorting
 	else {
 		for (const auto& el : aggregate_map)
-			_os << el.second << '\t' << el.first << '\n';
+			os << el.second << '\t' << el.first << '\n';
 	}
-	return _os;
+	return os;
 }
 
-void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& _spawn_diam) noexcept {
+void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) noexcept {
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// triple currently in the aggregate structure plus an offset to avoid direct sticking spawns
 	int rmax_sqd = std::get<0>(aggregate_pq.top())*std::get<0>(aggregate_pq.top()) + std::get<1>(aggregate_pq.top())*std::get<1>(aggregate_pq.top())
 		+ std::get<2>(aggregate_pq.top())*std::get<2>(aggregate_pq.top());
-	_spawn_diam = 2 * static_cast<int>(std::sqrt(rmax_sqd)) + boundary_offset;
+	spawn_diam = 2 * static_cast<int>(std::sqrt(rmax_sqd)) + boundary_offset;
 	double placement_pr = pr_gen();
 	// Spawn on negative constant z plane of bounding box
 	if (placement_pr < 1.0 / 6.0) {
-		std::get<0>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		std::get<1>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		std::get<2>(current) = -_spawn_diam / 2;
+		std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		std::get<2>(current) = -spawn_diam / 2;
 	}
 	// Spawn on positive constant z plane of bounding box
 	else if (placement_pr >= 1.0 / 6.0 && placement_pr < 2.0 / 6.0) {
-		std::get<0>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		std::get<1>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		std::get<2>(current) = _spawn_diam / 2;
+		std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		std::get<2>(current) = spawn_diam / 2;
 	}
 	// Spawn on negative constant x plane of bounding box
 	else if (placement_pr >= 2.0 / 6.0 && placement_pr < 3.0 / 6.0) {
-		std::get<0>(current) = -_spawn_diam / 2;
-		std::get<1>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		std::get<2>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
+		std::get<0>(current) = -spawn_diam / 2;
+		std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
 	}
 	// Spawn on positive constant x plane of bounding box
 	else if (placement_pr >= 3.0 / 6.0 && placement_pr < 4.0 / 6.0) {
-		std::get<0>(current) = _spawn_diam / 2;
-		std::get<1>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		std::get<2>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
+		std::get<0>(current) = spawn_diam / 2;
+		std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
 	}
 	// Spawn on negative constant y plane of bounding box
 	else if (placement_pr >= 4.0 / 6.0 && placement_pr < 5.0 / 6.0) {
-		std::get<0>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		std::get<1>(current) = -_spawn_diam / 2;
-		std::get<2>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
+		std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		std::get<1>(current) = -spawn_diam / 2;
+		std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
 	}
 	// Spawn on positive constant z plane of bounding box
 	else if (placement_pr >= 5.0 / 6.0 && placement_pr < 1.0) {
-		std::get<0>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		std::get<1>(current) = _spawn_diam / 2;
-		std::get<2>(current) = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
+		std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		std::get<1>(current) = spawn_diam / 2;
+		std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
 	}
 }
 
-bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const std::tuple<int,int,int>& previous, const double& _sticky_pr, std::size_t& _count) {
+bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const std::tuple<int,int,int>& previous, const double& sticky_pr, std::size_t& count) {
 	// particle did not stick to aggregate, increment aggregate_misses counter
-	if (_sticky_pr > coeff_stick)
+	if (sticky_pr > coeff_stick)
 		++aggregate_misses_;
 	// else, if current co-ordinates of particle exist in aggregate
 	// then collision and successful sticking occurred
 	else if (aggregate_map.find(current) != aggregate_map.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
-		aggregate_map.insert(std::make_pair(previous, ++_count));
+		aggregate_map.insert(std::make_pair(previous, ++count));
 		aggregate_pq.push(previous);
 		batch_queue.push(previous);
 		std::tuple<int,int,int> max_dist = aggregate_pq.top();

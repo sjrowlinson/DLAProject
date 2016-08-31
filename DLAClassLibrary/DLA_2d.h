@@ -84,7 +84,7 @@ public:
 	/**
 	 * \copydoc DLAContainer::write(std::ostream&,bool)
 	 */
-	std::ostream& write(std::ostream& _os, bool _sort_by_map_value = false) const override;
+	std::ostream& write(std::ostream& os, bool sort_by_gen_order = false) const override;
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
@@ -102,7 +102,7 @@ private:
 	 * \param _spawn_diam Diameter of spawn zone.
 	 * \param _dist Uniform real distribution for probability generation.
 	 */
-	void spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam) noexcept;
+	void spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noexcept;
 	/**
 	 * \brief Checks for collision of random-walking particle with aggregate structure
 	 *        and adds this particles' previous position to aggregate if collision occurred.
@@ -112,5 +112,5 @@ private:
 	 * \param _sticky_pr |coeff_stick - _sticky_pr| = |1 - probability of sticking to aggregate|.
 	 * \param _count Current number of particles generated in aggregate.
 	 */
-	bool aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, std::size_t& _count);
+	bool aggregate_collision(const std::pair<int,int>& current, const std::pair<int,int>& previous, const double& sticky_pr, std::size_t& count);
 };

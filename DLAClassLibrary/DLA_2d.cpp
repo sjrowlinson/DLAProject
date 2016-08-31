@@ -73,8 +73,7 @@ void DLA_2d::generate(size_t _n) {
 		// check for collision with aggregate structure and add particle to 
 		// the aggregate (both to map and pq) if true, set flag ready for
 		// next particle spawn
-		if (aggregate_collision(current, prev, pr_gen(), count))
-			has_next_spawned = false;
+		if (aggregate_collision(current, prev, pr_gen(), count)) has_next_spawned = false;
 		next_measurement_end = std::chrono::system_clock::now();
 		if ((next_measurement_end - next_measurement_start) >= static_cast<std::chrono::duration<double>>(1.0)) {
 			std::chrono::duration<double> elapsed = next_measurement_end - start;
@@ -91,10 +90,10 @@ double DLA_2d::estimate_fractal_dimension() const {
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
 
-std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
+std::ostream& DLA_2d::write(std::ostream& os, bool sort_by_gen_order) const {
 	using utl::operator<<;
 	// sort by order particles were added to the aggregate
-	if (_sort_by_map_value) {
+	if (sort_by_gen_order) {
 		// std::vector container to store aggregate_map values
 		std::vector<std::pair<std::size_t, std::pair<int, int>>> agg_vec;
 		// deep copy elements of aggregate_map to agg_vec
@@ -104,56 +103,56 @@ std::ostream& DLA_2d::write(std::ostream& _os, bool _sort_by_map_value) const {
 		std::sort(agg_vec.begin(), agg_vec.end(), [](auto& _lhs, auto& _rhs) {return _lhs.first < _rhs.first; });
         // write sorted data to stream
 		for (const auto& el : agg_vec)
-			_os << el.second << '\n';
+			os << el.second << '\n';
 	}
 	// output aggregate data "as-is" without sorting
 	else {
 		for (const auto& el : aggregate_map)
-			_os << el.second << '\t' << el.first << '\n';
+			os << el.second << '\t' << el.first << '\n';
 	}
-	return _os;
+	return os;
 }
 
-void DLA_2d::spawn_particle(std::pair<int,int>& _spawn_pos, int& _spawn_diam) noexcept {
+void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noexcept {
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
-	_spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
+	spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
 	// generate random double in [0,1]
 	double placement_pr = pr_gen();
 	// spawn on upper line of lattice boundary
 	if (placement_pr < 0.25) {
-		_spawn_pos.first = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		_spawn_pos.second = _spawn_diam / 2;
+		spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		spawn_pos.second = spawn_diam / 2;
 	}
 	// spawn on lower line of lattice boundary
 	else if (placement_pr >= 0.25 && placement_pr < 0.5) {
-		_spawn_pos.first = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
-		_spawn_pos.second = -_spawn_diam / 2;
+		spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		spawn_pos.second = -spawn_diam / 2;
 	}
 	// spawn on right line of lattice boundary
 	else if (placement_pr >= 0.5 && placement_pr < 0.75) {
-		_spawn_pos.first = _spawn_diam / 2;
-		_spawn_pos.second = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
+		spawn_pos.first = spawn_diam / 2;
+		spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
 	}
 	// spawn on left line of lattice boundary
 	else {
-		_spawn_pos.first = -_spawn_diam / 2;
-		_spawn_pos.second = static_cast<int>(_spawn_diam*(pr_gen() - 0.5));
+		spawn_pos.first = -spawn_diam / 2;
+		spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
 	}
 }
 
-bool DLA_2d::aggregate_collision(const std::pair<int,int>& _current, const std::pair<int,int>& _previous, const double& _sticky_pr, std::size_t& _count) {
+bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::pair<int,int>& previous, const double& sticky_pr, std::size_t& count) {
 	// particle did not stick to aggregate, increment aggregate_misses counter
-	if (_sticky_pr > coeff_stick)
+	if (sticky_pr > coeff_stick)
 		++aggregate_misses_;
 	// else, if current co-ordinates of particle exist in aggregate
 	// then collision and successful sticking occurred
-	else if (aggregate_map.find(_current) != aggregate_map.end()) {
+	else if (aggregate_map.find(current) != aggregate_map.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
-		aggregate_map.insert(std::make_pair(_previous, ++_count));
-		aggregate_pq.push(_previous);
-		batch_queue.push(_previous);
+		aggregate_map.insert(std::make_pair(previous, ++count));
+		aggregate_pq.push(previous);
+		batch_queue.push(previous);
 		aggregate_radius_sqd_ = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
 		return true;
 	}
