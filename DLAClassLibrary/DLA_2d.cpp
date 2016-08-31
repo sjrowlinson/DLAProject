@@ -31,20 +31,18 @@ void DLA_2d::set_attractor_type(AttractorType _attractor_type) {
 void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
-	aggregate_pq = std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, utl::distance_comparator>();
-	batch_queue = std::queue<std::pair<int, int>>();
+	aggregate_pq = aggregate2d_priority_queue();
+	batch_queue = aggregate2d_batch_queue();
 }
 
 void DLA_2d::generate(size_t _n) {
 	// push original aggregate point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (2D)
-	std::size_t count = 0;
+	std::size_t count = 0U;
 	std::pair<int, int> origin_sticky = std::make_pair(0, 0);
-	aggregate_map.insert(std::make_pair(origin_sticky, count));
-	aggregate_pq.push(origin_sticky);
-	batch_queue.push(origin_sticky);
+	push_particle(origin_sticky, count);
 	// initialise current and previous co-ordinate containers
-	std::pair<int, int> current = { 0, 0 };
+	std::pair<int, int> current = std::make_pair(0, 0);
 	std::pair<int, int> prev = current;
 	bool has_next_spawned = false;
 	// variable to store current allowed size of bounding
@@ -142,6 +140,12 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 	}
 }
 
+void DLA_2d::push_particle(const std::pair<int, int>& p, std::size_t count) {
+	aggregate_map.insert(std::make_pair(p, count));
+	aggregate_pq.push(p);
+	batch_queue.push(p);
+}
+
 bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::pair<int,int>& previous, const double& sticky_pr, std::size_t& count) {
 	// particle did not stick to aggregate, increment aggregate_misses counter
 	if (sticky_pr > coeff_stick)
@@ -150,9 +154,7 @@ bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::p
 	// then collision and successful sticking occurred
 	else if (aggregate_map.find(current) != aggregate_map.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
-		aggregate_map.insert(std::make_pair(previous, ++count));
-		aggregate_pq.push(previous);
-		batch_queue.push(previous);
+		push_particle(previous, ++count);
 		aggregate_radius_sqd_ = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
 		return true;
 	}

@@ -24,18 +24,16 @@ std::queue<std::tuple<int, int, int>>& DLA_3d::batch_queue_handle() noexcept {
 void DLA_3d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
-	aggregate_pq = std::priority_queue<std::tuple<int,int,int>, std::vector<std::tuple<int, int, int>>, utl::distance_comparator>();
-	batch_queue = std::queue<std::tuple<int, int, int>>();
+	aggregate_pq = aggregate3d_priority_queue();
+	batch_queue = aggregate3d_batch_queue();
 }
 
 void DLA_3d::generate(size_t n) {
 	// push original sticky point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (3D)
-	std::size_t count = 0;
+	std::size_t count = 0U;
 	std::tuple<int, int, int> origin_sticky = std::make_tuple(0, 0 ,0);
-	aggregate_map.insert(std::make_pair(origin_sticky, count));
-	aggregate_pq.push(origin_sticky);
-	batch_queue.push(origin_sticky);
+	push_particle(origin_sticky, count); // push initial seed to aggregate
 	// initialise current and previous co-ordinate containers
 	std::tuple<int, int, int> current = std::make_tuple(0,0,0);
 	std::tuple<int, int, int> prev = current;
@@ -145,6 +143,12 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 	}
 }
 
+void DLA_3d::push_particle(const std::tuple<int, int, int>& p, std::size_t count) {
+	aggregate_map.insert(std::make_pair(p, count));
+	aggregate_pq.push(p);
+	batch_queue.push(p);
+}
+
 bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const std::tuple<int,int,int>& previous, const double& sticky_pr, std::size_t& count) {
 	// particle did not stick to aggregate, increment aggregate_misses counter
 	if (sticky_pr > coeff_stick)
@@ -153,9 +157,7 @@ bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const s
 	// then collision and successful sticking occurred
 	else if (aggregate_map.find(current) != aggregate_map.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
-		aggregate_map.insert(std::make_pair(previous, ++count));
-		aggregate_pq.push(previous);
-		batch_queue.push(previous);
+		push_particle(previous, ++count);
 		std::tuple<int,int,int> max_dist = aggregate_pq.top();
 		aggregate_radius_sqd_ = std::get<0>(max_dist)*std::get<0>(max_dist) + std::get<1>(max_dist)*std::get<1>(max_dist)
 			+ std::get<2>(max_dist)*std::get<2>(max_dist);

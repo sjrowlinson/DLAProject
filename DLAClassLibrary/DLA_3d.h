@@ -18,6 +18,13 @@
  * \date May, 2016
  */
 class DLA_3d : public DLAContainer {
+	typedef std::unordered_map<std::tuple<int, int, int>,
+		std::size_t,
+		utl::tuple_hash> aggregate3d_unordered_map;
+	typedef std::priority_queue<std::tuple<int, int, int>,
+		std::vector<std::tuple<int, int, int>>,
+		utl::distance_comparator> aggregate3d_priority_queue;
+	typedef std::queue<std::tuple<int, int, int>> aggregate3d_batch_queue;
 public:
 	/**
 	 * \brief Default constructor, initialises empty 3d aggregate with given sticky coefficient.
@@ -83,13 +90,13 @@ public:
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
-	std::unordered_map<std::tuple<int, int, int>, std::size_t, utl::tuple_hash> aggregate_map;
+	aggregate3d_unordered_map aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
-	std::priority_queue<std::tuple<int, int, int>, std::vector<std::tuple<int, int, int>>, utl::distance_comparator> aggregate_pq;
+	aggregate3d_priority_queue aggregate_pq;
 	// queue for multi-thread batching - holds a buffer of aggregate
 	// points to be consumed by aggregate listening thread
-	std::queue<std::tuple<int, int, int>> batch_queue;
+	aggregate3d_batch_queue batch_queue;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *
@@ -108,4 +115,12 @@ private:
 	 * \param _count Current number of particles generated in aggregate.
 	 */
 	bool aggregate_collision(const std::tuple<int,int,int>& current, const std::tuple<int,int,int>& previous, const double& sticky_pr, std::size_t& count);
+	/**
+	 * \brief Pushes a particle into the aggregate, inserting the co-ordinates `p` into
+	 *        all necessary data structures used to contain the aggregate particles.
+	 *
+	 * \param p Co-ordinates of particle to insert.
+	 * \param count Index number of particle in aggregate.
+	 */
+	void push_particle(const std::tuple<int, int, int>& p, std::size_t count);
 };

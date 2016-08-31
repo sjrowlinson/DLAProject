@@ -18,6 +18,13 @@
  * \date May, 2016
  */
 class DLA_2d : public DLAContainer {
+	typedef std::unordered_map<std::pair<int, int>,
+		std::size_t,
+		utl::tuple_hash> aggregate2d_unordered_map;
+	typedef std::priority_queue<std::pair<int, int>,
+		std::vector<std::pair<int, int>>,
+		utl::distance_comparator> aggregate2d_priority_queue;
+	typedef std::queue<std::pair<int, int>> aggregate2d_batch_queue;
 public:
 	/**
 	 * \brief Default constructor, initialises empty 2d aggregate with given stickiness coefficient.
@@ -74,7 +81,7 @@ public:
 	 * \brief Generates a 2D diffusion limited aggregate consisting of the parameterised
 	 *        number of particles.
 	 *
-	 * \param _n Number of particles to generate in the 2D DLA.
+	 * \param n Number of particles to generate in the 2D DLA.
 	 */
 	void generate(std::size_t _n) override;
 	/**
@@ -88,29 +95,37 @@ public:
 private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
-	std::unordered_map<std::pair<int, int>, std::size_t, utl::tuple_hash> aggregate_map;
+	aggregate2d_unordered_map aggregate_map;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
-	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, utl::distance_comparator> aggregate_pq;
+	aggregate2d_priority_queue aggregate_pq;
 	// queue for multi-thread batching - holds a buffer of aggregate
 	// points to be consumed by aggregate listening thread
-	std::queue<std::pair<int, int>> batch_queue;
+	aggregate2d_batch_queue batch_queue;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *
-	 * \param _spawn_pos Position of spawn.
-	 * \param _spawn_diam Diameter of spawn zone.
-	 * \param _dist Uniform real distribution for probability generation.
+	 * \param spawn_pos Position of spawn.
+	 * \param spawn_diam Diameter of spawn zone.
+	 * \param dist Uniform real distribution for probability generation.
 	 */
 	void spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noexcept;
 	/**
 	 * \brief Checks for collision of random-walking particle with aggregate structure
 	 *        and adds this particles' previous position to aggregate if collision occurred.
 	 *
-	 * \param _current Current co-ordinates of particle.
-	 * \param _previous Previous co-ordinates of particle.
-	 * \param _sticky_pr |coeff_stick - _sticky_pr| = |1 - probability of sticking to aggregate|.
-	 * \param _count Current number of particles generated in aggregate.
+	 * \param current Current co-ordinates of particle.
+	 * \param previous Previous co-ordinates of particle.
+	 * \param sticky_pr |coeff_stick - _sticky_pr| = |1 - probability of sticking to aggregate|.
+	 * \param count Current number of particles generated in aggregate.
 	 */
 	bool aggregate_collision(const std::pair<int,int>& current, const std::pair<int,int>& previous, const double& sticky_pr, std::size_t& count);
+	/**
+	 * \brief Pushes a particle into the aggregate, inserting the co-ordinates `p` into
+	 *        all necessary data structures used to contain the aggregate particles.
+	 *
+	 * \param p Co-ordinates of particle to insert.
+	 * \param count Index number of particle in aggregate.
+	 */
+	void push_particle(const std::pair<int, int>& p, std::size_t count);
 };
