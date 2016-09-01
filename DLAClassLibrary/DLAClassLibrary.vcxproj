@@ -136,6 +136,7 @@
     <ClInclude Include="DLAContainer.h" />
     <ClInclude Include="DLA_2d.h" />
     <ClInclude Include="DLA_3d.h" />
+    <ClInclude Include="mutable_comp_priority_queue.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="utilities.h" />
