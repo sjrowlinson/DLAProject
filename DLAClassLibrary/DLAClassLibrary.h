@@ -147,14 +147,6 @@ namespace DLAClassLibrary {
 		std::size_t GetAggregateMisses() {
 			return native_dla_2d_ptr->aggregate_misses();
 		}
-		/** 
-		 * \brief Returns the rate of generation of particles in the aggregate.
-		 *
-		 * \return Rate of aggregate particle generation.
-		 */
-		std::size_t GenerationRate() {
-			return native_dla_2d_ptr->generation_rate();
-		}
 		/**
 		 * \brief Estimates the fractal dimension of the aggregrate.
 		 *

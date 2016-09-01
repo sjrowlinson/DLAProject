@@ -52,10 +52,6 @@ std::size_t DLAContainer::aggregate_misses() const noexcept {
 	return aggregate_misses_;
 }
 
-std::size_t DLAContainer::generation_rate() const noexcept {
-	return gen_rate;
-}
-
 void DLAContainer::raise_abort_signal() noexcept {
 	abort_signal = true;
 }
