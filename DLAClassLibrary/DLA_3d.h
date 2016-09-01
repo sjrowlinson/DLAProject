@@ -40,13 +40,13 @@ public:
 	 * \param _attractor_type Type of attractor of initial aggregate.
 	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
 	 */
-	DLA_3d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
+	DLA_3d(lattice_type ltt, attractor_type att, const double& _coeff_stick = 1.0);
 	/**
 	 * \brief Copy constructor, copies contents of parameterised DLA_3d to this.
 	 *
 	 * \param _other const reference to DLA_3d instance.
 	 */
-	DLA_3d(const DLA_3d& _other);
+	DLA_3d(const DLA_3d& other);
 	/**
 	 * \brief Move constructor, uses move-semantics for constructing a DLA_3d.
 	 *        from an rvalue reference of a DLA_3d - leaving that container.
@@ -54,13 +54,13 @@ public:
 	 *
 	 * \param _other rvalue reference to DLA_2d instance.
 	 */
-	DLA_3d(DLA_3d&& _other);
+	DLA_3d(DLA_3d&& other);
 	~DLA_3d();
 
 	/**
 	 * \copydoc DLAContainer::size()
 	 */
-	size_t size() const noexcept override;
+	std::size_t size() const noexcept override;
 	/**
 	 * \brief Gets a non-const reference to the batch_queue of the aggregate, used
 	 *        in C++/CLI ManagedDLA3DContainer::ProcessBatchQueue for GUI updating.

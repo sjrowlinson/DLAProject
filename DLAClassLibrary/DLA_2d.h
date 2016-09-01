@@ -40,13 +40,13 @@ public:
 	 * \param _attractor_type Type of attractor of initial aggregate.
 	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
 	 */
-	DLA_2d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
+	DLA_2d(lattice_type ltt, attractor_type att, const double& _coeff_stick = 1.0);
 	/**
 	 * \brief Copy constructor, copies contents of parameterised DLA_2d to this.
 	 *
 	 * \param _other const reference to DLA_2d instance.
 	 */
-	DLA_2d(const DLA_2d& _other);
+	DLA_2d(const DLA_2d& other);
 	/**
 	 * \brief Move constructor, uses move-semantics for constructing a DLA_2d.
 	 *        from an rvalue reference of a DLA_2d - leaving that container.
@@ -54,7 +54,7 @@ public:
 	 *
 	 * \param _other rvalue reference to DLA_2d instance
 	 */
-	DLA_2d(DLA_2d&& _other);
+	DLA_2d(DLA_2d&& other);
 	~DLA_2d();
 
 	/**
@@ -72,7 +72,7 @@ public:
 	 * \copydoc DLAContainer::set_attractor_type(AttractorType)
 	 * \throw Throws std::invalid_argument exception if _attractor_type is invalid for 2D lattice.
 	 */
-	void set_attractor_type(AttractorType _attractor_type) override;
+	void set_attractor_type(attractor_type att) override;
 	/**
 	 * \copydoc DLAContainer::clear()
 	 */
@@ -83,7 +83,7 @@ public:
 	 *
 	 * \param n Number of particles to generate in the 2D DLA.
 	 */
-	void generate(std::size_t _n) override;
+	void generate(std::size_t n) override;
 	/**
 	 * \copydoc DLAContainer::estimate_fractal_dimension()
 	 */

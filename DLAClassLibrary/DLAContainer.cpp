@@ -2,18 +2,18 @@
 #include "DLAContainer.h"
 
 DLAContainer::DLAContainer(const double& _coeff_stick) 
-	: lattice_type(LatticeType::SQUARE), attractor_type(AttractorType::POINT), pr_gen() { set_coeff_stick(_coeff_stick); }
+	: lattice(lattice_type::SQUARE), attractor(attractor_type::POINT), pr_gen() { set_coeff_stick(_coeff_stick); }
 
-DLAContainer::DLAContainer(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) 
-	: lattice_type(_lattice_type), attractor_type(_attractor_type), pr_gen() { set_coeff_stick(_coeff_stick); }
+DLAContainer::DLAContainer(lattice_type ltt, attractor_type att, const double& _coeff_stick) 
+	: lattice(ltt), attractor(att), pr_gen() { set_coeff_stick(_coeff_stick); }
 
-DLAContainer::DLAContainer(const DLAContainer& _other)
-	: lattice_type(_other.lattice_type), attractor_type(_other.attractor_type),
-		coeff_stick(_other.coeff_stick), pr_gen(_other.pr_gen) {}
+DLAContainer::DLAContainer(const DLAContainer& other)
+	: lattice(other.lattice), attractor(other.attractor),
+		coeff_stick(other.coeff_stick), pr_gen(other.pr_gen) {}
 
-DLAContainer::DLAContainer(DLAContainer&& _other)
-	: lattice_type(std::move(_other.lattice_type)), attractor_type(std::move(_other.attractor_type)),
-	coeff_stick(std::move(_other.coeff_stick)), pr_gen(std::move(_other.pr_gen)) {}
+DLAContainer::DLAContainer(DLAContainer&& other)
+	: lattice(std::move(other.lattice)), attractor(std::move(other.attractor)),
+	coeff_stick(std::move(other.coeff_stick)), pr_gen(std::move(other.pr_gen)) {}
 
 DLAContainer::~DLAContainer() {}
 
@@ -28,20 +28,20 @@ void DLAContainer::set_coeff_stick(const double& _coeff_stick) {
 	coeff_stick = _coeff_stick;
 }
 
-LatticeType DLAContainer::get_lattice_type() const noexcept {
-	return lattice_type;
+lattice_type DLAContainer::get_lattice_type() const noexcept {
+	return lattice;
 }
 
-void DLAContainer::set_lattice_type(LatticeType _lattice_type) noexcept {
-	lattice_type = _lattice_type;
+void DLAContainer::set_lattice_type(lattice_type ltt) noexcept {
+	lattice = ltt;
 }
 
-AttractorType DLAContainer::get_attractor_type() const noexcept {
-	return attractor_type;
+attractor_type DLAContainer::get_attractor_type() const noexcept {
+	return attractor;
 }
 
-void DLAContainer::set_attractor_type(AttractorType _attractor_type) {
-	attractor_type = _attractor_type;
+void DLAContainer::set_attractor_type(attractor_type att) {
+	attractor = att;
 }
 
 std::size_t DLAContainer::aggregate_radius_sqd() const noexcept {
@@ -68,8 +68,8 @@ void DLAContainer::clear() {
 
 void DLAContainer::update_particle_position(std::pair<int,int>& current, const double& movement_choice) const noexcept {
 	// perform different translations dependent upon type of lattice
-	switch (lattice_type) {
-	case LatticeType::SQUARE:
+	switch (lattice) {
+	case lattice_type::SQUARE:
 		// translate (+1,0)
 		if (movement_choice < 0.25) ++current.first;
 		// translate (-1,0)
@@ -79,7 +79,7 @@ void DLAContainer::update_particle_position(std::pair<int,int>& current, const d
 		// translate (0,-1)
 		else --current.second;
 		break;
-	case LatticeType::TRIANGLE:
+	case lattice_type::TRIANGLE:
 		// translate (+1,0)
 		if (movement_choice < 1.0 / 6.0) 
 			++current.first;
@@ -113,8 +113,8 @@ void DLAContainer::update_particle_position(std::pair<int,int>& current, const d
 
 void DLAContainer::update_particle_position(std::tuple<int,int,int>& current, const double& movement_choice) const noexcept {
 	// perform different translations dependent upon type of lattice
-	switch (lattice_type) {
-	case LatticeType::SQUARE:
+	switch (lattice) {
+	case lattice_type::SQUARE:
 		// translate (+1,0,0)
 		if (movement_choice < 1.0 / 6.0) ++std::get<0>(current);
 		// translate (-1,0,0)
@@ -128,7 +128,7 @@ void DLAContainer::update_particle_position(std::tuple<int,int,int>& current, co
 		// translate (0,0,-1)
 		else --std::get<2>(current);
 		break;
-	case LatticeType::TRIANGLE:
+	case lattice_type::TRIANGLE:
 		// translate (+1,0,0)
 		if (movement_choice < 1.0 / 8.0) 
 			++std::get<0>(current);
@@ -170,15 +170,15 @@ bool DLAContainer::lattice_boundary_collision(std::pair<int,int>& current, const
 	// small offset for correction on boundaries
 	const int epsilon = 2;
 	// choose correct boundary collision detection based on type of attractor
-	switch (attractor_type) {
-	case AttractorType::POINT:
+	switch (attractor) {
+	case attractor_type::POINT:
 		// reflect particle from boundary
 		if (std::abs(current.first) > ((spawn_diam / 2) + epsilon) || std::abs(current.second) > ((spawn_diam / 2) + epsilon)) {
 			current = previous;
 			return true;
 		}
 		break;
-	case AttractorType::LINE:
+	case attractor_type::LINE:
 		break;
 		// TODO: add extra cases for different AttractorType constants
 	}
@@ -189,17 +189,17 @@ bool DLAContainer::lattice_boundary_collision(std::tuple<int,int,int>& current, 
 	// small offset for correction on boundaries
 	const int epsilon = 2;
 	// choose correct boundary collision detection based on type of attractor
-	switch (attractor_type) {
-	case AttractorType::POINT:
+	switch (attractor) {
+	case attractor_type::POINT:
 		// reflect particle from boundary
 		if (std::abs(std::get<0>(current)) > ((spawn_diam / 2) + epsilon) || std::abs(std::get<1>(current)) > ((spawn_diam / 2) + epsilon) || std::abs(std::get<2>(current)) > ((spawn_diam / 2) + epsilon)) {
 			current = previous;
 			return true;
 		}
 		break;
-	case AttractorType::LINE:
+	case attractor_type::LINE:
 		break;
-	case AttractorType::PLANE:
+	case attractor_type::PLANE:
 		break;
 		// TODO: add extra cases for different AttractorType constants
 	}

@@ -5,6 +5,31 @@
 #include <tuple>
 #include <utility>
 
+/**
+ * \enum lattice_type
+ *
+ * \brief Defines several types of lattice applicable to both 2D and 3D DLA systems, for example
+ *        LatticeType::SQUARE will be interpreted as a square lattice in a 2D system and cubic
+ *        lattice in a 3D system.
+ */
+enum class lattice_type {
+	SQUARE, // square for 2D, cubic for 3D
+	TRIANGLE, // triangular for 2D, hexagonal for 3D
+};
+
+/** 
+ * \enum attractor_type
+ *
+ * \brief Defines several types of attractor geometry applicable to both 2D and 3D DLA systems. Note
+ *        that using some attractor geometries defined for 3D systems (i.e. AttractorType::PLANE) is
+ *        not allowed when applying to a DLA_2d object.
+ */
+enum class attractor_type {
+	POINT,
+	LINE,
+	PLANE, // not applicable for 2D
+};
+
 namespace utl {
 	// DISTANCE_COMPARATOR
 	/**
@@ -14,16 +39,16 @@ namespace utl {
 	 *        of a `std::tuple` co-ordinate from the origin.
 	 */
 	template<class Tuple, std::size_t N>
-	struct tuple_distance_compute {
-		static auto distance_sqd(const Tuple& t) {
-			return tuple_distance_compute<Tuple, N - 1>::distance_sqd(t)
+	struct tuple_distance_t {
+		static auto tuple_distance(const Tuple& t) {
+			return tuple_distance_t<Tuple, N - 1>::tuple_distance(t)
 				+ std::get<N - 1>(t)*std::get<N - 1>(t);
 		}
 	};
 	// base-helper
 	template<class Tuple>
-	struct tuple_distance_compute<Tuple, 1> {
-		static auto distance_sqd(const Tuple& t) {
+	struct tuple_distance_t<Tuple, 1> {
+		static auto tuple_distance(const Tuple& t) {
 			return std::get<0>(t)*std::get<0>(t);
 		}
 	};
@@ -36,13 +61,13 @@ namespace utl {
 	struct distance_comparator {
 		template<class... Args>
 		bool operator()(const std::tuple<Args...>& lhs, const std::tuple<Args...>& rhs) const {
-			return tuple_distance_compute<decltype(lhs), sizeof...(Args)>::distance_sqd(lhs)
-				< tuple_distance_compute<decltype(rhs), sizeof...(Args)>::distance_sqd(rhs);
+			return tuple_distance_t<decltype(lhs), sizeof...(Args)>::tuple_distance(lhs)
+				< tuple_distance_t<decltype(rhs), sizeof...(Args)>::tuple_distance(rhs);
 		}
 		template<class Ty1, class Ty2>
 		bool operator()(const std::pair<Ty1, Ty2>& lhs, const std::pair<Ty1, Ty2>& rhs) const {
-			return tuple_distance_compute<decltype(lhs), 2>::distance_sqd(lhs)
-				< tuple_distance_compute<decltype(rhs), 2>::distance_sqd(rhs);
+			return tuple_distance_t<decltype(lhs), 2>::tuple_distance(lhs)
+				< tuple_distance_t<decltype(rhs), 2>::tuple_distance(rhs);
 		}
 	};
 	// TUPLE_HASH

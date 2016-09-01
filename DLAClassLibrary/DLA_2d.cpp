@@ -3,13 +3,13 @@
 
 DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {}
 
-DLA_2d::DLA_2d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) : DLAContainer(_lattice_type, _attractor_type, _coeff_stick) {}
+DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, const double& _coeff_stick) : DLAContainer(ltt, att, _coeff_stick) {}
 
-DLA_2d::DLA_2d(const DLA_2d& _other) : DLAContainer(_other),
-	aggregate_map(_other.aggregate_map), aggregate_pq(_other.aggregate_pq), batch_queue(_other.batch_queue) {}
+DLA_2d::DLA_2d(const DLA_2d& other) : DLAContainer(other),
+	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), batch_queue(other.batch_queue) {}
 
-DLA_2d::DLA_2d(DLA_2d&& _other) : DLAContainer(std::move(_other)),
-	aggregate_map(std::move(_other.aggregate_map)), aggregate_pq(std::move(_other.aggregate_pq)), batch_queue(std::move(_other.batch_queue)) {}
+DLA_2d::DLA_2d(DLA_2d&& other) : DLAContainer(std::move(other)),
+	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)), batch_queue(std::move(other.batch_queue)) {}
 
 DLA_2d::~DLA_2d() {}
 
@@ -21,11 +21,11 @@ std::queue<std::pair<int,int>>& DLA_2d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
-void DLA_2d::set_attractor_type(AttractorType _attractor_type) {
+void DLA_2d::set_attractor_type(attractor_type att) {
 	// invalid attractor type for 2D lattice
-	if (_attractor_type == AttractorType::PLANE)
+	if (att == attractor_type::PLANE)
 		throw std::invalid_argument("Cannot set attractor type of 2D DLA to PLANE.");
-	DLAContainer::set_attractor_type(_attractor_type);
+	DLAContainer::set_attractor_type(att);
 }
 
 void DLA_2d::clear() {
@@ -35,7 +35,7 @@ void DLA_2d::clear() {
 	batch_queue = aggregate2d_batch_queue();
 }
 
-void DLA_2d::generate(size_t _n) {
+void DLA_2d::generate(std::size_t _n) {
 	// push original aggregate point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (2D)
 	std::size_t count = 0U;

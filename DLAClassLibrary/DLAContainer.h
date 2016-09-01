@@ -9,29 +9,6 @@
 #include <vector>
 
 /**
- * \enum LatticeType
- *
- * \brief Defines several types of lattice applicable to both 2D and 3D DLA systems, for example
- *        LatticeType::SQUARE will be interpreted as a square lattice in a 2D system and cubic 
- *        lattice in a 3D system.
- */
-enum class LatticeType {
-	SQUARE, // square for 2D, cubic for 3D
-	TRIANGLE, // triangular for 2D, hexagonal for 3D
-};
-
-/**
- * \brief Defines several types of attractor geometry applicable to both 2D and 3D DLA systems. Note
- *        that using some attractor geometries defined for 3D systems (i.e. AttractorType::PLANE) is
- *        not allowed when applying to a DLA_2d object.
- */
-enum class AttractorType {
-	POINT,
-	LINE,
-	PLANE, // not applicable for 2D
-};
-
-/**
  * \class DLAContainer
  *
  * \brief Abstract class containing data about a diffusion limited aggregate with virtual methods for generating an aggregate, finding
@@ -54,25 +31,25 @@ public:
 	/**
 	 * \brief Constructor with parameters for type of lattice and type of attractor.
 	 *
-	 * \param _lattice_type Type of lattice for DLA construction.
-	 * \param _attractor_type Type of attractor for DLA construction.
+	 * \param ltt Type of lattice for DLA construction.
+	 * \param att Type of attractor for DLA construction.
 	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
 	 */
-	DLAContainer(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick = 1.0);
+	DLAContainer(lattice_type ltt, attractor_type att, const double& _coeff_stick = 1.0);
 	/**
 	 * \brief Copy constructor, copies contents of parameterised DLAContainer to this.
 	 *
-	 * \param _other const reference to DLAContainer instance.
+	 * \param other const reference to DLAContainer instance.
 	 */
-	DLAContainer(const DLAContainer& _other);
+	DLAContainer(const DLAContainer& other);
 	/**
 	 * \brief Move constructor, uses move-semantics for constructing a DLAContainer 
 	 *        from an rvalue reference of a DLAContainer - leaving that container
 	 *        in a valid but unspecified state.
 	 *
- 	 * \param _other rvalue reference to DLAContainer instance.
+ 	 * \param other rvalue reference to DLAContainer instance.
 	 */
-	DLAContainer(DLAContainer&& _other);
+	DLAContainer(DLAContainer&& other);
 	/**
 	 * \brief Destructs the container.
 	 */
@@ -102,25 +79,25 @@ public:
 	 *
 	 * \return lattice_type of this instance.
 	 */
-	LatticeType get_lattice_type() const noexcept;
+	lattice_type get_lattice_type() const noexcept;
 	/**
 	 * \brief Gets the type of attractor.
 	 *
 	 * \return attractor_type of this instance.
 	 */
-	AttractorType get_attractor_type() const noexcept;
+	attractor_type get_attractor_type() const noexcept;
 	/**
 	 * \brief Sets the type of lattice.
 	 *
 	 * \param _lattice_type LatticeType to update to.
 	 */
-	void set_lattice_type(LatticeType _lattice_type) noexcept;
+	void set_lattice_type(lattice_type ltt) noexcept;
 	/**
 	 * \brief Sets the type of attractor.
 	 *
 	 * \param _attractor_type AttractorType to update to.
 	 */
-	virtual void set_attractor_type(AttractorType _attractor_type);
+	virtual void set_attractor_type(attractor_type att);
 	/**
 	 * \brief Gets the radial distance squared of the aggregate from its origin.
 	 *
@@ -176,8 +153,8 @@ public:
 	 */
 	virtual std::ostream& write(std::ostream& os, bool sort_by_gen_order = false) const = 0;
 protected:
-	LatticeType lattice_type;
-	AttractorType attractor_type;
+	lattice_type lattice;
+	attractor_type attractor;
 	double coeff_stick;
 	utl::uniform_random_probability_generator<> pr_gen;
 	bool abort_signal = false;

@@ -3,17 +3,17 @@
 
 DLA_3d::DLA_3d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {}
 
-DLA_3d::DLA_3d(LatticeType _lattice_type, AttractorType _attractor_type, const double& _coeff_stick) : DLAContainer(_lattice_type, _attractor_type, _coeff_stick) {}
+DLA_3d::DLA_3d(lattice_type ltt, attractor_type att, const double& _coeff_stick) : DLAContainer(ltt, att, _coeff_stick) {}
 
-DLA_3d::DLA_3d(const DLA_3d& _other) : DLAContainer(_other),
-	aggregate_map(_other.aggregate_map), aggregate_pq(_other.aggregate_pq), batch_queue(_other.batch_queue) {}
+DLA_3d::DLA_3d(const DLA_3d& other) : DLAContainer(other),
+	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), batch_queue(other.batch_queue) {}
 
-DLA_3d::DLA_3d(DLA_3d&& _other) : DLAContainer(std::move(_other)),
-	aggregate_map(std::move(_other.aggregate_map)), aggregate_pq(std::move(_other.aggregate_pq)), batch_queue(std::move(_other.batch_queue)) {}
+DLA_3d::DLA_3d(DLA_3d&& other) : DLAContainer(std::move(other)),
+	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)), batch_queue(std::move(other.batch_queue)) {}
 
 DLA_3d::~DLA_3d() {}
 
-size_t DLA_3d::size() const noexcept {
+std::size_t DLA_3d::size() const noexcept {
 	return aggregate_map.size();
 }
 
@@ -28,7 +28,7 @@ void DLA_3d::clear() {
 	batch_queue = aggregate3d_batch_queue();
 }
 
-void DLA_3d::generate(size_t n) {
+void DLA_3d::generate(std::size_t n) {
 	// push original sticky point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (3D)
 	std::size_t count = 0U;

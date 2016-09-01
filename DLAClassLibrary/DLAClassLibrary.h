@@ -62,7 +62,7 @@ namespace DLAClassLibrary {
 		 * \param lattice_type Type of lattice aggregate is to be built upon.
 		 * \param attractor_type Type of attractor for initial system seed.
 		 */
-		ManagedDLA2DContainer(ManagedLatticeType lattice_type, ManagedAttractorType attractor_type) : native_dla_2d_ptr(new DLA_2d(static_cast<LatticeType>(lattice_type), static_cast<AttractorType>(attractor_type))) {}
+		ManagedDLA2DContainer(ManagedLatticeType ltt, ManagedAttractorType att) : native_dla_2d_ptr(new DLA_2d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att))) {}
 		/**
 		 * \brief Initialises a ManagedDLA2DContainer with given lattice and attractor types and a given stickiness
 		 *        coefficient, and is initially empty.
@@ -71,8 +71,8 @@ namespace DLAClassLibrary {
 		 * \param attractor_type Type of attractor for initial system seed.
 		 * \param coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
 		 */
-		ManagedDLA2DContainer(ManagedLatticeType lattice_type, ManagedAttractorType attractor_type, double coeff_stick) : 
-			native_dla_2d_ptr(new DLA_2d(static_cast<LatticeType>(lattice_type), static_cast<AttractorType>(attractor_type), coeff_stick)) {}
+		ManagedDLA2DContainer(ManagedLatticeType ltt, ManagedAttractorType att, double coeff_stick) : 
+			native_dla_2d_ptr(new DLA_2d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att), coeff_stick)) {}
 		/**
 		 * \brief Copy constructor. Initialises a ManagedDLA2DContainer with a copy of the contents of `other`.
 		 *
@@ -112,16 +112,16 @@ namespace DLAClassLibrary {
 		 *
 		 * \param lattice_type LatticeType to update to.
 		 */
-		void SetLatticeType(ManagedLatticeType lattice_type) {
-			native_dla_2d_ptr->set_lattice_type(static_cast<LatticeType>(lattice_type));
+		void SetLatticeType(ManagedLatticeType ltt) {
+			native_dla_2d_ptr->set_lattice_type(static_cast<lattice_type>(ltt));
 		}
 		/**
 		 * \brief Sets the type of attractor.
 		 *
 		 * \param attractor_type AttractorType to update to.
 		 */
-		void SetAttractorType(ManagedAttractorType attractor_type) {
-			native_dla_2d_ptr->set_attractor_type(static_cast<AttractorType>(attractor_type));
+		void SetAttractorType(ManagedAttractorType att) {
+			native_dla_2d_ptr->set_attractor_type(static_cast<attractor_type>(att));
 		}
 		/**
 		 * \brief Gets the size of the aggregrate.
@@ -237,7 +237,7 @@ namespace DLAClassLibrary {
 		 * \param lattice_type Type of lattice aggregate is to be built upon.
 		 * \param attractor_type Type of attractor for initial system seed.
 		 */
-		ManagedDLA3DContainer(ManagedLatticeType lattice_type, ManagedAttractorType attractor_type) : native_dla_3d_ptr(new DLA_3d(static_cast<LatticeType>(lattice_type), static_cast<AttractorType>(attractor_type))) {}
+		ManagedDLA3DContainer(ManagedLatticeType ltt, ManagedAttractorType att) : native_dla_3d_ptr(new DLA_3d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att))) {}
 		/**
 		 * \brief Initialises a ManagedDLA3DContainer with given lattice and attractor types and a given stickiness
 		 *        coefficient, and is initially empty.
@@ -246,8 +246,8 @@ namespace DLAClassLibrary {
 		 * \param attractor_type Type of attractor for initial system seed.
 		 * \param coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
 		 */
-		ManagedDLA3DContainer(ManagedLatticeType lattice_type, ManagedAttractorType attractor_type, double coeff_stick) : 
-			native_dla_3d_ptr(new DLA_3d(static_cast<LatticeType>(lattice_type), static_cast<AttractorType>(attractor_type), coeff_stick)) {}
+		ManagedDLA3DContainer(ManagedLatticeType ltt, ManagedAttractorType att, double coeff_stick) : 
+			native_dla_3d_ptr(new DLA_3d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att), coeff_stick)) {}
 		/**
 		 * \brief Copy constructor. Initialises a `ManagedDLA3DContainer` with a copy of the contents of `other`.
 		 *
@@ -289,16 +289,16 @@ namespace DLAClassLibrary {
 		 *
 		 * \param lattice_type LatticeType to update to.
 		 */
-		void SetLatticeType(ManagedLatticeType lattice_type) {
-			native_dla_3d_ptr->set_lattice_type(static_cast<LatticeType>(lattice_type));
+		void SetLatticeType(ManagedLatticeType ltt) {
+			native_dla_3d_ptr->set_lattice_type(static_cast<lattice_type>(ltt));
 		}
 		/**
 		 * \brief Sets the type of attractor.
 		 *
 		 * \param attractor_type AttractorType to update to.
 		 */
-		void SetAttractorType(ManagedAttractorType attractor_type) {
-			native_dla_3d_ptr->set_attractor_type(static_cast<AttractorType>(attractor_type));
+		void SetAttractorType(ManagedAttractorType att) {
+			native_dla_3d_ptr->set_attractor_type(static_cast<attractor_type>(att));
 		}
 		/**
 		 * \brief Gets the size of the aggregrate.
