@@ -45,6 +45,8 @@ namespace DLAProject {
         private bool lattice_type_combo_handle = true;
         private ManagedAttractorType attractor_type;
         private bool attractor_type_combo_handle = true;
+        private bool spawn_aboveoutside_attractor = true;
+        private bool spawn_belowinside_attractor = true;
         // flags for paused and finished states
         private bool isPaused = false;
         private bool hasFinished = true;
@@ -98,6 +100,9 @@ namespace DLAProject {
             trackview.Viewport = World;
             trackview.Enabled = true;
         }
+
+        #region CheckboxHandlers
+
         /// <summary>
         /// Handler for continuous_checkbox click event.
         /// </summary>
@@ -125,7 +130,28 @@ namespace DLAProject {
                 }
             }
         }
-  
+        /// <summary>
+        /// Handle for aboveoroutsidespawnloc_checkbox click event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnAboveOrOutsideAttractorCheckboxClicked(object sender, RoutedEventArgs e) {
+            if (!spawn_aboveoutside_attractor) spawn_aboveoutside_attractor = true;
+            else spawn_aboveoutside_attractor = false;
+            // TODO: call DLAClassLibrary API to notify of change
+        }
+        /// <summary>
+        /// Handle for beloworoutsidespawnloc_checkbox click event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnBelowOrInsideAttractorCheckboxClicked(object sender, RoutedEventArgs e) {
+            if (!spawn_belowinside_attractor) spawn_belowinside_attractor = true;
+            else spawn_belowinside_attractor = false;
+            // TODO: call DLAClassLibrary API to notify of change
+        }
+        #endregion
+
         #region ComboBoxHandlers
 
         /// <summary>
@@ -220,7 +246,26 @@ namespace DLAProject {
             string attractor_type_str = (string)(selected_attractor_type.Content);
             // set corresponding attractor_type
             if (attractor_type_str == null) attractor_type = ManagedAttractorType.Point;
-            else attractor_type = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type_str);
+            else {
+                attractor_type = (ManagedAttractorType)Enum.Parse(typeof(ManagedAttractorType), attractor_type_str);
+                switch (attractor_type) {
+                    case ManagedAttractorType.Point:
+                        attractorsize_slider.IsEnabled = false;
+                        aboveoroutsidespawnloc_checkbox.Content = "Above Attractor Point";
+                        beloworinsidespawnloc_checkbox.Content = "Below Attractor Point";
+                        break;
+                    case ManagedAttractorType.Line:
+                        attractorsize_slider.IsEnabled = true;
+                        aboveoroutsidespawnloc_checkbox.Content = "Above Attractor Line";
+                        beloworinsidespawnloc_checkbox.Content = "Below Attractor Line";
+                        break;
+                    case ManagedAttractorType.Plane:
+                        attractorsize_slider.IsEnabled = true;
+                        aboveoroutsidespawnloc_checkbox.Content = "Above Attractor Plane";
+                        beloworinsidespawnloc_checkbox.Content = "Below Attractor Plane";
+                        break;
+                }
+            }
         }
 
         /// <summary>
