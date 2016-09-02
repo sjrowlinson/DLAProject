@@ -44,8 +44,8 @@ void DLAContainer::set_attractor_type(attractor_type att) {
 	attractor = att;
 }
 
-std::size_t DLAContainer::aggregate_radius_sqd() const noexcept {
-	return aggregate_radius_sqd_;
+std::size_t DLAContainer::aggregate_spanning_distance() const noexcept {
+	return aggregate_span;
 }
 
 std::size_t DLAContainer::aggregate_misses() const noexcept {
@@ -62,7 +62,7 @@ void DLAContainer::change_continuous_flag(bool _continuous) noexcept {
 
 void DLAContainer::clear() {
 	aggregate_misses_ = 0U;
-	aggregate_radius_sqd_ = 0U;
+	aggregate_span = 0U;
 	pr_gen.reset_distribution_state();
 }
 

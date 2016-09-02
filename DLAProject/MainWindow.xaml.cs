@@ -492,7 +492,7 @@ namespace DLAProject {
                         switch (chart_type) {
                             case ChartType.NUMBERRADIUS:
                                 if (current_particles % nrchart.PollingInterval == 0) {
-                                    double agg_radius = Math.Sqrt(dla_2d.GetAggregateRadiusSquared());
+                                    double agg_radius = Math.Sqrt(dla_2d.GetAggregateSpanningDistance());
                                     if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
                                     nrchart.AddDataPoint(current_particles, agg_radius);
                                 }
@@ -537,7 +537,7 @@ namespace DLAProject {
                         switch (chart_type) {
                             case ChartType.NUMBERRADIUS:
                                 if (current_particles % nrchart.PollingInterval == 0) {
-                                    double agg_radius = Math.Sqrt(dla_3d.GetAggregateRadiusSquared());
+                                    double agg_radius = Math.Sqrt(dla_3d.GetAggregateSpanningDistance());
                                     if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
                                     nrchart.AddDataPoint(current_particles, agg_radius);
                                 }

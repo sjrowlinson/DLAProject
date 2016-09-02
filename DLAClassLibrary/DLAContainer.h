@@ -1,4 +1,5 @@
 #pragma once
+#include "mutable_comp_priority_queue.h"
 #include "utilities.h"
 #include <algorithm>
 #include <cmath>
@@ -99,11 +100,16 @@ public:
 	 */
 	virtual void set_attractor_type(attractor_type att);
 	/**
-	 * \brief Gets the radial distance squared of the aggregate from its origin.
+	 * \brief Gets the distance of the aggregate from its origin attractor.
 	 *
-	 * \return Radial distance squared of the aggregate.
+	 * Returns: - the radius squared of furthest point if the aggregate attractor type
+	 * is `attractor_type::POINT`,
+	 * - the distance of the furthest point from the attractor line if the attractor
+	 * type is `attractor_type::LINE`.
+	 *
+	 * \return Distance of further point in the aggregate.
 	 */
-	std::size_t aggregate_radius_sqd() const noexcept;
+	std::size_t aggregate_spanning_distance() const noexcept;
 	/**
 	 * \brief Gets the number of misses corresponding to when a particle collides with
 	 *        the aggregate but fails to stick to it. If `_coeff_stick = 1.0` then this
@@ -159,7 +165,7 @@ protected:
 	utl::uniform_random_probability_generator<> pr_gen;
 	bool abort_signal = false;
 	bool continuous = false;
-	std::size_t aggregate_radius_sqd_ = 0;
+	std::size_t aggregate_span = 0;
 	std::size_t aggregate_misses_ = 0;
 	/**
 	 * \brief Updates position of random walking particle.

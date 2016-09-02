@@ -1,9 +1,11 @@
 #include "Stdafx.h"
 #include "DLA_2d.h"
 
-DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {}
+DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick), 
+	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 0U)) {}
 
-DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, const double& _coeff_stick) : DLAContainer(ltt, att, _coeff_stick) {}
+DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, _coeff_stick),
+	aggregate_pq(utl::distance_comparator(att, att_size)) {}
 
 DLA_2d::DLA_2d(const DLA_2d& other) : DLAContainer(other),
 	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), batch_queue(other.batch_queue) {}
@@ -21,21 +23,24 @@ std::queue<std::pair<int,int>>& DLA_2d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
-void DLA_2d::set_attractor_type(attractor_type att) {
+void DLA_2d::set_attractor_type(attractor_type attr) {
 	// invalid attractor type for 2D lattice
-	if (att == attractor_type::PLANE)
+	if (attr == attractor_type::PLANE)
 		throw std::invalid_argument("Cannot set attractor type of 2D DLA to PLANE.");
-	DLAContainer::set_attractor_type(att);
+	DLAContainer::set_attractor_type(attr);
+	aggregate_pq.comparator().att = attr;
+	if (!aggregate_pq.empty()) aggregate_pq.reheapify();
 }
 
 void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
-	aggregate_pq = aggregate2d_priority_queue();
+	//aggregate_pq = aggregate2d_priority_queue();
+	aggregate_pq.clear();
 	batch_queue = aggregate2d_batch_queue();
 }
 
-void DLA_2d::generate(std::size_t _n) {
+void DLA_2d::generate(std::size_t n) {
 	// push original aggregate point to map and priority queue
 	// TODO: alter original sticky seed code for different attractor types (2D)
 	std::size_t count = 0U;
@@ -49,7 +54,7 @@ void DLA_2d::generate(std::size_t _n) {
 	// box spawning zone
 	int spawn_diameter = 0;
 	// aggregate generation loop 
-	while (size() < _n || continuous) {
+	while (size() < n || continuous) {
 		if (abort_signal) {
 			abort_signal = false;
 			return;
@@ -74,7 +79,17 @@ void DLA_2d::generate(std::size_t _n) {
 
 double DLA_2d::estimate_fractal_dimension() const {
 	// find radius which minimally bounds the aggregate
-	double bounding_radius = std::hypot(aggregate_pq.top().first, aggregate_pq.top().second);
+	double bounding_radius = 0.0;
+	switch (attractor) {
+	case attractor_type::POINT:
+		bounding_radius = std::hypot(aggregate_pq.top().first, aggregate_pq.top().second);
+		break;
+	case attractor_type::LINE:
+		bounding_radius = aggregate_pq.top().second;
+		break;
+	default:
+		return -1.0;
+	}
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
@@ -106,7 +121,16 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
-	spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
+	switch (attractor) {
+	case attractor_type::POINT:
+		spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
+		break;
+	case attractor_type::LINE:
+		spawn_diam = aggregate_pq.top().second + boundary_offset;
+		break;
+	default:
+		break;
+	}
 	// generate random double in [0,1]
 	double placement_pr = pr_gen();
 	// spawn on upper line of lattice boundary
@@ -146,7 +170,14 @@ bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::p
 	else if (aggregate_map.find(current) != aggregate_map.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		push_particle(previous, ++count);
-		aggregate_radius_sqd_ = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
+		switch (attractor) {
+		case attractor_type::POINT: // compute r^2 of furthest point from origin
+			aggregate_span = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
+			break;
+		case attractor_type::LINE: // compute furthest y distance from origin line
+			aggregate_span = aggregate_pq.top().second;
+			break;
+		}
 		return true;
 	}
 	return false;

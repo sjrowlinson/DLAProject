@@ -62,7 +62,8 @@ namespace DLAClassLibrary {
 		 * \param lattice_type Type of lattice aggregate is to be built upon.
 		 * \param attractor_type Type of attractor for initial system seed.
 		 */
-		ManagedDLA2DContainer(ManagedLatticeType ltt, ManagedAttractorType att) : native_dla_2d_ptr(new DLA_2d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att))) {}
+		ManagedDLA2DContainer(ManagedLatticeType ltt, ManagedAttractorType att, std::size_t att_size) 
+			: native_dla_2d_ptr(new DLA_2d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att), att_size)) {}
 		/**
 		 * \brief Initialises a ManagedDLA2DContainer with given lattice and attractor types and a given stickiness
 		 *        coefficient, and is initially empty.
@@ -71,8 +72,8 @@ namespace DLAClassLibrary {
 		 * \param attractor_type Type of attractor for initial system seed.
 		 * \param coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
 		 */
-		ManagedDLA2DContainer(ManagedLatticeType ltt, ManagedAttractorType att, double coeff_stick) : 
-			native_dla_2d_ptr(new DLA_2d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att), coeff_stick)) {}
+		ManagedDLA2DContainer(ManagedLatticeType ltt, ManagedAttractorType att, std::size_t att_size, double coeff_stick) : 
+			native_dla_2d_ptr(new DLA_2d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att), att_size, coeff_stick)) {}
 		/**
 		 * \brief Copy constructor. Initialises a ManagedDLA2DContainer with a copy of the contents of `other`.
 		 *
@@ -136,8 +137,8 @@ namespace DLAClassLibrary {
 		 *
 		 * \return Radius squared of the diffusion limited aggregate.
 		 */
-		std::size_t GetAggregateRadiusSquared() {
-			return native_dla_2d_ptr->aggregate_radius_sqd();
+		std::size_t GetAggregateSpanningDistance() {
+			return native_dla_2d_ptr->aggregate_spanning_distance();
 		}
 		/**
 		 * \brief Returns the number of times a particle failed to stick to the aggregate.
@@ -237,7 +238,8 @@ namespace DLAClassLibrary {
 		 * \param lattice_type Type of lattice aggregate is to be built upon.
 		 * \param attractor_type Type of attractor for initial system seed.
 		 */
-		ManagedDLA3DContainer(ManagedLatticeType ltt, ManagedAttractorType att) : native_dla_3d_ptr(new DLA_3d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att))) {}
+		ManagedDLA3DContainer(ManagedLatticeType ltt, ManagedAttractorType att, std::size_t att_size) 
+			: native_dla_3d_ptr(new DLA_3d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att), att_size)) {}
 		/**
 		 * \brief Initialises a ManagedDLA3DContainer with given lattice and attractor types and a given stickiness
 		 *        coefficient, and is initially empty.
@@ -246,8 +248,8 @@ namespace DLAClassLibrary {
 		 * \param attractor_type Type of attractor for initial system seed.
 		 * \param coeff_stick Coefficient of stickiness of aggregrate, in interval (0,1].
 		 */
-		ManagedDLA3DContainer(ManagedLatticeType ltt, ManagedAttractorType att, double coeff_stick) : 
-			native_dla_3d_ptr(new DLA_3d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att), coeff_stick)) {}
+		ManagedDLA3DContainer(ManagedLatticeType ltt, ManagedAttractorType att, std::size_t att_size, double coeff_stick) : 
+			native_dla_3d_ptr(new DLA_3d(static_cast<lattice_type>(ltt), static_cast<attractor_type>(att), att_size, coeff_stick)) {}
 		/**
 		 * \brief Copy constructor. Initialises a `ManagedDLA3DContainer` with a copy of the contents of `other`.
 		 *
@@ -313,8 +315,8 @@ namespace DLAClassLibrary {
 		 *
 		 * \return Radius squared of the diffusion limited aggregate.
 		 */
-		std::size_t GetAggregateRadiusSquared() {
-			return native_dla_3d_ptr->aggregate_radius_sqd();
+		std::size_t GetAggregateSpanningDistance() {
+			return native_dla_3d_ptr->aggregate_spanning_distance();
 		}
 		/**
 		 * \brief Returns the number of times a particle failed to stick to the aggregate.

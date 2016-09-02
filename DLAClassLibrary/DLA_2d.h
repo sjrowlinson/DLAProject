@@ -21,7 +21,7 @@ class DLA_2d : public DLAContainer {
 	typedef std::unordered_map<std::pair<int, int>,
 		std::size_t,
 		utl::tuple_hash> aggregate2d_unordered_map;
-	typedef std::priority_queue<std::pair<int, int>,
+	typedef utl::mutable_comp_priority_queue<std::pair<int, int>,
 		std::vector<std::pair<int, int>>,
 		utl::distance_comparator> aggregate2d_priority_queue;
 	typedef std::queue<std::pair<int, int>> aggregate2d_batch_queue;
@@ -40,7 +40,7 @@ public:
 	 * \param _attractor_type Type of attractor of initial aggregate.
 	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
 	 */
-	DLA_2d(lattice_type ltt, attractor_type att, const double& _coeff_stick = 1.0);
+	DLA_2d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick = 1.0);
 	/**
 	 * \brief Copy constructor, copies contents of parameterised DLA_2d to this.
 	 *

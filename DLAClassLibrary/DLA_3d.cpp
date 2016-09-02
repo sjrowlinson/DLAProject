@@ -1,9 +1,11 @@
 #include "Stdafx.h"
 #include "DLA_3d.h"
 
-DLA_3d::DLA_3d(const double& _coeff_stick) : DLAContainer(_coeff_stick) {}
+DLA_3d::DLA_3d(const double& _coeff_stick) : DLAContainer(_coeff_stick),
+	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 0U)) {}
 
-DLA_3d::DLA_3d(lattice_type ltt, attractor_type att, const double& _coeff_stick) : DLAContainer(ltt, att, _coeff_stick) {}
+DLA_3d::DLA_3d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, _coeff_stick),
+	aggregate_pq(utl::distance_comparator(att, att_size)) {}
 
 DLA_3d::DLA_3d(const DLA_3d& other) : DLAContainer(other),
 	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), batch_queue(other.batch_queue) {}
@@ -21,10 +23,17 @@ std::queue<std::tuple<int, int, int>>& DLA_3d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
+void DLA_3d::set_attractor_type(attractor_type attr) {
+	DLAContainer::set_attractor_type(attr);
+	aggregate_pq.comparator().att = attr;
+	if (!aggregate_pq.empty()) aggregate_pq.reheapify();
+}
+
 void DLA_3d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
-	aggregate_pq = aggregate3d_priority_queue();
+	//aggregate_pq = aggregate3d_priority_queue();
+	aggregate_pq.clear();
 	batch_queue = aggregate3d_batch_queue();
 }
 
@@ -66,10 +75,18 @@ void DLA_3d::generate(std::size_t n) {
 }
 
 double DLA_3d::estimate_fractal_dimension() const {
-	// find radius which minimally bounds the aggregate
-	int rmax_sqd = std::get<0>(aggregate_pq.top())*std::get<0>(aggregate_pq.top()) + std::get<1>(aggregate_pq.top())*std::get<1>(aggregate_pq.top()) 
-		+ std::get<2>(aggregate_pq.top())*std::get<2>(aggregate_pq.top());
-	double bounding_radius = std::sqrt(rmax_sqd);
+	double bounding_radius = 0.0;
+	switch (attractor) {
+	case attractor_type::POINT:
+		bounding_radius = std::sqrt(utl::tuple_distance_t<decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor));
+		break;
+	case attractor_type::LINE:
+		// TODO
+		break;
+	case attractor_type::PLANE:
+		// TODO
+		break;
+	}
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
@@ -101,9 +118,18 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 	const int boundary_offset = 16;
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// triple currently in the aggregate structure plus an offset to avoid direct sticking spawns
-	int rmax_sqd = std::get<0>(aggregate_pq.top())*std::get<0>(aggregate_pq.top()) + std::get<1>(aggregate_pq.top())*std::get<1>(aggregate_pq.top())
-		+ std::get<2>(aggregate_pq.top())*std::get<2>(aggregate_pq.top());
-	spawn_diam = 2 * static_cast<int>(std::sqrt(rmax_sqd)) + boundary_offset;
+	switch (attractor) {
+	case attractor_type::POINT:
+	case attractor_type::LINE:
+		spawn_diam = 2*static_cast<int>(std::sqrt(utl::tuple_distance_t<
+			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor))) + boundary_offset;
+		break;
+	case attractor_type::PLANE:
+		spawn_diam = std::get<2>(aggregate_pq.top()) + boundary_offset;
+		break;
+	default:
+		break;
+	}
 	double placement_pr = pr_gen();
 	// Spawn on negative constant z plane of bounding box
 	if (placement_pr < 1.0 / 6.0) {
@@ -159,8 +185,17 @@ bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const s
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		push_particle(previous, ++count);
 		std::tuple<int,int,int> max_dist = aggregate_pq.top();
-		aggregate_radius_sqd_ = std::get<0>(max_dist)*std::get<0>(max_dist) + std::get<1>(max_dist)*std::get<1>(max_dist)
-			+ std::get<2>(max_dist)*std::get<2>(max_dist);
+		switch (attractor) {
+		case attractor_type::POINT:
+		case attractor_type::LINE:
+			aggregate_span = utl::tuple_distance_t<decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor);
+			break;
+		case attractor_type::PLANE:
+			aggregate_span = std::get<2>(aggregate_pq.top());
+			break;
+		default:
+			break;
+		}
 		return true;
 	}
 	return false;

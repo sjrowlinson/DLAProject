@@ -21,7 +21,7 @@ class DLA_3d : public DLAContainer {
 	typedef std::unordered_map<std::tuple<int, int, int>,
 		std::size_t,
 		utl::tuple_hash> aggregate3d_unordered_map;
-	typedef std::priority_queue<std::tuple<int, int, int>,
+	typedef utl::mutable_comp_priority_queue<std::tuple<int, int, int>,
 		std::vector<std::tuple<int, int, int>>,
 		utl::distance_comparator> aggregate3d_priority_queue;
 	typedef std::queue<std::tuple<int, int, int>> aggregate3d_batch_queue;
@@ -40,7 +40,7 @@ public:
 	 * \param _attractor_type Type of attractor of initial aggregate.
 	 * \param _coeff_stick [= 1.0] Coefficient of stickiness.
 	 */
-	DLA_3d(lattice_type ltt, attractor_type att, const double& _coeff_stick = 1.0);
+	DLA_3d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick = 1.0);
 	/**
 	 * \brief Copy constructor, copies contents of parameterised DLA_3d to this.
 	 *
@@ -68,6 +68,10 @@ public:
 	 * \return reference to batch_queue of 2d aggregate.
 	 */
 	std::queue<std::tuple<int, int, int>>& batch_queue_handle() noexcept;
+	/**
+	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
+	 */
+	void set_attractor_type(attractor_type att) override;
 	/**
 	 * \copydoc DLAContainer::clear()
 	 */

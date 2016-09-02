@@ -26,6 +26,7 @@ namespace utl {
 		using base_pq::size;
 		using base_pq::top;
 		using base_pq::push;
+		using base_pq::emplace;
 		using base_pq::pop;
 		// access reference to comparator function-object
 		auto& comparator() { return base_pq::comp; }
