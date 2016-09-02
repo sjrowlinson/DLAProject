@@ -36,7 +36,7 @@ public:
 	 * \param att Type of attractor for DLA construction.
 	 * \throw Throws std::invalid_argument exception if _coeff_stick not in (0,1].
 	 */
-	DLAContainer(lattice_type ltt, attractor_type att, const double& _coeff_stick = 1.0);
+	DLAContainer(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick = 1.0);
 	/**
 	 * \brief Copy constructor, copies contents of parameterised DLAContainer to this.
 	 *
@@ -82,11 +82,11 @@ public:
 	 */
 	lattice_type get_lattice_type() const noexcept;
 	/**
-	 * \brief Gets the type of attractor.
+	 * \brief Gets the type of attractor and its associated size.
 	 *
-	 * \return attractor_type of this instance.
+	 * \return `std::pair` of the `attractor_type` and its size.
 	 */
-	attractor_type get_attractor_type() const noexcept;
+	std::pair<attractor_type, std::size_t> get_attractor_type() const noexcept;
 	/**
 	 * \brief Sets the type of lattice.
 	 *
@@ -98,7 +98,12 @@ public:
 	 *
 	 * \param _attractor_type AttractorType to update to.
 	 */
-	virtual void set_attractor_type(attractor_type att);
+	virtual void set_attractor_type(attractor_type att, std::size_t att_size);
+	/**
+	 * \brief Initialises the attractor data structure corresponding to the
+	 *        `attractor_type` and size of the attractor.
+	 */
+	virtual void initialise_attractor_structure() = 0;
 	/**
 	 * \brief Gets the distance of the aggregate from its origin attractor.
 	 *
@@ -167,6 +172,7 @@ protected:
 	bool continuous = false;
 	std::size_t aggregate_span = 0;
 	std::size_t aggregate_misses_ = 0;
+	std::size_t attractor_size;
 	/**
 	 * \brief Updates position of random walking particle.
 	 *

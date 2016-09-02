@@ -121,8 +121,8 @@ namespace DLAClassLibrary {
 		 *
 		 * \param attractor_type AttractorType to update to.
 		 */
-		void SetAttractorType(ManagedAttractorType att) {
-			native_dla_2d_ptr->set_attractor_type(static_cast<attractor_type>(att));
+		void SetAttractorType(ManagedAttractorType att, std::size_t att_size) {
+			native_dla_2d_ptr->set_attractor_type(static_cast<attractor_type>(att), att_size);
 		}
 		/**
 		 * \brief Gets the size of the aggregrate.
@@ -299,8 +299,8 @@ namespace DLAClassLibrary {
 		 *
 		 * \param attractor_type AttractorType to update to.
 		 */
-		void SetAttractorType(ManagedAttractorType att) {
-			native_dla_3d_ptr->set_attractor_type(static_cast<attractor_type>(att));
+		void SetAttractorType(ManagedAttractorType att, std::size_t att_size) {
+			native_dla_3d_ptr->set_attractor_type(static_cast<attractor_type>(att), att_size);
 		}
 		/**
 		 * \brief Gets the size of the aggregrate.

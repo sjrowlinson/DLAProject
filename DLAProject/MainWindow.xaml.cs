@@ -388,13 +388,13 @@ namespace DLAProject {
                 case LatticeDimension._2D:
                     dla_2d.SetCoeffStick(_agg_sticky_coeff);
                     dla_2d.SetLatticeType(lattice_type);
-                    dla_2d.SetAttractorType(attractor_type);
+                    dla_2d.SetAttractorType(attractor_type, 0U);
                     dla_2d.ChangeContinuousFlag(isContinuous);
                     break;
                 case LatticeDimension._3D:
                     dla_3d.SetCoeffStick(_agg_sticky_coeff);
                     dla_3d.SetLatticeType(lattice_type);
-                    dla_3d.SetAttractorType(attractor_type);
+                    dla_3d.SetAttractorType(attractor_type, 0U);
                     dla_3d.ChangeContinuousFlag(isContinuous);
                     break;
             }

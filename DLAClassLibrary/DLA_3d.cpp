@@ -4,8 +4,8 @@
 DLA_3d::DLA_3d(const double& _coeff_stick) : DLAContainer(_coeff_stick),
 	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 0U)) {}
 
-DLA_3d::DLA_3d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, _coeff_stick),
-	aggregate_pq(utl::distance_comparator(att, att_size)) {}
+DLA_3d::DLA_3d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, att_size, _coeff_stick),
+aggregate_pq(utl::distance_comparator(att, att_size)) { initialise_attractor_structure(); }
 
 DLA_3d::DLA_3d(const DLA_3d& other) : DLAContainer(other),
 	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), batch_queue(other.batch_queue) {}
@@ -23,16 +23,34 @@ std::queue<std::tuple<int, int, int>>& DLA_3d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
-void DLA_3d::set_attractor_type(attractor_type attr) {
-	DLAContainer::set_attractor_type(attr);
+void DLA_3d::set_attractor_type(attractor_type attr, std::size_t att_size) {
+	DLAContainer::set_attractor_type(attr, att_size);
+	initialise_attractor_structure();
 	aggregate_pq.comparator().att = attr;
 	if (!aggregate_pq.empty()) aggregate_pq.reheapify();
+}
+
+void DLA_3d::initialise_attractor_structure() {
+	switch (attractor) {
+	case attractor_type::POINT: // insert single point at origin to attractor_set
+		attractor_set.insert(std::make_tuple(0, 0, 0));
+		break;
+	case attractor_type::LINE: // insert line extending from [-att_size/2, +att_size/2] to attractor_set
+		for (int i = -static_cast<int>(attractor_size) / 2; i < attractor_size / 2; ++i)
+			attractor_set.insert(std::make_tuple(i, 0, 0));
+		break;
+	case attractor_type::PLANE: // insert plane extending from [-att_size/2, +att_size/2] in both drns to attractor_set
+		for (int i = -static_cast<int>(attractor_size) / 2; i < attractor_size / 2; ++i) {
+			for (int j = -static_cast<int>(attractor_size) / 2; j < attractor_size / 2; ++j)
+				attractor_set.insert(std::make_tuple(i, j, 0));
+		}
+		break;
+	}
 }
 
 void DLA_3d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
-	//aggregate_pq = aggregate3d_priority_queue();
 	aggregate_pq.clear();
 	batch_queue = aggregate3d_batch_queue();
 }
@@ -180,8 +198,8 @@ bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const s
 	if (sticky_pr > coeff_stick)
 		++aggregate_misses_;
 	// else, if current co-ordinates of particle exist in aggregate
-	// then collision and successful sticking occurred
-	else if (aggregate_map.find(current) != aggregate_map.end()) {
+	// or attractor then collision and successful sticking occurred
+	else if (aggregate_map.find(current) != aggregate_map.end() || attractor_set.find(current) != attractor_set.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		push_particle(previous, ++count);
 		std::tuple<int,int,int> max_dist = aggregate_pq.top();

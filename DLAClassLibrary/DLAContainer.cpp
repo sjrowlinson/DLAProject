@@ -2,18 +2,18 @@
 #include "DLAContainer.h"
 
 DLAContainer::DLAContainer(const double& _coeff_stick) 
-	: lattice(lattice_type::SQUARE), attractor(attractor_type::POINT), pr_gen() { set_coeff_stick(_coeff_stick); }
+	: lattice(lattice_type::SQUARE), attractor(attractor_type::POINT), pr_gen(), attractor_size(0U) { set_coeff_stick(_coeff_stick); }
 
-DLAContainer::DLAContainer(lattice_type ltt, attractor_type att, const double& _coeff_stick) 
-	: lattice(ltt), attractor(att), pr_gen() { set_coeff_stick(_coeff_stick); }
+DLAContainer::DLAContainer(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) 
+	: lattice(ltt), attractor(att), pr_gen(), attractor_size(att_size) { set_coeff_stick(_coeff_stick); }
 
 DLAContainer::DLAContainer(const DLAContainer& other)
 	: lattice(other.lattice), attractor(other.attractor),
-		coeff_stick(other.coeff_stick), pr_gen(other.pr_gen) {}
+		coeff_stick(other.coeff_stick), pr_gen(other.pr_gen), attractor_size(other.attractor_size) {}
 
 DLAContainer::DLAContainer(DLAContainer&& other)
 	: lattice(std::move(other.lattice)), attractor(std::move(other.attractor)),
-	coeff_stick(std::move(other.coeff_stick)), pr_gen(std::move(other.pr_gen)) {}
+	coeff_stick(std::move(other.coeff_stick)), pr_gen(std::move(other.pr_gen)), attractor_size(std::move(other.attractor_size)) {}
 
 DLAContainer::~DLAContainer() {}
 
@@ -36,12 +36,13 @@ void DLAContainer::set_lattice_type(lattice_type ltt) noexcept {
 	lattice = ltt;
 }
 
-attractor_type DLAContainer::get_attractor_type() const noexcept {
-	return attractor;
+std::pair<attractor_type, std::size_t> DLAContainer::get_attractor_type() const noexcept {
+	return { attractor, attractor_size };
 }
 
-void DLAContainer::set_attractor_type(attractor_type att) {
+void DLAContainer::set_attractor_type(attractor_type att, std::size_t att_size) {
 	attractor = att;
+	attractor_size = att_size;
 }
 
 std::size_t DLAContainer::aggregate_spanning_distance() const noexcept {

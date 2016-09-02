@@ -9,7 +9,7 @@
  * \enum lattice_type
  *
  * \brief Defines several types of lattice applicable to both 2D and 3D DLA systems, for example
- *        LatticeType::SQUARE will be interpreted as a square lattice in a 2D system and cubic
+ *        `lattice_type::SQUARE` will be interpreted as a square lattice in a 2D system and cubic
  *        lattice in a 3D system.
  */
 enum class lattice_type {
@@ -21,7 +21,7 @@ enum class lattice_type {
  * \enum attractor_type
  *
  * \brief Defines several types of attractor geometry applicable to both 2D and 3D DLA systems. Note
- *        that using some attractor geometries defined for 3D systems (i.e. AttractorType::PLANE) is
+ *        that using some attractor geometries defined for 3D systems (i.e. `attractor_type::PLANE`) is
  *        not allowed when applying to a DLA_2d object.
  */
 enum class attractor_type {
@@ -35,21 +35,21 @@ namespace utl {
 	/**
 	 * \struct tuple_distance_compute
 	 *
-	 * \brief Helper recersive function-object for computing squared radius
-	 *        of a `std::tuple` co-ordinate from the origin.
+	 * \brief Helper recursive function-object for computing distance
+	 *        of a `std::tuple` co-ordinate from its attractor type.
 	 */
 	template<class Tuple, std::size_t N>
 	struct tuple_distance_t {
 		static auto tuple_distance(const Tuple& t, attractor_type att) {
 			switch (att) {
-			case attractor_type::POINT:
+			case attractor_type::POINT: // compute r^2 of point from origin
 				return tuple_distance_t<Tuple, N - 1>::tuple_distance(t, att)
 					+ std::get<N - 1>(t)*std::get<N - 1>(t);
-			case attractor_type::LINE:
+			case attractor_type::LINE: // compute y distance from origin line
 				if (N == 2) return std::get<N - 1>(t);
 				else return std::get<N - 2>(t)*std::get<N - 2>(t)
 					+ std::get<N - 1>(t)*std::get<N - 1>(t);
-			case attractor_type::PLANE:
+			case attractor_type::PLANE: // compute z distance from origin plane
 				return std::get<N - 1>(t);
 			default:
 				return std::get<0>(t);

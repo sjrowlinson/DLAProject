@@ -4,8 +4,8 @@
 DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick), 
 	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 0U)) {}
 
-DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, _coeff_stick),
-	aggregate_pq(utl::distance_comparator(att, att_size)) {}
+DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, att_size, _coeff_stick),
+aggregate_pq(utl::distance_comparator(att, att_size)) {	initialise_attractor_structure(); }
 
 DLA_2d::DLA_2d(const DLA_2d& other) : DLAContainer(other),
 	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), batch_queue(other.batch_queue) {}
@@ -23,19 +23,33 @@ std::queue<std::pair<int,int>>& DLA_2d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
-void DLA_2d::set_attractor_type(attractor_type attr) {
+void DLA_2d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 	// invalid attractor type for 2D lattice
 	if (attr == attractor_type::PLANE)
 		throw std::invalid_argument("Cannot set attractor type of 2D DLA to PLANE.");
-	DLAContainer::set_attractor_type(attr);
-	aggregate_pq.comparator().att = attr;
-	if (!aggregate_pq.empty()) aggregate_pq.reheapify();
+	DLAContainer::set_attractor_type(attr, att_size);
+	initialise_attractor_structure();
+	aggregate_pq.comparator().att = attr;	// get handle to comparator of pq and alter its attractor_type field
+	if (!aggregate_pq.empty()) aggregate_pq.reheapify(); // perform reordering of pq based on new attractor_type
+}
+
+void DLA_2d::initialise_attractor_structure() {
+	switch (attractor) {
+	case attractor_type::POINT:	// insert single point at origin to attractor_set
+		attractor_set.insert(std::make_pair(0, 0));
+		break;
+	case attractor_type::LINE:	// insert line extending from [-att_size/2, +att_size/2] to attractor_set
+		for (int i = -static_cast<int>(attractor_size) / 2; i < attractor_size / 2; ++i)
+			attractor_set.insert(std::make_pair(i, 0));
+		break;
+	default:
+		break;
+	}
 }
 
 void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
-	//aggregate_pq = aggregate2d_priority_queue();
 	aggregate_pq.clear();
 	batch_queue = aggregate2d_batch_queue();
 }
@@ -166,8 +180,8 @@ bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::p
 	if (sticky_pr > coeff_stick)
 		++aggregate_misses_;
 	// else, if current co-ordinates of particle exist in aggregate
-	// then collision and successful sticking occurred
-	else if (aggregate_map.find(current) != aggregate_map.end()) {
+	// or attractor then collision and successful sticking occurred
+	else if (aggregate_map.find(current) != aggregate_map.end() || attractor_set.find(current) != attractor_set.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		push_particle(previous, ++count);
 		switch (attractor) {

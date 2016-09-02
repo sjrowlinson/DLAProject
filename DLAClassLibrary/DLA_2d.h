@@ -2,6 +2,7 @@
 #include "DLAContainer.h"
 #include <queue>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 /**
@@ -21,6 +22,8 @@ class DLA_2d : public DLAContainer {
 	typedef std::unordered_map<std::pair<int, int>,
 		std::size_t,
 		utl::tuple_hash> aggregate2d_unordered_map;
+	typedef std::unordered_set<std::pair<int, int>,
+		utl::tuple_hash> attractor2d_unordered_set;
 	typedef utl::mutable_comp_priority_queue<std::pair<int, int>,
 		std::vector<std::pair<int, int>>,
 		utl::distance_comparator> aggregate2d_priority_queue;
@@ -69,10 +72,14 @@ public:
 	 */
 	std::queue<std::pair<int,int>>& batch_queue_handle() noexcept;
 	/**
-	 * \copydoc DLAContainer::set_attractor_type(AttractorType)
+	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
 	 * \throw Throws std::invalid_argument exception if _attractor_type is invalid for 2D lattice.
 	 */
-	void set_attractor_type(attractor_type att) override;
+	void set_attractor_type(attractor_type att, std::size_t att_size) override;
+	/**
+	 * \copydoc DLAContainer::initialise_attractor_structure()
+	 */
+	void initialise_attractor_structure() override;
 	/**
 	 * \copydoc DLAContainer::clear()
 	 */
@@ -96,6 +103,8 @@ private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
 	aggregate2d_unordered_map aggregate_map;
+	// set storing point co-ordinates of attractor
+	attractor2d_unordered_set attractor_set;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	aggregate2d_priority_queue aggregate_pq;

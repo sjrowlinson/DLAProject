@@ -2,6 +2,7 @@
 #include "DLAContainer.h"
 #include <queue>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 /**
@@ -21,6 +22,8 @@ class DLA_3d : public DLAContainer {
 	typedef std::unordered_map<std::tuple<int, int, int>,
 		std::size_t,
 		utl::tuple_hash> aggregate3d_unordered_map;
+	typedef std::unordered_set<std::tuple<int, int, int>,
+		utl::tuple_hash> attractor3d_unordered_set;
 	typedef utl::mutable_comp_priority_queue<std::tuple<int, int, int>,
 		std::vector<std::tuple<int, int, int>>,
 		utl::distance_comparator> aggregate3d_priority_queue;
@@ -71,7 +74,11 @@ public:
 	/**
 	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
 	 */
-	void set_attractor_type(attractor_type att) override;
+	void set_attractor_type(attractor_type att, std::size_t att_size) override;
+	/**
+	 * \copydoc DLAContainer::initialise_attractor_structure()
+	 */
+	void initialise_attractor_structure() override;
 	/**
 	 * \copydoc DLAContainer::clear()
 	 */
@@ -95,6 +102,8 @@ private:
 	// map to store aggregate point co-ordinates as Keys and
 	// order of adding to the container as Values
 	aggregate3d_unordered_map aggregate_map;
+	// set storing point co-ordinates of attractor
+	attractor3d_unordered_set attractor_set;
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	aggregate3d_priority_queue aggregate_pq;
