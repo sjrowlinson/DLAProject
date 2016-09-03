@@ -25,9 +25,8 @@ std::queue<std::tuple<int, int, int>>& DLA_3d::batch_queue_handle() noexcept {
 
 void DLA_3d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 	DLAContainer::set_attractor_type(attr, att_size);
-	initialise_attractor_structure();
-	aggregate_pq.comparator().att = attr;
-	if (!aggregate_pq.empty()) aggregate_pq.reheapify();
+	aggregate_pq.comparator().att = attr;	// get handle to comparator of pq and alter its attractor_type field
+	if (!aggregate_pq.empty()) aggregate_pq.reheapify();	// perform reordering of pq based on new attractor_type
 }
 
 void DLA_3d::initialise_attractor_structure() {
@@ -58,11 +57,10 @@ void DLA_3d::clear() {
 }
 
 void DLA_3d::generate(std::size_t n) {
-	// push original sticky point to map and priority queue
-	// TODO: alter original sticky seed code for different attractor types (3D)
+	// compute attractor geometry inserting points to attractor_set
+	initialise_attractor_structure();
+	aggregate_map.reserve(n);	// pre-allocate n memory slots in agg map
 	std::size_t count = 0U;
-	std::tuple<int, int, int> origin_sticky = std::make_tuple(0, 0 ,0);
-	push_particle(origin_sticky, count); // push initial seed to aggregate
 	// initialise current and previous co-ordinate containers
 	std::tuple<int, int, int> current = std::make_tuple(0,0,0);
 	std::tuple<int, int, int> prev = current;
@@ -136,57 +134,98 @@ std::ostream& DLA_3d::write(std::ostream& os, bool sort_by_gen_order) const {
 
 void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) noexcept {
 	const int boundary_offset = 16;
+	// generate random double in [0,1]
+	double placement_pr = pr_gen();
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// triple currently in the aggregate structure plus an offset to avoid direct sticking spawns
 	switch (attractor) {
 	case attractor_type::POINT:
+		spawn_diam = (aggregate_pq.empty() ? 0 : 2 * static_cast<int>(std::sqrt(utl::tuple_distance_t<
+			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor)))) + boundary_offset;
+		// Spawn on negative constant z plane of bounding box
+		if (placement_pr < 1.0 / 6.0) {
+			std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			std::get<2>(current) = -spawn_diam / 2;
+		}
+		// Spawn on positive constant z plane of bounding box
+		else if (placement_pr >= 1.0 / 6.0 && placement_pr < 2.0 / 6.0) {
+			std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			std::get<2>(current) = spawn_diam / 2;
+		}
+		// Spawn on negative constant x plane of bounding box
+		else if (placement_pr >= 2.0 / 6.0 && placement_pr < 3.0 / 6.0) {
+			std::get<0>(current) = -spawn_diam / 2;
+			std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		}
+		// Spawn on positive constant x plane of bounding box
+		else if (placement_pr >= 3.0 / 6.0 && placement_pr < 4.0 / 6.0) {
+			std::get<0>(current) = spawn_diam / 2;
+			std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		}
+		// Spawn on negative constant y plane of bounding box
+		else if (placement_pr >= 4.0 / 6.0 && placement_pr < 5.0 / 6.0) {
+			std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			std::get<1>(current) = -spawn_diam / 2;
+			std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		}
+		// Spawn on positive constant z plane of bounding box
+		else if (placement_pr >= 5.0 / 6.0 && placement_pr < 1.0) {
+			std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			std::get<1>(current) = spawn_diam / 2;
+			std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		}
+		break;
 	case attractor_type::LINE:
-		spawn_diam = 2*static_cast<int>(std::sqrt(utl::tuple_distance_t<
-			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor))) + boundary_offset;
+		spawn_diam = (aggregate_pq.empty() ? 0 : 2*static_cast<int>(std::sqrt(utl::tuple_distance_t<
+			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor)))) + boundary_offset;
+		// negative z plane
+		if (placement_pr < 1.0 / 4.0) {
+			std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			std::get<1>(current) = (pr_gen() < 0.5) ? spawn_diam/2 : -spawn_diam/2;
+			std::get<2>(current) = -spawn_diam/2;
+		}
+		// positive z plane
+		else if (placement_pr >= 1.0 / 4.0 && placement_pr < 2.0 / 4.0) {
+			std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			std::get<1>(current) = (pr_gen() < 0.5) ? spawn_diam/2 : -spawn_diam/2;
+			std::get<2>(current) = spawn_diam/2;
+		}
+		// negative y plane
+		else if (placement_pr >= 2.0 / 4.0 && placement_pr < 3.0 / 4.0) {
+			std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			std::get<1>(current) = -spawn_diam/2;
+			std::get<2>(current) = (pr_gen() < 0.5) ? spawn_diam/2 : -spawn_diam/2;
+		}
+		// positive y plane
+		else {
+			std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			std::get<1>(current) = spawn_diam/2;
+			std::get<2>(current) = (pr_gen() < 0.5) ? spawn_diam/2 : -spawn_diam/2;
+		}
 		break;
 	case attractor_type::PLANE:
-		spawn_diam = std::get<2>(aggregate_pq.top()) + boundary_offset;
+		spawn_diam = (aggregate_pq.empty() ? 0 : std::get<2>(aggregate_pq.top())) + boundary_offset;
+		// negative z plane
+		if (placement_pr < 0.5) {
+			std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			std::get<1>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			std::get<2>(current) = -spawn_diam;
+		}
+		// positive z plane
+		else {
+			std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			std::get<1>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			std::get<2>(current) = spawn_diam;
+		}
 		break;
 	default:
 		break;
 	}
-	double placement_pr = pr_gen();
-	// Spawn on negative constant z plane of bounding box
-	if (placement_pr < 1.0 / 6.0) {
-		std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		std::get<2>(current) = -spawn_diam / 2;
-	}
-	// Spawn on positive constant z plane of bounding box
-	else if (placement_pr >= 1.0 / 6.0 && placement_pr < 2.0 / 6.0) {
-		std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		std::get<2>(current) = spawn_diam / 2;
-	}
-	// Spawn on negative constant x plane of bounding box
-	else if (placement_pr >= 2.0 / 6.0 && placement_pr < 3.0 / 6.0) {
-		std::get<0>(current) = -spawn_diam / 2;
-		std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-	}
-	// Spawn on positive constant x plane of bounding box
-	else if (placement_pr >= 3.0 / 6.0 && placement_pr < 4.0 / 6.0) {
-		std::get<0>(current) = spawn_diam / 2;
-		std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-	}
-	// Spawn on negative constant y plane of bounding box
-	else if (placement_pr >= 4.0 / 6.0 && placement_pr < 5.0 / 6.0) {
-		std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		std::get<1>(current) = -spawn_diam / 2;
-		std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-	}
-	// Spawn on positive constant z plane of bounding box
-	else if (placement_pr >= 5.0 / 6.0 && placement_pr < 1.0) {
-		std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		std::get<1>(current) = spawn_diam / 2;
-		std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-	}
+	
 }
 
 void DLA_3d::push_particle(const std::tuple<int, int, int>& p, std::size_t count) {

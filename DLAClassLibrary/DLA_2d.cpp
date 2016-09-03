@@ -28,7 +28,6 @@ void DLA_2d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 	if (attr == attractor_type::PLANE)
 		throw std::invalid_argument("Cannot set attractor type of 2D DLA to PLANE.");
 	DLAContainer::set_attractor_type(attr, att_size);
-	initialise_attractor_structure();
 	aggregate_pq.comparator().att = attr;	// get handle to comparator of pq and alter its attractor_type field
 	if (!aggregate_pq.empty()) aggregate_pq.reheapify(); // perform reordering of pq based on new attractor_type
 }
@@ -57,11 +56,10 @@ void DLA_2d::clear() {
 }
 
 void DLA_2d::generate(std::size_t n) {
-	// push original aggregate point to map and priority queue
-	// TODO: alter original sticky seed code for different attractor types (2D)
+	// compute attractor geometry inserting points to attractor_set
+	initialise_attractor_structure();
+	aggregate_map.reserve(n);	// pre-allocate n memory slots in agg map
 	std::size_t count = 0U;
-	std::pair<int, int> origin_sticky = std::make_pair(0, 0);
-	push_particle(origin_sticky, count);
 	// initialise current and previous co-ordinate containers
 	std::pair<int, int> current = std::make_pair(0, 0);
 	std::pair<int, int> prev = current;
@@ -141,7 +139,8 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
 	switch (attractor) {
 	case attractor_type::POINT:
-		spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
+		spawn_diam = (aggregate_pq.empty() ? 0 : 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second))) 
+			+ boundary_offset;
 		// spawn on upper line of lattice boundary
 		if (placement_pr < 0.25) {
 			spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
@@ -164,11 +163,13 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 		}
 		break;
 	case attractor_type::LINE:
-		spawn_diam = aggregate_pq.top().second + boundary_offset;
+		spawn_diam = (aggregate_pq.empty() ? 0 : aggregate_pq.top().second) + boundary_offset;
+		// spawn on upper line of lattice boundary
 		if (placement_pr < 0.5) {
 			spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
 			spawn_pos.second = spawn_diam;
 		}
+		// spawn on lower line of lattice boundary
 		else {
 			spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
 			spawn_pos.second = -spawn_diam;

@@ -202,8 +202,20 @@ bool DLAContainer::lattice_boundary_collision(std::tuple<int,int,int>& current, 
 		}
 		break;
 	case attractor_type::LINE:
+		if (std::abs(std::get<0>(current)) > (static_cast<int>(attractor_size) / 2 + epsilon)
+			|| std::abs(std::get<1>(current)) > (spawn_diam + epsilon)
+			|| std::abs(std::get<2>(current)) > (spawn_diam + epsilon)) {
+			current = previous;
+			return true;
+		}
 		break;
 	case attractor_type::PLANE:
+		if (std::abs(std::get<0>(current)) > (static_cast<int>(attractor_size) / 2 + epsilon)
+			|| std::abs(std::get<1>(current)) > ((static_cast<int>(attractor_size) / 2 + epsilon))
+			|| std::abs(std::get<2>(current)) > (spawn_diam + epsilon)) {
+			current = previous;
+			return true;
+		}
 		break;
 		// TODO: add extra cases for different AttractorType constants
 	}
