@@ -560,33 +560,46 @@ namespace DLAProject {
         #endregion
 
         /// <summary>
+        /// Performs CPU intensive work, computing the build-up of an aggregate of `nparticles`
+        /// through calling the DLAClassLibrary c++ code. This method should be called in a 
+        /// separate worker thread.
+        /// </summary>
+        /// <param name="nparticles">Number of particles in aggregate to produce.</param>
+        private void CallNativeCppAggregateGenerators(uint nparticles) {
+            Timer simulation_timer = new Timer(25); // create timer for simulation routine
+            DateTime startDT = DateTime.Now;
+            simulation_timer.Elapsed += (source, e) => OnSimulationTimerUpdateEvent(source, e, startDT);
+            simulation_timer.AutoReset = true;
+            simulation_timer.Enabled = true;
+            // call native c++ code to generate aggregate data structures
+            switch (current_executing_dimension) {
+                case LatticeDimension._2D:
+                    dla_2d.Generate(nparticles);
+                    break;
+                case LatticeDimension._3D:
+                    dla_3d.Generate(nparticles);
+                    break;
+            }
+            simulation_timer.Stop(); 
+            hasFinished = true;
+            saveCurrentChartSeries = false;
+            Dispatcher.Invoke(() => { compare_button.IsEnabled = true; });
+        }
+
+        /// <summary>
         /// Generates a Diffusion Limited Aggregate with properties initialised by
         /// current values of sliders and combo-boxes in the UI. Should be called
         /// in a separate thread.
         /// </summary>
         private void GenerateAggregate(uint _nparticles) {
             hasFinished = false;
-            Timer simulation_timer = new Timer(25);
-            DateTime startDT = DateTime.Now;
-            simulation_timer.Elapsed += (source, e) => OnSimulationTimerUpdateEvent(source, e, startDT);
-            simulation_timer.AutoReset = true;
-            simulation_timer.Enabled = true;
+            // start asynchronous task calling CallNativeCppAggregateGenerators 
+            // to perform simulation computations
+            var agg_generate_task = Task.Run(() => CallNativeCppAggregateGenerators(_nparticles));
+            // sleep for short interval to avoid std::deque iterator non-dereferencable run-time error
+            System.Threading.Thread.Sleep(5); 
             // start asynchronous task calling AggregateUpdateListener to perform rendering
             var agg_listen_task = Task.Run(() => AggregateUpdateListener(_nparticles));
-            // generate the DLA using value of particle slider
-            switch (current_executing_dimension) {
-                case LatticeDimension._2D:
-                    dla_2d.Generate(_nparticles);
-                    break;
-                case LatticeDimension._3D:
-                    dla_3d.Generate(_nparticles);
-                    break;
-            }
-            agg_listen_task.Dispose();  // dispose all resources used by agg_listen_task
-            hasFinished = true;
-            simulation_timer.Stop();
-            saveCurrentChartSeries = false;
-            Dispatcher.Invoke(() => { compare_button.IsEnabled = true; });
         }
         /// <summary>
         /// Handles updating of simulation timer.
@@ -618,8 +631,7 @@ namespace DLAProject {
             //for (int i = 0; i < (int)particles_slider.Value; ++i) {
             //    WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
             //}
-            // start asynchronous task calling GenerateAggregate method
-            Task.Run(() => GenerateAggregate(isContinuous ? 0 : nparticles));
+            GenerateAggregate(isContinuous ? 0 : nparticles);
         }
 
         /// <summary>
