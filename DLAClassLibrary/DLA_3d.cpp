@@ -2,7 +2,7 @@
 #include "DLA_3d.h"
 
 DLA_3d::DLA_3d(const double& _coeff_stick) : DLAContainer(_coeff_stick),
-	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 0U)) {}
+	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 1U)) {}
 
 DLA_3d::DLA_3d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, att_size, _coeff_stick),
 aggregate_pq(utl::distance_comparator(att, att_size)) { initialise_attractor_structure(); }
@@ -31,17 +31,19 @@ void DLA_3d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 }
 
 void DLA_3d::initialise_attractor_structure() {
+	attractor_set.clear();
+	attractor_set.reserve(attractor_size);
 	switch (attractor) {
 	case attractor_type::POINT: // insert single point at origin to attractor_set
 		attractor_set.insert(std::make_tuple(0, 0, 0));
 		break;
 	case attractor_type::LINE: // insert line extending from [-att_size/2, +att_size/2] to attractor_set
-		for (int i = -static_cast<int>(attractor_size) / 2; i < attractor_size / 2; ++i)
+		for (int i = -static_cast<int>(attractor_size) / 2; i < static_cast<int>(attractor_size) / 2; ++i)
 			attractor_set.insert(std::make_tuple(i, 0, 0));
 		break;
 	case attractor_type::PLANE: // insert plane extending from [-att_size/2, +att_size/2] in both drns to attractor_set
-		for (int i = -static_cast<int>(attractor_size) / 2; i < attractor_size / 2; ++i) {
-			for (int j = -static_cast<int>(attractor_size) / 2; j < attractor_size / 2; ++j)
+		for (int i = -static_cast<int>(attractor_size) / 2; i < static_cast<int>(attractor_size) / 2; ++i) {
+			for (int j = -static_cast<int>(attractor_size) / 2; j < static_cast<int>(attractor_size) / 2; ++j)
 				attractor_set.insert(std::make_tuple(i, j, 0));
 		}
 		break;

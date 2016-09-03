@@ -2,7 +2,7 @@
 #include "DLAContainer.h"
 
 DLAContainer::DLAContainer(const double& _coeff_stick) 
-	: lattice(lattice_type::SQUARE), attractor(attractor_type::POINT), pr_gen(), attractor_size(0U) { set_coeff_stick(_coeff_stick); }
+	: lattice(lattice_type::SQUARE), attractor(attractor_type::POINT), pr_gen(), attractor_size(1U) { set_coeff_stick(_coeff_stick); }
 
 DLAContainer::DLAContainer(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) 
 	: lattice(ltt), attractor(att), pr_gen(), attractor_size(att_size) { set_coeff_stick(_coeff_stick); }
@@ -180,8 +180,11 @@ bool DLAContainer::lattice_boundary_collision(std::pair<int,int>& current, const
 		}
 		break;
 	case attractor_type::LINE:
+		if (std::abs(current.first) > ((static_cast<int>(attractor_size) / 2) + epsilon) || std::abs(current.second) > (spawn_diam + epsilon)) {
+			current = previous;
+			return true;
+		}
 		break;
-		// TODO: add extra cases for different AttractorType constants
 	}
 	return false;
 }

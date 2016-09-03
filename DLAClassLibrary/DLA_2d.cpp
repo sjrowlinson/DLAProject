@@ -2,7 +2,7 @@
 #include "DLA_2d.h"
 
 DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick), 
-	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 0U)) {}
+	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 1U)) {}
 
 DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, att_size, _coeff_stick),
 aggregate_pq(utl::distance_comparator(att, att_size)) {	initialise_attractor_structure(); }
@@ -34,12 +34,14 @@ void DLA_2d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 }
 
 void DLA_2d::initialise_attractor_structure() {
+	attractor_set.clear();
+	attractor_set.reserve(attractor_size);
 	switch (attractor) {
 	case attractor_type::POINT:	// insert single point at origin to attractor_set
 		attractor_set.insert(std::make_pair(0, 0));
 		break;
 	case attractor_type::LINE:	// insert line extending from [-att_size/2, +att_size/2] to attractor_set
-		for (int i = -static_cast<int>(attractor_size) / 2; i < attractor_size / 2; ++i)
+		for (int i = -static_cast<int>(attractor_size) / 2; i < static_cast<int>(attractor_size) / 2; ++i)
 			attractor_set.insert(std::make_pair(i, 0));
 		break;
 	default:
@@ -133,39 +135,47 @@ std::ostream& DLA_2d::write(std::ostream& os, bool sort_by_gen_order) const {
 
 void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noexcept {
 	const int boundary_offset = 16;
+	// generate random double in [0,1]
+	double placement_pr = pr_gen();
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
 	// pair currently in the aggregate structure plus an offset to avoid direct sticking spawns
 	switch (attractor) {
 	case attractor_type::POINT:
 		spawn_diam = 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second)) + boundary_offset;
+		// spawn on upper line of lattice boundary
+		if (placement_pr < 0.25) {
+			spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			spawn_pos.second = spawn_diam / 2;
+		}
+		// spawn on lower line of lattice boundary
+		else if (placement_pr >= 0.25 && placement_pr < 0.5) {
+			spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			spawn_pos.second = -spawn_diam / 2;
+		}
+		// spawn on right line of lattice boundary
+		else if (placement_pr >= 0.5 && placement_pr < 0.75) {
+			spawn_pos.first = spawn_diam / 2;
+			spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		}
+		// spawn on left line of lattice boundary
+		else {
+			spawn_pos.first = -spawn_diam / 2;
+			spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+		}
 		break;
 	case attractor_type::LINE:
 		spawn_diam = aggregate_pq.top().second + boundary_offset;
+		if (placement_pr < 0.5) {
+			spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			spawn_pos.second = spawn_diam;
+		}
+		else {
+			spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+			spawn_pos.second = -spawn_diam;
+		}
 		break;
 	default:
 		break;
-	}
-	// generate random double in [0,1]
-	double placement_pr = pr_gen();
-	// spawn on upper line of lattice boundary
-	if (placement_pr < 0.25) {
-		spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		spawn_pos.second = spawn_diam / 2;
-	}
-	// spawn on lower line of lattice boundary
-	else if (placement_pr >= 0.25 && placement_pr < 0.5) {
-		spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		spawn_pos.second = -spawn_diam / 2;
-	}
-	// spawn on right line of lattice boundary
-	else if (placement_pr >= 0.5 && placement_pr < 0.75) {
-		spawn_pos.first = spawn_diam / 2;
-		spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-	}
-	// spawn on left line of lattice boundary
-	else {
-		spawn_pos.first = -spawn_diam / 2;
-		spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
 	}
 }
 

@@ -93,14 +93,15 @@
 
             <Slider Maximum="10000" TickPlacement="BottomRight" TickFrequency="200" IsSnapToTickEnabled="True" x:Name="particles_slider" Margin="0,62,111,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
             <Label x:Name="NParticles_Label" Content="Number of Particles" Margin="0,61,468,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123"/>
-            <TextBox Text="{Binding ElementName=particles_slider, Path=Value, UpdateSourceTrigger=PropertyChanged}" x:Name="particle_val" Height="23" Margin="0,65,46,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" HorizontalAlignment="Right" Width="40"/>
+            <TextBox Text="{Binding ElementName=particles_slider, Path=Value, UpdateSourceTrigger=PropertyChanged}" x:Name="particle_val" Height="23" Margin="0,61,66,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" HorizontalAlignment="Right" Width="40" RenderTransformOrigin="0.588,-0.338"/>
 
             <Label x:Name="AggSticky_Label" Content="Aggregate Stickiness" Margin="0,92,468,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123"/>
             <Slider Minimum="0.01" Maximum="1.0" TickPlacement="BottomRight" TickFrequency="0.01" IsSnapToTickEnabled="True" x:Name="stickiness_slider" Margin="0,93,111,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
-            <TextBox Text="{Binding Value, ElementName=stickiness_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="sticky_val" Height="23" Margin="0,104,46,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" RenderTransformOrigin="0.496,3.33" HorizontalAlignment="Right" Width="40"/>
+            <TextBox Text="{Binding Value, ElementName=stickiness_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="sticky_val" Height="23" Margin="0,92,66,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" RenderTransformOrigin="0.496,3.33" HorizontalAlignment="Right" Width="40"/>
 
             <Label x:Name="LinePlaneSize_Label" Content="Attractor Size" Margin="0,123,468,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123"/>
-            <Slider Minimum="100" Maximum="1000" TickPlacement="BottomRight" TickFrequency="10" IsSnapToTickEnabled="True" x:Name="attractorsize_slider" Margin="0,124,111,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
+            <Slider Minimum="20" Maximum="500" TickPlacement="BottomRight" TickFrequency="10" IsSnapToTickEnabled="True" x:Name="attractorsize_slider" Margin="0,124,111,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
+            <TextBox Text="{Binding Value, ElementName=attractorsize_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="attsize" Height="23" Margin="0,120,66,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" RenderTransformOrigin="0.496,3.33" HorizontalAlignment="Right" Width="40"/>
 
             <Label x:Name="spawnlocdescr_Label" Content="Spawn walking particles from: " Margin="0,154,393,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="174"/>
             <CheckBox x:Name="aboveoroutsidespawnloc_checkbox" Content="Above Attractor Point" IsChecked="True" HorizontalAlignment="Right" Margin="0,160,239,0" VerticalAlignment="Top" Click="OnAboveOrOutsideAttractorCheckboxClicked"/>
@@ -117,6 +118,7 @@
                 <ComboBoxItem Content="Generation Rate"/>
             </ComboBox>
             <Label x:Name="chartSelectorLabel" Content="Select Chart to Plot" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123" Height="26" VerticalAlignment="Top" Margin="0,246,303,0"/>
+            
         </Grid>
         <Grid Visibility="Visible" Margin="735,287,10,0" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <lvc:CartesianChart Name="Chart" Series="{Binding SeriesCollection}" HorizontalAlignment="Right" Width="603" Height="450" VerticalAlignment="Top">
