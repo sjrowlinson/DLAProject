@@ -47,20 +47,22 @@ namespace DLAProject {
         private bool attractor_type_combo_handle = true;
         private bool spawn_aboveoutside_attractor = true;
         private bool spawn_belowinside_attractor = true;
-        // flags for paused and finished states
+        // flags for paused, cleared and finished states
         private bool isPaused = false;
         private bool hasFinished = true;
+        private bool isCleared = true;
         private bool isContinuous = false;
-        private bool saveCurrentChartSeries = true;
         // simulation view related properties/handles
         private readonly AggregateSystemManager aggregate_manager;
         private TrackView trackview;
         private List<Color> colour_list;
+        private bool showAttractor = true;
         // chart related properties/handles
         private NumberRadiusChart nrchart;
         private GenerationRateChart ratechart;
         private ChartType chart_type;
         private bool chart_type_combo_handle = true;
+        private bool saveCurrentChartSeries = true;
         //private readonly AggregateComponentManager comp_manager;
         #endregion
 
@@ -78,6 +80,7 @@ namespace DLAProject {
             aggregate_manager = new AggregateSystemManager();
             WorldModels.Children.Add(aggregate_manager.AggregateSystemModel()); // add model to view
             colour_list = new List<Color>();
+            RenderAttractorGeometry();
             // initialise chart related properties/handles
             nrchart = new NumberRadiusChart();
             ratechart = new GenerationRateChart();
@@ -99,10 +102,28 @@ namespace DLAProject {
             // assign Viewport3D world to trackview viewport slave
             trackview.Viewport = World;
             trackview.Enabled = true;
+            attractorsize_slider.IsEnabled = false;
+            ComboBoxItem planeItem = (ComboBoxItem)attractorType_ComboBox.FindName("PlaneItem");
+            planeItem.IsEnabled = false;
+            RenderAttractorGeometry();
         }
 
         #region CheckboxHandlers
-
+        /// <summary>
+        /// Handler for ShowAttractor_Checkbox click event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnShowAttractorCheckboxClicked(object sender, RoutedEventArgs e) {
+            if (!showAttractor) {
+                showAttractor = true;
+                RenderAttractorGeometry();
+            }
+            else {
+                showAttractor = false;
+                if (hasFinished && isCleared) aggregate_manager.ClearAggregate();
+            }
+        }
         /// <summary>
         /// Handler for continuous_checkbox click event.
         /// </summary>
@@ -170,6 +191,11 @@ namespace DLAProject {
                     case "2D":
                         lattice_dimension = LatticeDimension._2D;
                         planeItem.IsEnabled = false;
+                        // get current selected attractor type
+                        ComboBoxItem selected_attractor_type = (ComboBoxItem)(attractorType_ComboBox.SelectedValue);
+                        string attractor_type_str = (string)(selected_attractor_type.Content);
+                        // if selected attractor is Plane, switch it to Point
+                        if (attractor_type_str == "Plane") attractorType_ComboBox.SelectedValue = attractorType_ComboBox.Items[0];
                         break;
                     case "3D":
                         lattice_dimension = LatticeDimension._3D;
@@ -265,6 +291,10 @@ namespace DLAProject {
                         beloworinsidespawnloc_checkbox.Content = "Below Attractor Plane";
                         break;
                 }
+            }
+            if (hasFinished && isCleared && attractor_type_str != null) {
+                aggregate_manager.ClearAggregate();
+                RenderAttractorGeometry();
             }
         }
 
@@ -560,6 +590,32 @@ namespace DLAProject {
         #endregion
 
         /// <summary>
+        /// Render the points of the attractor type used.
+        /// </summary>
+        private void RenderAttractorGeometry() {
+            if (!showAttractor) return;
+            switch (attractor_type) {
+                case ManagedAttractorType.Point:
+                    aggregate_manager.AddParticle(new Point3D(0.0, 0.0, 0.0), Colors.White, 1.0);
+                    aggregate_manager.Update();
+                    break;
+                case ManagedAttractorType.Line:
+                    for (int i = -(int)attractorsize_slider.Value / 2; i < (int)attractorsize_slider.Value / 2; ++i) {
+                        aggregate_manager.AddParticle(new Point3D(i, 0.0, 0.0), Colors.White, 1.0);
+                        aggregate_manager.Update();
+                    }
+                    break;
+                case ManagedAttractorType.Plane:
+                    for (int i = -(int)attractorsize_slider.Value/2; i < (int)attractorsize_slider.Value/2; ++i) {
+                        for (int j = -(int)attractorsize_slider.Value / 2; j < (int)attractorsize_slider.Value / 2; ++j) {
+                            aggregate_manager.AddParticle(new Point3D(i, j, 0.0), Colors.White, 1.0);
+                            aggregate_manager.Update();
+                        }
+                    }
+                    break;
+            }
+        }
+        /// <summary>
         /// Performs CPU intensive work, computing the build-up of an aggregate of `nparticles`
         /// through calling the DLAClassLibrary c++ code. This method should be called in a 
         /// separate worker thread.
@@ -585,7 +641,6 @@ namespace DLAProject {
             saveCurrentChartSeries = false;
             Dispatcher.Invoke(() => { compare_button.IsEnabled = true; });
         }
-
         /// <summary>
         /// Generates a Diffusion Limited Aggregate with properties initialised by
         /// current values of sliders and combo-boxes in the UI. Should be called
@@ -593,11 +648,12 @@ namespace DLAProject {
         /// </summary>
         private void GenerateAggregate(uint _nparticles) {
             hasFinished = false;
+            isCleared = false; 
             // start asynchronous task calling CallNativeCppAggregateGenerators 
             // to perform simulation computations
             var agg_generate_task = Task.Run(() => CallNativeCppAggregateGenerators(_nparticles));
             // sleep for short interval to avoid std::deque iterator non-dereferencable run-time error
-            System.Threading.Thread.Sleep(5); 
+            System.Threading.Thread.Sleep(10); 
             // start asynchronous task calling AggregateUpdateListener to perform rendering
             var agg_listen_task = Task.Run(() => AggregateUpdateListener(_nparticles));
         }
@@ -622,7 +678,7 @@ namespace DLAProject {
         /// <param name="e">Variable containing state information associated with event</param>
         private void OnGenerateButtonClicked(object sender, RoutedEventArgs e) {
             // clear any existing aggregate
-            ClearAggregate();
+            if(!isCleared) ClearAggregate();
             current_executing_dimension = lattice_dimension;
             uint nparticles = (uint)particles_slider.Value;
             double agg_sticky_coeff = stickiness_slider.Value;
@@ -682,6 +738,8 @@ namespace DLAProject {
             FracDimLabel.Content = "Est. Fractal Dimension: 0.00";
             AggMissesLabel.Content = "Aggregate Misses: 0";
             SimulationTimerLabel.Content = "Elapsed Time: 00:00.000";
+            isCleared = true;
+            RenderAttractorGeometry(); // re-render initial attractor geometry
             // WORK IN PROGRESS, USED FOR MULTI-COLOUR AGGREGATE VERSION
             // WorldModels.Children.Clear();
             // WorldModels.Children.Add(new AmbientLight(Colors.White));
