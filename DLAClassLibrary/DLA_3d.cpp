@@ -60,6 +60,7 @@ void DLA_3d::generate(std::size_t n) {
 	// compute attractor geometry inserting points to attractor_set
 	initialise_attractor_structure();
 	aggregate_map.reserve(n);	// pre-allocate n memory slots in agg map
+	aggregate_pq.reserve(n); // pre-allocate n capacity to underlying container of priority_queue
 	std::size_t count = 0U;
 	// initialise current and previous co-ordinate containers
 	std::tuple<int, int, int> current = std::make_tuple(0,0,0);

@@ -34,5 +34,9 @@ namespace utl {
 		void clear() { base_pq::c.clear(); }
 		// perform heapification of underlying container to preserve heap-invariant
 		void reheapify() { std::make_heap(std::begin(base_pq::c), std::end(base_pq::c), base_pq::comp); }
+		// enable reserve method for underlying container
+		void reserve(std::size_t new_cap) {
+			base_pq::c.reserve(new_cap);
+		}
 	};
 }

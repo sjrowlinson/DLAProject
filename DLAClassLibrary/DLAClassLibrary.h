@@ -201,11 +201,13 @@ namespace DLAClassLibrary {
 			std::queue<std::pair<int,int>>& batch_queue_ref = native_dla_2d_ptr->batch_queue_handle();
 			// loop over batch_queue transferring particles to blocking_queue
 			while (!batch_queue_ref.empty()) {
-				blocking_queue->Add(KeyValuePair<int, int>(batch_queue_ref.front().first, batch_queue_ref.front().second));
-				batch_queue_ref.pop();
+				if (!batch_queue_ref.empty()) {
+					blocking_queue->Add(KeyValuePair<int, int>(batch_queue_ref.front().first, batch_queue_ref.front().second));
+					batch_queue_ref.pop();
+				}
 			}
 			return blocking_queue;
-		}	
+		}
 	};
 
 	/**
@@ -374,9 +376,11 @@ namespace DLAClassLibrary {
 			std::queue<std::tuple<int,int,int>>& batch_queue_ref = native_dla_3d_ptr->batch_queue_handle();
 			// loop over batch_queue transferring particles to blocking_queue
 			while (!batch_queue_ref.empty()) {
-				blocking_queue->Add(gcnew Tuple<int,int,int>(std::get<0>(batch_queue_ref.front()), std::get<1>(batch_queue_ref.front()), 
-					std::get<2>(batch_queue_ref.front())));
-				batch_queue_ref.pop();
+				if (!batch_queue_ref.empty()) {
+					blocking_queue->Add(gcnew Tuple<int, int, int>(std::get<0>(batch_queue_ref.front()), std::get<1>(batch_queue_ref.front()),
+						std::get<2>(batch_queue_ref.front())));
+					batch_queue_ref.pop();
+				}
 			}
 			return blocking_queue;
 		}
