@@ -179,11 +179,11 @@ protected:
 	 * \param _current Current position, to be updated.
 	 * \param _movement_choice Double in [0,1] for direction choice.
 	 */
-	void update_particle_position(std::pair<int,int>& current, const double& movement_choice) const noexcept;
+	void update_particle_position(std::pair<int,int>& current, const double& movement_choice) noexcept;
 	/**
 	 * \copydoc DLAContainer::update_particle_position(std::pair<int,int>,const double&)
 	 */
-	void update_particle_position(std::tuple<int,int,int>& current, const double& movement_choice) const noexcept;
+	void update_particle_position(std::tuple<int,int,int>& current, const double& movement_choice) noexcept;
 	/**
 	 * \brief Checks for collision with boundary of lattice and reflects.
 	 *

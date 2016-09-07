@@ -141,39 +141,21 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 	case attractor_type::POINT:
 		spawn_diam = (aggregate_pq.empty() ? 0 : 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second))) 
 			+ boundary_offset;
-		// spawn on upper line of lattice boundary
-		if (placement_pr < 0.25) {
+		// spawn on upper or lower line of lattice boundary
+		if (placement_pr < 0.5) {
 			spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-			spawn_pos.second = spawn_diam / 2;
+			spawn_pos.second = (placement_pr < 0.25) ? spawn_diam / 2 : - spawn_diam / 2;
 		}
-		// spawn on lower line of lattice boundary
-		else if (placement_pr >= 0.25 && placement_pr < 0.5) {
-			spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-			spawn_pos.second = -spawn_diam / 2;
-		}
-		// spawn on right line of lattice boundary
-		else if (placement_pr >= 0.5 && placement_pr < 0.75) {
-			spawn_pos.first = spawn_diam / 2;
-			spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		}
-		// spawn on left line of lattice boundary
+		// else spawn on left or right line of lattice boundary
 		else {
-			spawn_pos.first = -spawn_diam / 2;
+			spawn_pos.first = (placement_pr < 0.75) ? spawn_diam / 2 : -spawn_diam / 2;
 			spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
 		}
 		break;
 	case attractor_type::LINE:
 		spawn_diam = (aggregate_pq.empty() ? 0 : aggregate_pq.top().second) + boundary_offset;
-		// spawn on upper line of lattice boundary
-		if (placement_pr < 0.5) {
-			spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
-			spawn_pos.second = spawn_diam;
-		}
-		// spawn on lower line of lattice boundary
-		else {
-			spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
-			spawn_pos.second = -spawn_diam;
-		}
+		spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+		spawn_pos.second = (placement_pr < 0.5) ? spawn_diam : -spawn_diam; // upper : lower line
 		break;
 	default:
 		break;
