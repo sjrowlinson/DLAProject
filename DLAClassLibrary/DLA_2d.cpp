@@ -52,6 +52,7 @@ void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
 	aggregate_pq.clear();
+	aggregate_pq.shrink_to_fit();	// return unused capacity of underlying std::vector
 	batch_queue = aggregate2d_batch_queue();
 }
 

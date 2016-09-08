@@ -38,5 +38,9 @@ namespace utl {
 		void reserve(std::size_t new_cap) {
 			base_pq::c.reserve(new_cap);
 		}
+		// return unused container capacity memory to system
+		void shrink_to_fit() {
+			base_pq::c.shrink_to_fit();
+		}
 	};
 }
