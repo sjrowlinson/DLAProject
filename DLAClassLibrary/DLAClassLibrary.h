@@ -1,5 +1,4 @@
 // DLAClassLibrary.h
-
 #pragma once
 #include "DLAContainer.h"
 #include "DLA_2d.h"
@@ -44,6 +43,8 @@ namespace DLAClassLibrary {
 	private:
 		// handle to DLA_2d class
 		DLA_2d* native_dla_2d_ptr;
+		// lock object used for critical section locking on ProcessBatchQueue()
+		Object^ lock_obj = gcnew Object();
 	public:
 		// CONSTRUCTION/ASSIGNMENT
 		/**
@@ -197,14 +198,19 @@ namespace DLAClassLibrary {
 		BlockingCollection<KeyValuePair<int, int>>^ ProcessBatchQueue() {
 			// stores particles in a BlockingQueue configuration
 			BlockingCollection<KeyValuePair<int, int>>^ blocking_queue = gcnew BlockingCollection<KeyValuePair<int, int>>();
-			// get reference to batch_queue of DLA_2d
-			std::queue<std::pair<int,int>>& batch_queue_ref = native_dla_2d_ptr->batch_queue_handle();
-			// loop over batch_queue transferring particles to blocking_queue
-			while (!batch_queue_ref.empty()) {
-				if (!batch_queue_ref.empty()) {
-					blocking_queue->Add(KeyValuePair<int, int>(batch_queue_ref.front().first, batch_queue_ref.front().second));
+			Monitor::Enter(lock_obj); // define critical section
+			try {	// execute critical section batch queue processing code
+				// get reference to batch_queue of DLA_2d
+				std::queue<std::pair<int, int>>& batch_queue_ref = native_dla_2d_ptr->batch_queue_handle();
+				// loop over batch_queue transferring particles to blocking_queue
+				while (!batch_queue_ref.empty()) {
+					auto front = std::move(batch_queue_ref.front());
+					blocking_queue->Add(KeyValuePair<int, int>(front.first, front.second));
 					batch_queue_ref.pop();
 				}
+			}
+			finally {	// release exclusive lock on lock_obj
+				Monitor::Exit(lock_obj);
 			}
 			return blocking_queue;
 		}
@@ -222,6 +228,7 @@ namespace DLAClassLibrary {
 	private:
 		// handle to DLAContainer abstract class
 		DLA_3d* native_dla_3d_ptr;
+		Object^ lock_obj = gcnew Object();
 	public:
 		// CONSTRUCTION/ASSIGNMENT
 		/**
@@ -372,15 +379,20 @@ namespace DLAClassLibrary {
 		BlockingCollection<Tuple<int,int,int>^>^ ProcessBatchQueue() {
 			// stores particles in a BlockingQueue configuration
 			BlockingCollection<Tuple<int,int,int>^>^ blocking_queue = gcnew BlockingCollection<Tuple<int,int,int>^>();
-			// get reference to batch_queue of DLA_2d
-			std::queue<std::tuple<int,int,int>>& batch_queue_ref = native_dla_3d_ptr->batch_queue_handle();
-			// loop over batch_queue transferring particles to blocking_queue
-			while (!batch_queue_ref.empty()) {
-				if (!batch_queue_ref.empty()) {
-					blocking_queue->Add(gcnew Tuple<int, int, int>(std::get<0>(batch_queue_ref.front()), std::get<1>(batch_queue_ref.front()),
-						std::get<2>(batch_queue_ref.front())));
+			Monitor::Enter(lock_obj);	// define critical section
+			try {	// execute critical section batch queue processing code
+				// get reference to batch_queue of DLA_2d
+				std::queue<std::tuple<int, int, int>>& batch_queue_ref = native_dla_3d_ptr->batch_queue_handle();
+				// loop over batch_queue transferring particles to blocking_queue
+				while (!batch_queue_ref.empty()) {
+					auto front = std::move(batch_queue_ref.front());
+					blocking_queue->Add(gcnew Tuple<int, int, int>(std::get<0>(front), std::get<1>(front),
+						std::get<2>(front)));
 					batch_queue_ref.pop();
 				}
+			}
+			finally {	// release exclusive lock on lock_obj
+				Monitor::Exit(lock_obj);
 			}
 			return blocking_queue;
 		}

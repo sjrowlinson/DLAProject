@@ -506,7 +506,7 @@ namespace DLAProject {
         private void Aggregate2DUpdateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
-            lock (locker) {
+            //lock (locker) {
                 // get and process the batch_queue from the DLA handle
                 BlockingCollection<KeyValuePair<int, int>> blocking_queue = dla_2d.ProcessBatchQueue();
                 // loop over blocking_queue adding contents to interface and dequeueing on each iteration
@@ -539,7 +539,7 @@ namespace DLAProject {
                         }
                     });
                 }
-            }
+            //}
         }
         
         /// <summary>

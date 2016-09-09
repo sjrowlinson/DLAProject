@@ -181,10 +181,10 @@ bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::p
 		push_particle(previous, ++count);
 		switch (attractor) {
 		case attractor_type::POINT: // compute r^2 of furthest point from origin
-			aggregate_span = aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
+			aggregate_span = aggregate_pq.empty() ? 0 : aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
 			break;
 		case attractor_type::LINE: // compute furthest y distance from origin line
-			aggregate_span = aggregate_pq.top().second;
+			aggregate_span = aggregate_pq.empty() ? 0 : aggregate_pq.top().second;
 			break;
 		}
 		return true;
