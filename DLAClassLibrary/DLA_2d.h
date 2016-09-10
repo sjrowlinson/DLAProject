@@ -58,7 +58,7 @@ public:
 	 * \param _other rvalue reference to DLA_2d instance
 	 */
 	DLA_2d(DLA_2d&& other);
-	~DLA_2d();
+	~DLA_2d() override = default;
 
 	/**
 	 * \copydoc DLAContainer::size()

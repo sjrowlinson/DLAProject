@@ -52,9 +52,9 @@ public:
 	 */
 	DLAContainer(DLAContainer&& other);
 	/**
-	 * \brief Destructs the container.
+	 * \brief Destructs the container, releasing all memory handled by the aggregate structure.
 	 */
-	virtual ~DLAContainer();
+	virtual ~DLAContainer() = default;
 	// AGGREGATE PROPERTIES
 	/**
 	 * \brief Gets the size of the aggregate.
@@ -135,6 +135,14 @@ public:
 	 */
 	void change_continuous_flag(bool _continuous) noexcept;
 	/**
+	 * \brief Configures the spawning location of the random walking particles used
+	 *        in the aggregate generating simulation.
+	 *
+	 * \param above_below `std::pair` where `first` element indicates above flag and
+	 *        `second` element indicates below flag.
+	 */
+	void set_random_walk_particle_spawn_source(const std::pair<bool, bool>& above_below);
+	/**
 	 * \brief Clears the aggregrate structure.
 	 */
 	virtual void clear();
@@ -164,15 +172,22 @@ public:
 	 */
 	virtual std::ostream& write(std::ostream& os, bool sort_by_gen_order = false) const = 0;
 protected:
+	// lattice and attractor type properties
 	lattice_type lattice;
 	attractor_type attractor;
 	double coeff_stick;
+	// random floating point value generator uniform in [0.0, 1.0]
 	utl::uniform_random_probability_generator<> pr_gen;
+	// multithreaded event firing signal flags
 	bool abort_signal = false;
 	bool continuous = false;
+	// properties of aggregate
 	std::size_t aggregate_span = 0;
 	std::size_t aggregate_misses_ = 0;
+	// properties of attractor
 	std::size_t attractor_size;
+	bool is_spawn_source_above = true;
+	bool is_spawn_source_below = true;
 	/**
 	 * \brief Updates position of random walking particle.
 	 *

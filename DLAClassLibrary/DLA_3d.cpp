@@ -13,8 +13,6 @@ DLA_3d::DLA_3d(const DLA_3d& other) : DLAContainer(other),
 DLA_3d::DLA_3d(DLA_3d&& other) : DLAContainer(std::move(other)),
 	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)), batch_queue(std::move(other.batch_queue)) {}
 
-DLA_3d::~DLA_3d() {}
-
 std::size_t DLA_3d::size() const noexcept {
 	return aggregate_map.size();
 }
@@ -144,46 +142,74 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 	case attractor_type::POINT:
 		spawn_diam = (aggregate_pq.empty() ? 0 : 2 * static_cast<int>(std::sqrt(utl::tuple_distance_t<
 			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor)))) + boundary_offset;
-		// spawn on positive or negative constant z plane of bounding box
-		if (placement_pr < 1.0 / 3.0) {
-			std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-			std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-			std::get<2>(current) = (placement_pr < 1.0/6.0) ? spawn_diam / 2 : -spawn_diam / 2;
+		if (is_spawn_source_above && is_spawn_source_below) {
+			if (placement_pr < 1.0 / 3.0) {	// positive/negative z-plane of boundary
+				std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<2>(current) = (placement_pr < 1.0 / 6.0) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
+			else if (placement_pr >= 1.0 / 3.0 && placement_pr < 2.0 / 3.0) { // positive/negative x-plane of boundary
+				std::get<0>(current) = (placement_pr < 0.5) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			}
+			else {	// positive/negative y-plane of boundary
+				std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<1>(current) = (placement_pr < 5.0 / 6.0) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			}
 		}
-		// spawn on positive or negative constant x plane of bounding box
-		else if (placement_pr >= 1.0 / 3.0 && placement_pr < 2.0 / 3.0) {
-			std::get<0>(current) =  (placement_pr < 0.5) ? spawn_diam / 2 : -spawn_diam / 2;
-			std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-			std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-		}
-		// spawn on positive or negative constant y plane of bounding box
 		else {
-			std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-			std::get<1>(current) = (placement_pr < 5.0/6.0) ? spawn_diam / 2 : -spawn_diam / 2;
-			std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			if (placement_pr < 1.0 / 3.0) { // positive/negative z-plane
+				std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<2>(current) = (is_spawn_source_above) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
+			else if (placement_pr >= 1.0 / 3.0 && placement_pr < 2.0 / 3.0) { // positive/negative x-plane of boundary
+				std::get<0>(current) = (placement_pr < 0.5) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<2>(current) = ((is_spawn_source_above) ? 1 : -1) * static_cast<int>(spawn_diam*(pr_gen()*0.5));
+			}
+			else {	// positive/negative y-plane of boundary
+				std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<1>(current) = (placement_pr < 5.0 / 6.0) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<2>(current) = ((is_spawn_source_above) ? 1 : -1) * static_cast<int>(spawn_diam*(pr_gen()*0.5));
+			}
 		}
 		break;
 	case attractor_type::LINE:
 		spawn_diam = (aggregate_pq.empty() ? 0 : 2*static_cast<int>(std::sqrt(utl::tuple_distance_t<
 			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor)))) + boundary_offset;
-		// positive or negative z plane
-		if (placement_pr < 0.5) {
-			std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
-			std::get<1>(current) = (pr_gen() < 0.5) ? spawn_diam/2 : -spawn_diam/2;
-			std::get<2>(current) = (placement_pr < 0.25) ? spawn_diam/2 : -spawn_diam/2;
+		std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
+		if (is_spawn_source_above && is_spawn_source_below) {
+			if (placement_pr < 0.5) {	// positive/negative z-plane of boundary
+				std::get<1>(current) = (pr_gen() < 0.5) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<2>(current) = (placement_pr < 0.25) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
+			else {	// positive/negative y-plane of boundary			
+				std::get<1>(current) = (placement_pr < 0.75) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<2>(current) = (pr_gen() < 0.5) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
 		}
-		// positive or negative y plane
 		else {
-			std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
-			std::get<1>(current) = (placement_pr < 0.75) ? spawn_diam/2 : -spawn_diam/2;
-			std::get<2>(current) = (pr_gen() < 0.5) ? spawn_diam/2 : -spawn_diam/2;
+			if (placement_pr < 0.5) { // positive/negative z-plane of boundary
+				std::get<1>(current) = (pr_gen() < 0.5) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<2>(current) = (is_spawn_source_above) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
+			else { // postive/negative y-plane of boundary
+				std::get<1>(current) = (placement_pr < 0.75) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<2>(current) = (is_spawn_source_above) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
 		}
 		break;
 	case attractor_type::PLANE:
 		spawn_diam = (aggregate_pq.empty() ? 0 : std::get<2>(aggregate_pq.top())) + boundary_offset;
 		std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
 		std::get<1>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
-		std::get<2>(current) = (placement_pr < 0.5) ? spawn_diam : -spawn_diam; // positive : negative z plane
+		if (is_spawn_source_above && is_spawn_source_below)
+			std::get<2>(current) = (placement_pr < 0.5) ? spawn_diam : -spawn_diam; // positive : negative z-plane
+		else
+			std::get<2>(current) = (is_spawn_source_above) ? spawn_diam : -spawn_diam; // positive : negative z-plane
 		break;
 	default:
 		break;

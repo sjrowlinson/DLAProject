@@ -15,8 +15,6 @@ DLAContainer::DLAContainer(DLAContainer&& other)
 	: lattice(std::move(other.lattice)), attractor(std::move(other.attractor)),
 	coeff_stick(std::move(other.coeff_stick)), pr_gen(std::move(other.pr_gen)), attractor_size(std::move(other.attractor_size)) {}
 
-DLAContainer::~DLAContainer() {}
-
 double DLAContainer::get_coeff_stick() const noexcept {
 	return coeff_stick;
 }
@@ -59,6 +57,12 @@ void DLAContainer::raise_abort_signal() noexcept {
 
 void DLAContainer::change_continuous_flag(bool _continuous) noexcept {
 	continuous = _continuous;
+}
+
+void DLAContainer::set_random_walk_particle_spawn_source(const std::pair<bool, bool>& above_below) {
+	if (!above_below.first && !above_below.second) throw std::invalid_argument("must have at least one spawn source.");
+	is_spawn_source_above = above_below.first;
+	is_spawn_source_below = above_below.second;
 }
 
 void DLAContainer::clear() {

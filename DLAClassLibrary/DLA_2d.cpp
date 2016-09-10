@@ -13,8 +13,6 @@ DLA_2d::DLA_2d(const DLA_2d& other) : DLAContainer(other),
 DLA_2d::DLA_2d(DLA_2d&& other) : DLAContainer(std::move(other)),
 	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)), batch_queue(std::move(other.batch_queue)) {}
 
-DLA_2d::~DLA_2d() {}
-
 std::size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
 }
@@ -143,21 +141,34 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 	case attractor_type::POINT:
 		spawn_diam = (aggregate_pq.empty() ? 0 : 2 * static_cast<int>(std::hypot(aggregate_pq.top().first, aggregate_pq.top().second))) 
 			+ boundary_offset;
-		// spawn on upper or lower line of lattice boundary
-		if (placement_pr < 0.5) {
-			spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
-			spawn_pos.second = (placement_pr < 0.25) ? spawn_diam / 2 : - spawn_diam / 2;
+		if (is_spawn_source_above && is_spawn_source_below) {
+			if (placement_pr < 0.5) {	// spawn on upper or lower line of lattice boundary
+				spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				spawn_pos.second = (placement_pr < 0.25) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
+			else {	// spawn on left/right line of lattice boundary
+				spawn_pos.first = (placement_pr < 0.75) ? spawn_diam / 2 : -spawn_diam / 2;
+				spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			}
 		}
-		// else spawn on left or right line of lattice boundary
 		else {
-			spawn_pos.first = (placement_pr < 0.75) ? spawn_diam / 2 : -spawn_diam / 2;
-			spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			if (placement_pr < 0.5) {	// spawn on upper : lower line of lattice boundary
+				spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				spawn_pos.second = (is_spawn_source_above) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
+			else {	// spawn on left/right line of lattice boundary in upper : lower region
+				spawn_pos.first = (placement_pr < 0.75) ? spawn_diam / 2 : -spawn_diam / 2;
+				spawn_pos.second = ((is_spawn_source_above) ? 1 : -1) * static_cast<int>(spawn_diam*(pr_gen()*0.5));
+			}
 		}
 		break;
 	case attractor_type::LINE:
 		spawn_diam = (aggregate_pq.empty() ? 0 : aggregate_pq.top().second) + boundary_offset;
 		spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
-		spawn_pos.second = (placement_pr < 0.5) ? spawn_diam : -spawn_diam; // upper : lower line
+		if (is_spawn_source_above && is_spawn_source_below) 			
+			spawn_pos.second = (placement_pr < 0.5) ? spawn_diam : -spawn_diam; // upper : lower 		
+		else 
+			spawn_pos.second = (is_spawn_source_above) ? spawn_diam : -spawn_diam; // upper : lower
 		break;
 	default:
 		break;
