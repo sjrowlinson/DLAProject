@@ -110,9 +110,8 @@
             <CheckBox x:Name="ShowAttractor_Checkbox" Content="Show Attractor" IsChecked="True" HorizontalAlignment="Right" Margin="0,185,393,0" VerticalAlignment="Top" Click="OnShowAttractorCheckboxClicked"/>
             
             <Button x:Name="generate_button" Content="Generate" Margin="0,217,492,0" VerticalAlignment="Top" Click="OnGenerateButtonClicked" HorizontalAlignment="Right" Width="75"/>
-            <Button x:Name="pause_button" Content="Pause" Margin="0,217,393,0" VerticalAlignment="Top" Click="OnPauseButtonClicked" HorizontalAlignment="Right" Width="75"/>
-            <Button x:Name="clear_button" Content="Clear" Margin="0,217,293,0" VerticalAlignment="Top" Click="OnClearButtonClicked" HorizontalAlignment="Right" Width="75"/>
-            <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="OnResetViewButtonClicked" HorizontalAlignment="Right" Width="75" Margin="0,217,194,0"/>
+            <Button x:Name="clear_button" Content="Clear" Margin="0,217,393,0" VerticalAlignment="Top" Click="OnClearButtonClicked" HorizontalAlignment="Right" Width="75"/>
+            <Button x:Name="reset_view_button" Content="Reset View" VerticalAlignment="Top" Click="OnResetViewButtonClicked" HorizontalAlignment="Right" Width="75" Margin="0,217,298,0"/>
             <CheckBox x:Name="continuous_checkbox" Content="Continuous Generation" HorizontalAlignment="Right" Margin="0,217,32,0" VerticalAlignment="Top" Click="OnContinuousCheckboxClicked"/>
             <Button x:Name="compare_button" Content="Add to Compare" HorizontalAlignment="Right" Margin="0,247,10,0" VerticalAlignment="Top" Width="106" Click="OnCompareButtonClicked" IsEnabled="False"/>
             <ComboBox x:Name="chartSelectorComboBox" HorizontalAlignment="Right" Width="114" Height="22" VerticalAlignment="Top" SelectionChanged="OnLatticeTypeSelectionChanged" DropDownClosed="OnLatticeTypeDropDownClosed" Margin="0,247,189,0">

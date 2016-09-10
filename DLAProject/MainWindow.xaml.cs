@@ -31,9 +31,6 @@ namespace DLAProject {
         #region Fields
         // lock object for multi-threading tasks
         private static readonly object locker = new object();
-        // TODO: implement locks around aggregate generation methods for pause functionality
-        // whilst using Monitor.Enter(pause_obj) and Monitor.Exit(pause_obj) in pause handler
-        private static readonly object pause_obj = new object();
         // handles to ManagedDLAContainer objects and related properties
         private readonly ManagedDLA2DContainer dla_2d;
         private readonly ManagedDLA3DContainer dla_3d;
@@ -158,8 +155,13 @@ namespace DLAProject {
         /// <param name="e"></param>
         private void OnAboveOrOutsideAttractorCheckboxClicked(object sender, RoutedEventArgs e) {
             if (!spawn_aboveoutside_attractor) spawn_aboveoutside_attractor = true;
-            else spawn_aboveoutside_attractor = false;
+            else {
+                if (!spawn_belowinside_attractor) aboveoroutsidespawnloc_checkbox.IsChecked = true;
+                else spawn_aboveoutside_attractor = false;
+            }
             // TODO: call DLAClassLibrary API to notify of change
+            dla_2d.SetRandomWalkParticleSpawnSource(new KeyValuePair<bool, bool>(spawn_aboveoutside_attractor, spawn_belowinside_attractor));
+            dla_3d.SetRandomWalkParticleSpawnSource(new KeyValuePair<bool, bool>(spawn_aboveoutside_attractor, spawn_belowinside_attractor));
         }
         /// <summary>
         /// Handle for beloworoutsidespawnloc_checkbox click event.
@@ -168,8 +170,13 @@ namespace DLAProject {
         /// <param name="e"></param>
         private void OnBelowOrInsideAttractorCheckboxClicked(object sender, RoutedEventArgs e) {
             if (!spawn_belowinside_attractor) spawn_belowinside_attractor = true;
-            else spawn_belowinside_attractor = false;
+            else {
+                if (!spawn_aboveoutside_attractor) beloworinsidespawnloc_checkbox.IsChecked = true;
+                else spawn_belowinside_attractor = false;
+            }
             // TODO: call DLAClassLibrary API to notify of change
+            dla_2d.SetRandomWalkParticleSpawnSource(new KeyValuePair<bool, bool>(spawn_aboveoutside_attractor, spawn_belowinside_attractor));
+            dla_3d.SetRandomWalkParticleSpawnSource(new KeyValuePair<bool, bool>(spawn_aboveoutside_attractor, spawn_belowinside_attractor));
         }
         #endregion
 
@@ -196,10 +203,20 @@ namespace DLAProject {
                         string attractor_type_str = (string)(selected_attractor_type.Content);
                         // if selected attractor is Plane, switch it to Point
                         if (attractor_type_str == "Plane") attractorType_ComboBox.SelectedValue = attractorType_ComboBox.Items[0];
+                        if (hasFinished) {
+                            orthograghic_camera.Position = new Point3D(0, 0, 32);
+                            orthograghic_camera.LookDirection = new Vector3D(0, 0, -32);
+                            orthograghic_camera.Width = 256.0;
+                        }
                         break;
                     case "3D":
                         lattice_dimension = LatticeDimension._3D;
                         planeItem.IsEnabled = true;
+                        if (hasFinished) {
+                            orthograghic_camera.Position = new Point3D(16, 16, 16);
+                            orthograghic_camera.LookDirection = new Vector3D(-8, -8, -8);
+                            orthograghic_camera.Width = 128.0;
+                        }
                         break;
                 }
             }
@@ -506,7 +523,7 @@ namespace DLAProject {
         private void Aggregate2DUpdateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
-            //lock (locker) {
+            lock (locker) {
                 // get and process the batch_queue from the DLA handle
                 BlockingCollection<KeyValuePair<int, int>> blocking_queue = dla_2d.ProcessBatchQueue();
                 // loop over blocking_queue adding contents to interface and dequeueing on each iteration
@@ -539,7 +556,7 @@ namespace DLAProject {
                         }
                     });
                 }
-            //}
+            }
         }
         
         /// <summary>
@@ -688,23 +705,6 @@ namespace DLAProject {
             //    WorldModels.Children.Add(comp_manager.CreateAggregateComponent(colour_list[i]));
             //}
             GenerateAggregate(isContinuous ? 0 : nparticles);
-        }
-
-        /// <summary>
-        /// Handler for pause_button click event. Pauses simulation if running, resumes if paused.
-        /// </summary>
-        /// <param name="sender">Sender identification</param>
-        /// <param name="e">Variable containing state information associated with event</param>
-        private void OnPauseButtonClicked(object sender, RoutedEventArgs e) {
-            // TODO: implement pause functionality
-            if (!isPaused) {
-                pause_button.Content = "Resume";
-                isPaused = true;
-            }
-            else {
-                pause_button.Content = "Pause";
-                isPaused = false;
-            }
         }
 
         /// <summary>
