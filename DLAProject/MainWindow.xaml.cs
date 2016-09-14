@@ -466,19 +466,19 @@ namespace DLAProject {
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
-                    timer.Elapsed += (source, e) => Aggregate2DUpdateOnTimedEvent(source, e, _particle_slider_val);
+                    timer.Elapsed += (source, e) => Update2DAggregateOnTimedEvent(source, e, _particle_slider_val);
                     timer.AutoReset = true;
                     timer.Enabled = true;
                     break;
                 case LatticeDimension._3D:
-                    timer.Elapsed += (source, e) => Aggregate3DUpdateOnTimedEvent(source, e, _particle_slider_val);
+                    timer.Elapsed += (source, e) => Update3DAggregateOnTimedEvent(source, e, _particle_slider_val);
                     timer.AutoReset = true;
                     timer.Enabled = true;
                     break;
             }
         }
 
-        private void Aggregate2DUpdateOnTimedEventTest(object source, ElapsedEventArgs e) {
+        private void Update2DAggregateOnTimedEventTest(object source, ElapsedEventArgs e) {
             lock(locker) {
                 BlockingCollection<KeyValuePair<int, int>> blocking_queue = dla_2d.ProcessBatchQueue();
                 while (blocking_queue.Count != 0) {
@@ -496,7 +496,7 @@ namespace DLAProject {
             }
         }
 
-        private void Aggregate3DUpdateOnTimedEventTest(object source, ElapsedEventArgs e) {
+        private void Update3DAggregateOnTimedEventTest(object source, ElapsedEventArgs e) {
             lock(locker) {
                 BlockingCollection<Tuple<int, int, int>> blocking_queue = dla_3d.ProcessBatchQueue();
                 while (blocking_queue.Count != 0) {
@@ -520,7 +520,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        private void Aggregate2DUpdateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
+        private void Update2DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
@@ -565,7 +565,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        private void Aggregate3DUpdateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
+        private void Update3DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
