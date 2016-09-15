@@ -68,7 +68,7 @@ void DLAContainer::set_random_walk_particle_spawn_source(const std::pair<bool, b
 void DLAContainer::clear() {
 	aggregate_misses_ = 0U;
 	aggregate_span = 0U;
-	pr_gen.reset_distribution_state();
+	pr_gen.reset_distribution_state();	// reset prng distribution state such that next generated values independent
 }
 
 void DLAContainer::update_particle_position(std::pair<int,int>& current, const double& movement_choice) noexcept {
@@ -104,7 +104,6 @@ void DLAContainer::update_particle_position(std::pair<int,int>& current, const d
 			--current.second;
 		}
 		break;
-		// TODO: add extra cases for different LatticeType constants
 	}
 }
 
@@ -145,7 +144,6 @@ void DLAContainer::update_particle_position(std::tuple<int,int,int>& current, co
 		// translate (0,0,+1) or (0,0,-1)
 		else (movement_choice < 11.0/12.0) ? ++std::get<2>(current) : --std::get<2>(current);
 		break;
-		// TODO: add extra cases for different LatticeType constants
 	}
 }
 
@@ -201,7 +199,6 @@ bool DLAContainer::lattice_boundary_collision(std::tuple<int,int,int>& current, 
 			return true;
 		}
 		break;
-		// TODO: add extra cases for different AttractorType constants
 	}
 	return false;
 }

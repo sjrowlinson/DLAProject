@@ -17,7 +17,7 @@ std::size_t DLA_3d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-std::queue<std::tuple<int, int, int>>& DLA_3d::batch_queue_handle() noexcept {
+DLA_3d::aggregate3d_batch_queue& DLA_3d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
@@ -28,8 +28,8 @@ void DLA_3d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 }
 
 void DLA_3d::initialise_attractor_structure() {
-	attractor_set.clear();
-	attractor_set.reserve(attractor_size);
+	attractor_set.clear();	// clear any current attractor
+	attractor_set.reserve(attractor_size);	// pre-allocate memory buckets
 	switch (attractor) {
 	case attractor_type::POINT: // insert single point at origin to attractor_set
 		attractor_set.insert(std::make_tuple(0, 0, 0));
@@ -38,7 +38,7 @@ void DLA_3d::initialise_attractor_structure() {
 		for (int i = -static_cast<int>(attractor_size) / 2; i < static_cast<int>(attractor_size) / 2; ++i)
 			attractor_set.insert(std::make_tuple(i, 0, 0));
 		break;
-	case attractor_type::PLANE: // insert plane extending from [-att_size/2, +att_size/2] in both drns to attractor_set
+	case attractor_type::PLANE: // insert plane extending from [-att_size/2, +att_size/2] in both x,y to attractor_set
 		for (int i = -static_cast<int>(attractor_size) / 2; i < static_cast<int>(attractor_size) / 2; ++i) {
 			for (int j = -static_cast<int>(attractor_size) / 2; j < static_cast<int>(attractor_size) / 2; ++j)
 				attractor_set.insert(std::make_tuple(i, j, 0));
@@ -51,8 +51,8 @@ void DLA_3d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
 	aggregate_pq.clear();
-	aggregate_pq.shrink_to_fit();	// return unused capacity of underlying std::vector
-	batch_queue = aggregate3d_batch_queue();
+	aggregate_pq.shrink_to_fit();
+	batch_queue.clear();
 }
 
 void DLA_3d::generate(std::size_t n) {
@@ -93,18 +93,10 @@ void DLA_3d::generate(std::size_t n) {
 }
 
 double DLA_3d::estimate_fractal_dimension() const {
-	double bounding_radius = 0.0;
-	switch (attractor) {
-	case attractor_type::POINT:
-		bounding_radius = std::sqrt(utl::tuple_distance_t<decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor));
-		break;
-	case attractor_type::LINE:
-		// TODO
-		break;
-	case attractor_type::PLANE:
-		// TODO
-		break;
-	}
+	if (aggregate_pq.empty()) return 0.0;
+	// find radius which minimally bounds the aggregate
+	double bounding_radius = utl::tuple_distance_t<decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor);
+	if (attractor == attractor_type::POINT || attractor == attractor_type::LINE) bounding_radius = std::sqrt(bounding_radius);
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
@@ -115,25 +107,22 @@ std::ostream& DLA_3d::write(std::ostream& os, bool sort_by_gen_order) const {
 	if (sort_by_gen_order) {
 		// std::vector container to store aggregate map values
 		std::vector<std::pair<std::size_t, std::tuple<int, int, int>>> agg_vec;
-		// deep copy elements of aggregate_map to agg_vec
-		for (const auto& el : aggregate_map)
-			agg_vec.push_back(std::make_pair(el.second, el.first));
+		agg_vec.reserve(size());
+		for (const auto& el : aggregate_map) agg_vec.push_back(std::make_pair(el.second, el.first));
 		// sort agg_vec using a lambda based on order of particle generation
 		std::sort(agg_vec.begin(), agg_vec.end(), [](auto& _lhs, auto& _rhs) {return _lhs.first < _rhs.first; });
 		// write sorted data to stream
-		for (const auto& el : agg_vec)
-			os << el.second << '\n';
+		for (const auto& el : agg_vec) os << el.second << '\n';
 	}
 	// output aggregate data "as-is" without sorting
 	else {
-		for (const auto& el : aggregate_map)
-			os << el.second << '\t' << el.first << '\n';
+		for (const auto& el : aggregate_map) os << el.second << '\t' << el.first << '\n';
 	}
 	return os;
 }
 
 void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) noexcept {
-	const int boundary_offset = 16;
+	const int boundary_offset = 8;
 	// generate random double in [0,1]
 	double placement_pr = pr_gen();
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
@@ -211,39 +200,25 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 		else
 			std::get<2>(current) = (is_spawn_source_above) ? spawn_diam : -spawn_diam; // positive : negative z-plane
 		break;
-	default:
-		break;
 	}
-	
 }
 
 void DLA_3d::push_particle(const std::tuple<int, int, int>& p, std::size_t count) {
 	aggregate_map.insert(std::make_pair(p, count));
 	aggregate_pq.push(p);
-	batch_queue.push(p);
+	batch_queue.push_back(p);
 }
 
 bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const std::tuple<int,int,int>& previous, const double& sticky_pr, std::size_t& count) {
 	// particle did not stick to aggregate, increment aggregate_misses counter
-	if (sticky_pr > coeff_stick)
-		++aggregate_misses_;
+	if (sticky_pr > coeff_stick) ++aggregate_misses_;
 	// else, if current co-ordinates of particle exist in aggregate
 	// or attractor then collision and successful sticking occurred
 	else if (aggregate_map.find(current) != aggregate_map.end() || attractor_set.find(current) != attractor_set.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		push_particle(previous, ++count);
 		std::tuple<int,int,int> max_dist = aggregate_pq.top();
-		switch (attractor) {
-		case attractor_type::POINT:
-		case attractor_type::LINE:
-			aggregate_span = utl::tuple_distance_t<decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor);
-			break;
-		case attractor_type::PLANE:
-			aggregate_span = std::get<2>(aggregate_pq.top());
-			break;
-		default:
-			break;
-		}
+		aggregate_span = aggregate_pq.empty() ? 0 : utl::tuple_distance_t<decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor);
 		return true;
 	}
 	return false;

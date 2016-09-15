@@ -45,7 +45,6 @@ namespace DLAProject {
         private bool spawn_aboveoutside_attractor = true;
         private bool spawn_belowinside_attractor = true;
         // flags for paused, cleared and finished states
-        private bool isPaused = false;
         private bool hasFinished = true;
         private bool isCleared = true;
         private bool isContinuous = false;

@@ -1,6 +1,6 @@
 #pragma once
 #include "DLAContainer.h"
-#include <queue>
+#include <deque>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -27,7 +27,7 @@ class DLA_2d : public DLAContainer {
 	typedef utl::mutable_comp_priority_queue<std::pair<int, int>,
 		std::vector<std::pair<int, int>>,
 		utl::distance_comparator> aggregate2d_priority_queue;
-	typedef std::queue<std::pair<int, int>> aggregate2d_batch_queue;
+	typedef std::deque<std::pair<int, int>> aggregate2d_batch_queue;
 public:
 	/**
 	 * \brief Default constructor, initialises empty 2d aggregate with given stickiness coefficient.
@@ -58,8 +58,10 @@ public:
 	 * \param _other rvalue reference to DLA_2d instance
 	 */
 	DLA_2d(DLA_2d&& other);
+	/**
+	 * \copydoc DLAContainer::~DLAContainer()
+	 */
 	~DLA_2d() override = default;
-
 	/**
 	 * \copydoc DLAContainer::size()
 	 */
@@ -70,7 +72,7 @@ public:
 	 *
 	 * \return reference to batch_queue of 2d aggregate.
 	 */
-	std::queue<std::pair<int,int>>& batch_queue_handle() noexcept;
+	aggregate2d_batch_queue& batch_queue_handle() noexcept;
 	/**
 	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
 	 * \throw Throws std::invalid_argument exception if _attractor_type is invalid for 2D lattice.

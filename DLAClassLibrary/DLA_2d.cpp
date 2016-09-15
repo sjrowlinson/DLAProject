@@ -17,7 +17,7 @@ std::size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-std::queue<std::pair<int,int>>& DLA_2d::batch_queue_handle() noexcept {
+DLA_2d::aggregate2d_batch_queue& DLA_2d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
@@ -31,8 +31,8 @@ void DLA_2d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 }
 
 void DLA_2d::initialise_attractor_structure() {
-	attractor_set.clear();
-	attractor_set.reserve(attractor_size);
+	attractor_set.clear();	// clear any current attractor
+	attractor_set.reserve(attractor_size);	// pre-allocate memory buckets
 	switch (attractor) {
 	case attractor_type::POINT:	// insert single point at origin to attractor_set
 		attractor_set.insert(std::make_pair(0, 0));
@@ -41,8 +41,6 @@ void DLA_2d::initialise_attractor_structure() {
 		for (int i = -static_cast<int>(attractor_size) / 2; i < static_cast<int>(attractor_size) / 2; ++i)
 			attractor_set.insert(std::make_pair(i, 0));
 		break;
-	default:
-		break;
 	}
 }
 
@@ -50,8 +48,8 @@ void DLA_2d::clear() {
 	DLAContainer::clear();
 	aggregate_map.clear();
 	aggregate_pq.clear();
-	aggregate_pq.shrink_to_fit();	// return unused capacity of underlying std::vector
-	batch_queue = aggregate2d_batch_queue();
+	aggregate_pq.shrink_to_fit();
+	batch_queue.clear();
 }
 
 void DLA_2d::generate(std::size_t n) {
@@ -92,18 +90,10 @@ void DLA_2d::generate(std::size_t n) {
 }
 
 double DLA_2d::estimate_fractal_dimension() const {
+	if (aggregate_pq.empty()) return 0.0;
 	// find radius which minimally bounds the aggregate
-	double bounding_radius = 0.0;
-	switch (attractor) {
-	case attractor_type::POINT:
-		bounding_radius = std::hypot(aggregate_pq.top().first, aggregate_pq.top().second);
-		break;
-	case attractor_type::LINE:
-		bounding_radius = aggregate_pq.top().second;
-		break;
-	default:
-		return -1.0;
-	}
+	double bounding_radius = utl::tuple_distance_t<decltype(aggregate_pq.top()), 2>::tuple_distance(aggregate_pq.top(), attractor);
+	if (attractor == attractor_type::POINT) bounding_radius = std::sqrt(bounding_radius);
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
@@ -114,25 +104,22 @@ std::ostream& DLA_2d::write(std::ostream& os, bool sort_by_gen_order) const {
 	if (sort_by_gen_order) {
 		// std::vector container to store aggregate_map values
 		std::vector<std::pair<std::size_t, std::pair<int, int>>> agg_vec;
-		// deep copy elements of aggregate_map to agg_vec
-		for (const auto& el : aggregate_map)
-			agg_vec.push_back(std::make_pair(el.second, el.first));
+		agg_vec.reserve(size());	// pre-reserve space for performance
+		for (const auto& el : aggregate_map) agg_vec.push_back(std::make_pair(el.second, el.first));
 		// sort agg_vec using a lambda based on order of particle generation
-		std::sort(agg_vec.begin(), agg_vec.end(), [](auto& _lhs, auto& _rhs) {return _lhs.first < _rhs.first; });
+		std::sort(agg_vec.begin(), agg_vec.end(), [](auto& lhs, auto& rhs) {return lhs.first < rhs.first; });
         // write sorted data to stream
-		for (const auto& el : agg_vec)
-			os << el.second << '\n';
+		for (const auto& el : agg_vec) os << el.second << '\n';
 	}
 	// output aggregate data "as-is" without sorting
 	else {
-		for (const auto& el : aggregate_map)
-			os << el.second << '\t' << el.first << '\n';
+		for (const auto& el : aggregate_map) os << el.second << '\t' << el.first << '\n';
 	}
 	return os;
 }
 
 void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noexcept {
-	const int boundary_offset = 16;
+	const int boundary_offset = 8;
 	// generate random double in [0,1]
 	double placement_pr = pr_gen();
 	// set diameter of spawn zone to double the maximum of the largest distance co-ordinate
@@ -170,34 +157,24 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 		else 
 			spawn_pos.second = (is_spawn_source_above) ? spawn_diam : -spawn_diam; // upper : lower
 		break;
-	default:
-		break;
 	}
 }
 
 void DLA_2d::push_particle(const std::pair<int, int>& p, std::size_t count) {
 	aggregate_map.insert(std::make_pair(p, count));
 	aggregate_pq.push(p);
-	batch_queue.push(p);
+	batch_queue.push_back(p);
 }
 
 bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::pair<int,int>& previous, const double& sticky_pr, std::size_t& count) {
 	// particle did not stick to aggregate, increment aggregate_misses counter
-	if (sticky_pr > coeff_stick)
-		++aggregate_misses_;
+	if (sticky_pr > coeff_stick) ++aggregate_misses_;
 	// else, if current co-ordinates of particle exist in aggregate
 	// or attractor then collision and successful sticking occurred
 	else if (aggregate_map.find(current) != aggregate_map.end() || attractor_set.find(current) != attractor_set.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		push_particle(previous, ++count);
-		switch (attractor) {
-		case attractor_type::POINT: // compute r^2 of furthest point from origin
-			aggregate_span = aggregate_pq.empty() ? 0 : aggregate_pq.top().first*aggregate_pq.top().first + aggregate_pq.top().second*aggregate_pq.top().second;
-			break;
-		case attractor_type::LINE: // compute furthest y distance from origin line
-			aggregate_span = aggregate_pq.empty() ? 0 : aggregate_pq.top().second;
-			break;
-		}
+		aggregate_span = aggregate_pq.empty() ? 0 : utl::tuple_distance_t<decltype(aggregate_pq.top()), 2>::tuple_distance(aggregate_pq.top(), attractor);
 		return true;
 	}
 	return false;

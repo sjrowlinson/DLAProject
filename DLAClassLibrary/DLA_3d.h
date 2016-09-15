@@ -1,6 +1,6 @@
 #pragma once
 #include "DLAContainer.h"
-#include <queue>
+#include <deque>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -27,7 +27,7 @@ class DLA_3d : public DLAContainer {
 	typedef utl::mutable_comp_priority_queue<std::tuple<int, int, int>,
 		std::vector<std::tuple<int, int, int>>,
 		utl::distance_comparator> aggregate3d_priority_queue;
-	typedef std::queue<std::tuple<int, int, int>> aggregate3d_batch_queue;
+	typedef std::deque<std::tuple<int, int, int>> aggregate3d_batch_queue;
 public:
 	/**
 	 * \brief Default constructor, initialises empty 3d aggregate with given sticky coefficient.
@@ -58,8 +58,10 @@ public:
 	 * \param _other rvalue reference to DLA_2d instance.
 	 */
 	DLA_3d(DLA_3d&& other);
+	/**
+	 * \copydoc DLAContainer::~DLAContainer()
+	 */
 	~DLA_3d() override = default;
-
 	/**
 	 * \copydoc DLAContainer::size()
 	 */
@@ -70,7 +72,7 @@ public:
 	 *
 	 * \return reference to batch_queue of 2d aggregate.
 	 */
-	std::queue<std::tuple<int, int, int>>& batch_queue_handle() noexcept;
+	aggregate3d_batch_queue& batch_queue_handle() noexcept;
 	/**
 	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
 	 */
