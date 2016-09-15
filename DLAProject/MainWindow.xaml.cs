@@ -450,6 +450,43 @@ namespace DLAProject {
 
         #endregion
 
+        #region AttractorPropertySetting
+
+        /// <summary>
+        /// Render the points of the attractor type used.
+        /// </summary>
+        private void RenderAttractorGeometry() {
+            if (!showAttractor || aggregate_manager == null) return;
+            switch (attractor_type) {
+                case ManagedAttractorType.Point:
+                    aggregate_manager.AddParticle(new Point3D(0.0, 0.0, 0.0), Colors.White, 1.0);
+                    aggregate_manager.Update();
+                    break;
+                case ManagedAttractorType.Line:
+                    for (int i = -(int)attractorsize_slider.Value / 2; i < (int)attractorsize_slider.Value / 2; ++i) {
+                        aggregate_manager.AddParticle(new Point3D(i, 0.0, 0.0), Colors.White, 1.0);
+                        aggregate_manager.Update();
+                    }
+                    break;
+                case ManagedAttractorType.Plane:
+                    for (int i = -(int)attractorsize_slider.Value / 2; i < (int)attractorsize_slider.Value / 2; ++i) {
+                        for (int j = -(int)attractorsize_slider.Value / 2; j < (int)attractorsize_slider.Value / 2; ++j) {
+                            aggregate_manager.AddParticle(new Point3D(i, j, 0.0), Colors.White, 1.0);
+                            aggregate_manager.Update();
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void OnAttractorSizeSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+            if (!hasFinished || !isCleared) return;
+            if (aggregate_manager != null) aggregate_manager.ClearAggregate();
+            RenderAttractorGeometry();
+        }
+
+        #endregion
+
         #region AggregateSimulationViewUpdating
 
         /// <summary>
@@ -604,33 +641,7 @@ namespace DLAProject {
         }
 
         #endregion
-
-        /// <summary>
-        /// Render the points of the attractor type used.
-        /// </summary>
-        private void RenderAttractorGeometry() {
-            if (!showAttractor) return;
-            switch (attractor_type) {
-                case ManagedAttractorType.Point:
-                    aggregate_manager.AddParticle(new Point3D(0.0, 0.0, 0.0), Colors.White, 1.0);
-                    aggregate_manager.Update();
-                    break;
-                case ManagedAttractorType.Line:
-                    for (int i = -(int)attractorsize_slider.Value / 2; i < (int)attractorsize_slider.Value / 2; ++i) {
-                        aggregate_manager.AddParticle(new Point3D(i, 0.0, 0.0), Colors.White, 1.0);
-                        aggregate_manager.Update();
-                    }
-                    break;
-                case ManagedAttractorType.Plane:
-                    for (int i = -(int)attractorsize_slider.Value/2; i < (int)attractorsize_slider.Value/2; ++i) {
-                        for (int j = -(int)attractorsize_slider.Value / 2; j < (int)attractorsize_slider.Value / 2; ++j) {
-                            aggregate_manager.AddParticle(new Point3D(i, j, 0.0), Colors.White, 1.0);
-                            aggregate_manager.Update();
-                        }
-                    }
-                    break;
-            }
-        }
+   
         /// <summary>
         /// Performs CPU intensive work, computing the build-up of an aggregate of `nparticles`
         /// through calling the DLAClassLibrary c++ code. This method should be called in a 

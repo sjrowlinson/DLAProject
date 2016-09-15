@@ -100,7 +100,7 @@
             <TextBox Text="{Binding Value, ElementName=stickiness_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="sticky_val" Height="23" Margin="0,92,66,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" RenderTransformOrigin="0.496,3.33" HorizontalAlignment="Right" Width="40"/>
 
             <Label x:Name="LinePlaneSize_Label" Content="Attractor Size" Margin="0,123,468,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="123"/>
-            <Slider Minimum="10" Maximum="100" TickPlacement="BottomRight" TickFrequency="5" IsSnapToTickEnabled="True" x:Name="attractorsize_slider" Margin="0,124,111,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>
+            <Slider Minimum="10" Maximum="100" TickPlacement="BottomRight" TickFrequency="5" IsSnapToTickEnabled="True" x:Name="attractorsize_slider" Margin="0,124,111,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337" ValueChanged="OnAttractorSizeSliderValueChanged"/>
             <TextBox Text="{Binding Value, ElementName=attractorsize_slider, UpdateSourceTrigger=PropertyChanged}" x:Name="attsize" Height="23" Margin="0,120,66,0" TextWrapping="Wrap" VerticalAlignment="Top" TextAlignment="Right" RenderTransformOrigin="0.496,3.33" HorizontalAlignment="Right" Width="40"/>
 
             <Label x:Name="spawnlocdescr_Label" Content="Spawn walking particles from: " Margin="0,154,393,0" VerticalAlignment="Top" RenderTransformOrigin="1.019,-0.647" HorizontalAlignment="Right" Width="174"/>
