@@ -502,7 +502,8 @@ namespace DLAProject {
             // repeatedly call AggregateUpdateOnTimedEvent every 'interval' ms
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
-                    timer.Elapsed += (source, e) => Update2DAggregateOnTimedEvent(source, e, _particle_slider_val);
+                    //timer.Elapsed += (source, e) => Update2DAggregateOnTimedEvent(source, e, _particle_slider_val);
+                    timer.Elapsed += (source, e) => Update2DAggregateOnTimedEventTest2(source, e, _particle_slider_val);
                     timer.AutoReset = true;
                     timer.Enabled = true;
                     break;
@@ -546,6 +547,38 @@ namespace DLAProject {
                         AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
                     });
                     ++current_particles;
+                }
+            }
+        }
+
+        private void Update2DAggregateOnTimedEventTest2(object source, ElapsedEventArgs e, uint total_particles) {
+            lock (locker) {
+                List<KeyValuePair<int, int>> buffer = new List<KeyValuePair<int, int>>();
+                buffer = dla_2d.ConsumeBuffer((current_particles == 0) ? 0 : current_particles-1);
+                foreach (var p in buffer) {
+                    aggregate_manager.AddParticle(new Point3D(p.Key, p.Value, 0.0), colour_list[(int)current_particles], 1.0);
+                    ++current_particles;
+                    Dispatcher.Invoke(() => {
+                        aggregate_manager.Update();
+                        DynamicParticleLabel.Content = "Particles: " + current_particles;
+                        AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
+                        if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
+                        switch (chart_type) {
+                            case ChartType.NUMBERRADIUS:
+                                if (current_particles % nrchart.PollingInterval == 0) {
+                                    double agg_radius = Math.Sqrt(dla_2d.GetAggregateSpanningDistance());
+                                    if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
+                                    nrchart.AddDataPoint(current_particles, agg_radius);
+                                }
+                                if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
+                                    nrchart.XAxisStep += 200;
+                                    nrchart.XAxisMax += 2000;
+                                }
+                                break;
+                            case ChartType.RATEGENERATION:
+                                break;
+                        }
+                    });
                 }
             }
         }

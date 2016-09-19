@@ -197,14 +197,16 @@ namespace DLAClassLibrary {
 		System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>^ ConsumeBuffer(std::size_t marked_index) {
 			System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>^ buffer =
 				gcnew System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>();
+			if (native_dla_2d_ptr->aggregate_buffer().empty()) return buffer;
 			System::Threading::Monitor::Enter(lock_obj);
 			try {
-				for (std::size_t i = marked_index; i < native_dla_2d_ptr->size(); ++i)
+				for (int i = marked_index; i < native_dla_2d_ptr->aggregate_buffer().size(); ++i) {
 					buffer->Add(System::Collections::Generic::KeyValuePair<int, int>(
 						native_dla_2d_ptr->aggregate_buffer()[i].first,
 						native_dla_2d_ptr->aggregate_buffer()[i].second
 						)
 					);
+				}
 			}
 			finally { System::Threading::Monitor::Exit(lock_obj); }
 			return buffer;
