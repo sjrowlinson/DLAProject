@@ -28,6 +28,7 @@ class DLA_2d : public DLAContainer {
 		std::vector<std::pair<int, int>>,
 		utl::distance_comparator> aggregate2d_priority_queue;
 	typedef std::deque<std::pair<int, int>> aggregate2d_batch_queue;
+	typedef std::vector<std::pair<int, int>> aggregate_buffer_vector;
 public:
 	/**
 	 * \brief Default constructor, initialises empty 2d aggregate with given stickiness coefficient.
@@ -73,6 +74,7 @@ public:
 	 * \return reference to batch_queue of 2d aggregate.
 	 */
 	aggregate2d_batch_queue& batch_queue_handle() noexcept;
+	const aggregate_buffer_vector& aggregate_buffer() const noexcept;
 	/**
 	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
 	 * \throw Throws std::invalid_argument exception if _attractor_type is invalid for 2D lattice.
@@ -113,6 +115,8 @@ private:
 	// queue for multi-thread batching - holds a buffer of aggregate
 	// points to be consumed by aggregate listening thread
 	aggregate2d_batch_queue batch_queue;
+	// test
+	aggregate_buffer_vector buffer;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *

@@ -21,6 +21,10 @@ DLA_2d::aggregate2d_batch_queue& DLA_2d::batch_queue_handle() noexcept {
 	return batch_queue;
 }
 
+const DLA_2d::aggregate_buffer_vector& DLA_2d::aggregate_buffer() const noexcept {
+	return buffer;
+}
+
 void DLA_2d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 	// invalid attractor type for 2D lattice
 	if (attr == attractor_type::PLANE)
@@ -50,6 +54,8 @@ void DLA_2d::clear() {
 	aggregate_pq.clear();
 	aggregate_pq.shrink_to_fit();
 	batch_queue.clear();
+	buffer.clear();
+	buffer.shrink_to_fit();
 }
 
 void DLA_2d::generate(std::size_t n) {
@@ -57,6 +63,7 @@ void DLA_2d::generate(std::size_t n) {
 	initialise_attractor_structure();
 	aggregate_map.reserve(n);	// pre-allocate n memory slots in agg map
 	aggregate_pq.reserve(n); // pre-allocate n capacity to underlying container of priority_queue
+	buffer.reserve(n);	// test
 	std::size_t count = 0U;
 	// initialise current and previous co-ordinate containers
 	std::pair<int, int> current = std::make_pair(0, 0);
@@ -164,6 +171,7 @@ void DLA_2d::push_particle(const std::pair<int, int>& p, std::size_t count) {
 	aggregate_map.insert(std::make_pair(p, count));
 	aggregate_pq.push(p);
 	batch_queue.push_back(p);
+	buffer.push_back(p);
 }
 
 bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::pair<int,int>& previous, const double& sticky_pr, std::size_t& count) {
