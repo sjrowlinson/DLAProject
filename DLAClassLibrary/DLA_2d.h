@@ -27,8 +27,7 @@ class DLA_2d : public DLAContainer {
 	typedef utl::mutable_comp_priority_queue<std::pair<int, int>,
 		std::vector<std::pair<int, int>>,
 		utl::distance_comparator> aggregate2d_priority_queue;
-	typedef std::deque<std::pair<int, int>> aggregate2d_batch_queue;
-	typedef std::vector<std::pair<int, int>> aggregate_buffer_vector;
+	typedef std::vector<std::pair<int, int>> aggregate2d_buffer_vector;
 public:
 	/**
 	 * \brief Default constructor, initialises empty 2d aggregate with given stickiness coefficient.
@@ -68,13 +67,12 @@ public:
 	 */
 	std::size_t size() const noexcept override;
 	/**
-	 * \brief Gets a non-const reference to the batch_queue of the aggregate, used
-	 *        in C++/CLI ManagedDLA2DContainer::ProcessBatchQueue for GUI updating.
-	 *
-	 * \return reference to batch_queue of 2d aggregate.
+	 * \brief Returns a const reference to the buffer vector of the aggregate, storing
+	 *        the particles of the aggregate structure in the order in which they were
+	 *        added.
+	 * \return const reference to buffer of 2d aggregate.
 	 */
-	aggregate2d_batch_queue& batch_queue_handle() noexcept;
-	const aggregate_buffer_vector& aggregate_buffer() const noexcept;
+	const aggregate2d_buffer_vector& aggregate_buffer() const noexcept;
 	/**
 	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
 	 * \throw Throws std::invalid_argument exception if _attractor_type is invalid for 2D lattice.
@@ -112,11 +110,8 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	aggregate2d_priority_queue aggregate_pq;
-	// queue for multi-thread batching - holds a buffer of aggregate
-	// points to be consumed by aggregate listening thread
-	aggregate2d_batch_queue batch_queue;
 	// test
-	aggregate_buffer_vector buffer;
+	aggregate2d_buffer_vector buffer;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *

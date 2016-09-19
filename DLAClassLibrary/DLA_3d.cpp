@@ -8,17 +8,17 @@ DLA_3d::DLA_3d(lattice_type ltt, attractor_type att, std::size_t att_size, const
 aggregate_pq(utl::distance_comparator(att, att_size)) { initialise_attractor_structure(); }
 
 DLA_3d::DLA_3d(const DLA_3d& other) : DLAContainer(other),
-	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), batch_queue(other.batch_queue) {}
+	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq) {}
 
 DLA_3d::DLA_3d(DLA_3d&& other) : DLAContainer(std::move(other)),
-	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)), batch_queue(std::move(other.batch_queue)) {}
+	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)) {}
 
 std::size_t DLA_3d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-DLA_3d::aggregate3d_batch_queue& DLA_3d::batch_queue_handle() noexcept {
-	return batch_queue;
+const DLA_3d::aggregate3d_buffer_vector& DLA_3d::aggregate_buffer() const noexcept {
+	return buffer;
 }
 
 void DLA_3d::set_attractor_type(attractor_type attr, std::size_t att_size) {
@@ -52,7 +52,8 @@ void DLA_3d::clear() {
 	aggregate_map.clear();
 	aggregate_pq.clear();
 	aggregate_pq.shrink_to_fit();
-	batch_queue.clear();
+	buffer.clear();
+	buffer.shrink_to_fit();
 }
 
 void DLA_3d::generate(std::size_t n) {
@@ -60,6 +61,7 @@ void DLA_3d::generate(std::size_t n) {
 	initialise_attractor_structure();
 	aggregate_map.reserve(n);	// pre-allocate n memory slots in agg map
 	aggregate_pq.reserve(n); // pre-allocate n capacity to underlying container of priority_queue
+	buffer.reserve(n);
 	std::size_t count = 0U;
 	// initialise current and previous co-ordinate containers
 	std::tuple<int, int, int> current = std::make_tuple(0,0,0);
@@ -206,7 +208,7 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 void DLA_3d::push_particle(const std::tuple<int, int, int>& p, std::size_t count) {
 	aggregate_map.insert(std::make_pair(p, count));
 	aggregate_pq.push(p);
-	batch_queue.push_back(p);
+	buffer.push_back(p);
 }
 
 bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const std::tuple<int,int,int>& previous, const double& sticky_pr, std::size_t& count) {

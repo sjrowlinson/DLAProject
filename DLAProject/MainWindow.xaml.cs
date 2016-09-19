@@ -508,14 +508,15 @@ namespace DLAProject {
                     timer.Enabled = true;
                     break;
                 case LatticeDimension._3D:
-                    timer.Elapsed += (source, e) => Update3DAggregateOnTimedEvent(source, e, _particle_slider_val);
+                    //timer.Elapsed += (source, e) => Update3DAggregateOnTimedEvent(source, e, _particle_slider_val);
+                    timer.Elapsed += (source, e) => Update3DAggregateOnTimedEventTest2(source, e, _particle_slider_val);
                     timer.AutoReset = true;
                     timer.Enabled = true;
                     break;
             }
         }
 
-        private void Update2DAggregateOnTimedEventTest(object source, ElapsedEventArgs e) {
+        /*private void Update2DAggregateOnTimedEventTest(object source, ElapsedEventArgs e) {
             lock(locker) {
                 BlockingCollection<KeyValuePair<int, int>> blocking_queue = dla_2d.ProcessBatchQueue();
                 while (blocking_queue.Count != 0) {
@@ -531,9 +532,9 @@ namespace DLAProject {
                     ++current_particles;
                 }
             }
-        }
+        }*/
 
-        private void Update3DAggregateOnTimedEventTest(object source, ElapsedEventArgs e) {
+        /*private void Update3DAggregateOnTimedEventTest(object source, ElapsedEventArgs e) {
             lock(locker) {
                 BlockingCollection<Tuple<int, int, int>> blocking_queue = dla_3d.ProcessBatchQueue();
                 while (blocking_queue.Count != 0) {
@@ -549,7 +550,7 @@ namespace DLAProject {
                     ++current_particles;
                 }
             }
-        }
+        }*/
 
         private void Update2DAggregateOnTimedEventTest2(object source, ElapsedEventArgs e, uint total_particles) {
             lock (locker) {
@@ -583,13 +584,45 @@ namespace DLAProject {
             }
         }
 
+        private void Update3DAggregateOnTimedEventTest2(object source, ElapsedEventArgs e, uint total_particles) {
+            lock (locker) {
+                List<Tuple<int, int, int>> buffer = new List<Tuple<int, int, int>>();
+                buffer = dla_3d.ConsumeBuffer((current_particles == 0) ? 0 : current_particles - 1);
+                foreach (var p in buffer) {
+                    aggregate_manager.AddParticle(new Point3D(p.Item1, p.Item2, p.Item3), colour_list[(int)current_particles], 1.0);
+                    ++current_particles;
+                    Dispatcher.Invoke(() => {
+                        aggregate_manager.Update();
+                        DynamicParticleLabel.Content = "Particles: " + current_particles;
+                        AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
+                        if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
+                        switch (chart_type) {
+                            case ChartType.NUMBERRADIUS:
+                                if (current_particles % nrchart.PollingInterval == 0) {
+                                    double agg_radius = Math.Sqrt(dla_3d.GetAggregateSpanningDistance());
+                                    if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
+                                    nrchart.AddDataPoint(current_particles, agg_radius);
+                                }
+                                if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
+                                    nrchart.XAxisStep += 200;
+                                    nrchart.XAxisMax += 2000;
+                                }
+                                break;
+                            case ChartType.RATEGENERATION:
+                                break;
+                        }
+                    });
+                }
+            }
+        }
+
         /// <summary>
         /// Updates a 2D aggregate based on current contents of dla_2d batch_queue - processes this
         /// batch_queue and adds its contents to the simulation view.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        private void Update2DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
+        /*private void Update2DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
@@ -626,7 +659,7 @@ namespace DLAProject {
                     });
                 }
             }
-        }
+        }*/
         
         /// <summary>
         /// Updates a 3D aggregate based on current contents of dla_3d batch_queue - processes this
@@ -634,7 +667,7 @@ namespace DLAProject {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="e"></param>
-        private void Update3DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
+        /*private void Update3DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             // lock around aggregate updating and batch queue processing to prevent 
             // non-dereferencable std::deque iterator run-time errors
             lock (locker) {
@@ -671,7 +704,7 @@ namespace DLAProject {
                     });
                 }
             }
-        }
+        }*/
 
         #endregion
    

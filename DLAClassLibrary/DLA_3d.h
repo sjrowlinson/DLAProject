@@ -27,7 +27,7 @@ class DLA_3d : public DLAContainer {
 	typedef utl::mutable_comp_priority_queue<std::tuple<int, int, int>,
 		std::vector<std::tuple<int, int, int>>,
 		utl::distance_comparator> aggregate3d_priority_queue;
-	typedef std::deque<std::tuple<int, int, int>> aggregate3d_batch_queue;
+	typedef std::vector<std::tuple<int, int, int>> aggregate3d_buffer_vector;
 public:
 	/**
 	 * \brief Default constructor, initialises empty 3d aggregate with given sticky coefficient.
@@ -66,13 +66,7 @@ public:
 	 * \copydoc DLAContainer::size()
 	 */
 	std::size_t size() const noexcept override;
-	/**
-	 * \brief Gets a non-const reference to the batch_queue of the aggregate, used
-	 *        in C++/CLI ManagedDLA3DContainer::ProcessBatchQueue for GUI updating.
-	 *
-	 * \return reference to batch_queue of 2d aggregate.
-	 */
-	aggregate3d_batch_queue& batch_queue_handle() noexcept;
+	const aggregate3d_buffer_vector& aggregate_buffer() const noexcept;
 	/**
 	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
 	 */
@@ -109,9 +103,7 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	aggregate3d_priority_queue aggregate_pq;
-	// queue for multi-thread batching - holds a buffer of aggregate
-	// points to be consumed by aggregate listening thread
-	aggregate3d_batch_queue batch_queue;
+	aggregate3d_buffer_vector buffer;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.
 	 *

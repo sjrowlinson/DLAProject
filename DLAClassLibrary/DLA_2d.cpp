@@ -8,20 +8,16 @@ DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, std::size_t att_size, const
 aggregate_pq(utl::distance_comparator(att, att_size)) {	initialise_attractor_structure(); }
 
 DLA_2d::DLA_2d(const DLA_2d& other) : DLAContainer(other),
-	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), batch_queue(other.batch_queue) {}
+	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq) {}
 
 DLA_2d::DLA_2d(DLA_2d&& other) : DLAContainer(std::move(other)),
-	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)), batch_queue(std::move(other.batch_queue)) {}
+	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)) {}
 
 std::size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();
 }
 
-DLA_2d::aggregate2d_batch_queue& DLA_2d::batch_queue_handle() noexcept {
-	return batch_queue;
-}
-
-const DLA_2d::aggregate_buffer_vector& DLA_2d::aggregate_buffer() const noexcept {
+const DLA_2d::aggregate2d_buffer_vector& DLA_2d::aggregate_buffer() const noexcept {
 	return buffer;
 }
 
@@ -53,7 +49,6 @@ void DLA_2d::clear() {
 	aggregate_map.clear();
 	aggregate_pq.clear();
 	aggregate_pq.shrink_to_fit();
-	batch_queue.clear();
 	buffer.clear();
 	buffer.shrink_to_fit();
 }
@@ -63,7 +58,7 @@ void DLA_2d::generate(std::size_t n) {
 	initialise_attractor_structure();
 	aggregate_map.reserve(n);	// pre-allocate n memory slots in agg map
 	aggregate_pq.reserve(n); // pre-allocate n capacity to underlying container of priority_queue
-	buffer.reserve(n);	// test
+	buffer.reserve(n);	// pre-allocate storage for buffer vector to avoid expensive reallocations
 	std::size_t count = 0U;
 	// initialise current and previous co-ordinate containers
 	std::pair<int, int> current = std::make_pair(0, 0);
@@ -170,7 +165,6 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 void DLA_2d::push_particle(const std::pair<int, int>& p, std::size_t count) {
 	aggregate_map.insert(std::make_pair(p, count));
 	aggregate_pq.push(p);
-	batch_queue.push_back(p);
 	buffer.push_back(p);
 }
 

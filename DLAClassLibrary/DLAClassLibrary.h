@@ -174,7 +174,7 @@ namespace DLAClassLibrary {
 		 *
 		 * \return BlockingCollection containing co-ordinates held in current state of batch_queue.
 		 */
-		System::Collections::Concurrent::BlockingCollection<System::Collections::Generic::KeyValuePair<int, int>>^ ProcessBatchQueue() {
+		/*System::Collections::Concurrent::BlockingCollection<System::Collections::Generic::KeyValuePair<int, int>>^ ProcessBatchQueue() {
 			// stores particles in a BlockingQueue configuration
 			System::Collections::Concurrent::BlockingCollection<System::Collections::Generic::KeyValuePair<int, int>>^ blocking_queue =
 				gcnew System::Collections::Concurrent::BlockingCollection<System::Collections::Generic::KeyValuePair<int, int>>();
@@ -193,7 +193,7 @@ namespace DLAClassLibrary {
 				System::Threading::Monitor::Exit(lock_obj);
 			}
 			return blocking_queue;
-		}
+		}*/
 		System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>^ ConsumeBuffer(std::size_t marked_index) {
 			System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>^ buffer =
 				gcnew System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>();
@@ -361,7 +361,7 @@ namespace DLAClassLibrary {
 		 *
 		 * \return BlockingCollection containing co-ordinates held in current state of batch_queue.
 		 */
-		System::Collections::Concurrent::BlockingCollection<System::Tuple<int,int,int>^>^ ProcessBatchQueue() {
+		/*System::Collections::Concurrent::BlockingCollection<System::Tuple<int,int,int>^>^ ProcessBatchQueue() {
 			// stores particles in a BlockingQueue configuration
 			System::Collections::Concurrent::BlockingCollection<System::Tuple<int,int,int>^>^ blocking_queue =
 				gcnew System::Collections::Concurrent::BlockingCollection<System::Tuple<int,int,int>^>();
@@ -381,6 +381,24 @@ namespace DLAClassLibrary {
 				System::Threading::Monitor::Exit(lock_obj);
 			}
 			return blocking_queue;
+		}*/
+		System::Collections::Generic::List<System::Tuple<int, int, int>^>^ ConsumeBuffer(std::size_t marked_index) {
+			System::Collections::Generic::List<System::Tuple<int,int,int>^>^ buffer =
+				gcnew System::Collections::Generic::List<System::Tuple<int, int, int>^>();
+			if (native_dla_3d_ptr->aggregate_buffer().empty()) return buffer;
+			System::Threading::Monitor::Enter(lock_obj);
+			try {
+				for (int i = marked_index; i < native_dla_3d_ptr->aggregate_buffer().size(); ++i) {
+					buffer->Add(gcnew System::Tuple<int, int, int>(
+						std::get<0>(native_dla_3d_ptr->aggregate_buffer()[i]),
+						std::get<1>(native_dla_3d_ptr->aggregate_buffer()[i]),
+						std::get<2>(native_dla_3d_ptr->aggregate_buffer()[i])
+						)
+					);
+				}
+			}
+			finally { System::Threading::Monitor::Exit(lock_obj); }
+			return buffer;
 		}
 	};
 }
