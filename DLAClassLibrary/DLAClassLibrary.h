@@ -168,38 +168,19 @@ namespace DLAClassLibrary {
 		 */
 		void Generate(std::size_t n) { native_dla_2d_ptr->generate(n); }
 		/**
-		 * \brief Gets the batch_queue from the DLA_2d pointer and processes the data, saving
-		 *        each co-ordinate point to a BlockingCollection and dequeuing the batch_queue
-		 *        ready to receive next block of aggregate data.
+		 * \brief Fetches the buffer from the DLA_3d pointer and consumes the buffer data in-order, adding
+		 *        each particle from the buffer into a List of KVPs to be used by .NET code for rendering.
 		 *
-		 * \return BlockingCollection containing co-ordinates held in current state of batch_queue.
+		 * \param marked_index Index to which consumer thread read to in the buffer in the last polling interval.
+		 * \return List of KVPs containing co-ordinates of current batch of particles to render.
 		 */
-		/*System::Collections::Concurrent::BlockingCollection<System::Collections::Generic::KeyValuePair<int, int>>^ ProcessBatchQueue() {
-			// stores particles in a BlockingQueue configuration
-			System::Collections::Concurrent::BlockingCollection<System::Collections::Generic::KeyValuePair<int, int>>^ blocking_queue =
-				gcnew System::Collections::Concurrent::BlockingCollection<System::Collections::Generic::KeyValuePair<int, int>>();
-			System::Threading::Monitor::Enter(lock_obj); // define critical section
-			try {	// execute critical section batch queue processing code
-				// get reference to batch_queue of DLA_2d
-				std::deque<std::pair<int,int>>& batch_queue_ref = native_dla_2d_ptr->batch_queue_handle();
-				// loop over batch_queue transferring particles to blocking_queue
-				while (!batch_queue_ref.empty()) {
-					auto front = std::move(batch_queue_ref.front());
-					blocking_queue->Add(System::Collections::Generic::KeyValuePair<int, int>(front.first, front.second));
-					batch_queue_ref.pop_front();
-				}
-			}
-			finally {	// release exclusive lock on lock_obj
-				System::Threading::Monitor::Exit(lock_obj);
-			}
-			return blocking_queue;
-		}*/
 		System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>^ ConsumeBuffer(std::size_t marked_index) {
 			System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>^ buffer =
 				gcnew System::Collections::Generic::List<System::Collections::Generic::KeyValuePair<int, int>>();
 			if (native_dla_2d_ptr->aggregate_buffer().empty()) return buffer;
-			System::Threading::Monitor::Enter(lock_obj);
-			try {
+			System::Threading::Monitor::Enter(lock_obj);	// define critical section start
+			try {	// execute critical section
+				// read from last marked buffer index up to size of buffer and write these data to batch list
 				for (int i = marked_index; i < native_dla_2d_ptr->aggregate_buffer().size(); ++i) {
 					buffer->Add(System::Collections::Generic::KeyValuePair<int, int>(
 						native_dla_2d_ptr->aggregate_buffer()[i].first,
@@ -208,7 +189,7 @@ namespace DLAClassLibrary {
 					);
 				}
 			}
-			finally { System::Threading::Monitor::Exit(lock_obj); }
+			finally { System::Threading::Monitor::Exit(lock_obj); } // exit critical section by releasing exclusive lock
 			return buffer;
 		}
 	};
@@ -355,39 +336,19 @@ namespace DLAClassLibrary {
 		 */
 		void Generate(std::size_t n) { native_dla_3d_ptr->generate(n); }
 		/**
-		 * \brief Gets the batch_queue from the DLA_2d pointer and processes the data, saving
-		 *        each co-ordinate point to a BlockingCollection and dequeuing the batch_queue
-		 *        ready to receive next block of aggregate data.
+		 * \brief Fetches the buffer from the DLA_3d pointer and consumes the buffer data in-order, adding
+		 *        each particle from the buffer into a List of Tuples to be used by .NET code for rendering.
 		 *
-		 * \return BlockingCollection containing co-ordinates held in current state of batch_queue.
+		 * \param marked_index Index to which consumer thread read to in the buffer in the last polling interval.
+		 * \return List of Tuples containing co-ordinates of current batch of particles to render.
 		 */
-		/*System::Collections::Concurrent::BlockingCollection<System::Tuple<int,int,int>^>^ ProcessBatchQueue() {
-			// stores particles in a BlockingQueue configuration
-			System::Collections::Concurrent::BlockingCollection<System::Tuple<int,int,int>^>^ blocking_queue =
-				gcnew System::Collections::Concurrent::BlockingCollection<System::Tuple<int,int,int>^>();
-			System::Threading::Monitor::Enter(lock_obj);	// define critical section
-			try {	// execute critical section batch queue processing code
-				// get reference to batch_queue of DLA_2d
-				std::deque<std::tuple<int, int, int>>& batch_queue_ref = native_dla_3d_ptr->batch_queue_handle();
-				// loop over batch_queue transferring particles to blocking_queue
-				while (!batch_queue_ref.empty()) {
-					auto front = std::move(batch_queue_ref.front());
-					blocking_queue->Add(gcnew System::Tuple<int, int, int>(std::get<0>(front), std::get<1>(front),
-						std::get<2>(front)));
-					batch_queue_ref.pop_front();
-				}
-			}
-			finally {	// release exclusive lock on lock_obj
-				System::Threading::Monitor::Exit(lock_obj);
-			}
-			return blocking_queue;
-		}*/
 		System::Collections::Generic::List<System::Tuple<int, int, int>^>^ ConsumeBuffer(std::size_t marked_index) {
 			System::Collections::Generic::List<System::Tuple<int,int,int>^>^ buffer =
 				gcnew System::Collections::Generic::List<System::Tuple<int, int, int>^>();
 			if (native_dla_3d_ptr->aggregate_buffer().empty()) return buffer;
-			System::Threading::Monitor::Enter(lock_obj);
-			try {
+			System::Threading::Monitor::Enter(lock_obj);	// define critical section start
+			try {	// execute critical section
+				// read from last marked buffer index up to size of buffer and write these data to batch list
 				for (int i = marked_index; i < native_dla_3d_ptr->aggregate_buffer().size(); ++i) {
 					buffer->Add(gcnew System::Tuple<int, int, int>(
 						std::get<0>(native_dla_3d_ptr->aggregate_buffer()[i]),
@@ -397,7 +358,7 @@ namespace DLAClassLibrary {
 					);
 				}
 			}
-			finally { System::Threading::Monitor::Exit(lock_obj); }
+			finally { System::Threading::Monitor::Exit(lock_obj); }	// exit critical section by releasing exclusive lock
 			return buffer;
 		}
 	};

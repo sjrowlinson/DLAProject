@@ -110,7 +110,8 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	aggregate2d_priority_queue aggregate_pq;
-	// test
+	// buffer vector holding co-ordinates of aggregate structure in
+	// order in which they were added
 	aggregate2d_buffer_vector buffer;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.

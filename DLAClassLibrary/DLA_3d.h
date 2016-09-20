@@ -66,6 +66,12 @@ public:
 	 * \copydoc DLAContainer::size()
 	 */
 	std::size_t size() const noexcept override;
+	/**
+	 * \brief Returns a const reference to the buffer vector of the aggregate, storing
+	 *        the particles of the aggregate structure in the order in which they were
+	 *        added.
+	 * \return const reference to buffer of 2d aggregate.
+	 */
 	const aggregate3d_buffer_vector& aggregate_buffer() const noexcept;
 	/**
 	 * \copydoc DLAContainer::set_attractor_type(attractor_type)
@@ -103,6 +109,8 @@ private:
 	// priority queue for retrieving co-ordinates of aggregate
 	// particle furthest from origin in constant time
 	aggregate3d_priority_queue aggregate_pq;
+	// buffer vector holding co-ordinates of aggregate structure in
+	// order in which they were added
 	aggregate3d_buffer_vector buffer;
 	/**
 	 * \brief Spawns a particle at a random position on the lattice boundary.

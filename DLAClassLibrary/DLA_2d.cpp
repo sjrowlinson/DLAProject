@@ -5,13 +5,15 @@ DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick),
 	aggregate_pq(utl::distance_comparator(attractor_type::POINT, 1U)) {}
 
 DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, att_size, _coeff_stick),
-aggregate_pq(utl::distance_comparator(att, att_size)) {	initialise_attractor_structure(); }
+	aggregate_pq(utl::distance_comparator(att, att_size)) {	initialise_attractor_structure(); }
 
 DLA_2d::DLA_2d(const DLA_2d& other) : DLAContainer(other),
-	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq) {}
+	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), attractor_set(other.attractor_set),
+		buffer(other.buffer) {}
 
 DLA_2d::DLA_2d(DLA_2d&& other) : DLAContainer(std::move(other)),
-	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)) {}
+	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)),
+	attractor_set(std::move(other.attractor_set)), buffer(std::move(other.buffer)) {}
 
 std::size_t DLA_2d::size() const noexcept {
 	return aggregate_map.size();

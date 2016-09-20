@@ -503,60 +503,31 @@ namespace DLAProject {
             switch (current_executing_dimension) {
                 case LatticeDimension._2D:
                     //timer.Elapsed += (source, e) => Update2DAggregateOnTimedEvent(source, e, _particle_slider_val);
-                    timer.Elapsed += (source, e) => Update2DAggregateOnTimedEventTest2(source, e, _particle_slider_val);
+                    timer.Elapsed += (source, e) => Update2DAggregateOnTimedEvent(source, e, _particle_slider_val);
                     timer.AutoReset = true;
                     timer.Enabled = true;
                     break;
                 case LatticeDimension._3D:
                     //timer.Elapsed += (source, e) => Update3DAggregateOnTimedEvent(source, e, _particle_slider_val);
-                    timer.Elapsed += (source, e) => Update3DAggregateOnTimedEventTest2(source, e, _particle_slider_val);
+                    timer.Elapsed += (source, e) => Update3DAggregateOnTimedEvent(source, e, _particle_slider_val);
                     timer.AutoReset = true;
                     timer.Enabled = true;
                     break;
             }
         }
 
-        /*private void Update2DAggregateOnTimedEventTest(object source, ElapsedEventArgs e) {
-            lock(locker) {
-                BlockingCollection<KeyValuePair<int, int>> blocking_queue = dla_2d.ProcessBatchQueue();
-                while (blocking_queue.Count != 0) {
-                    KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
-                    Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0.0);
-                    //comp_manager.AddParticleToComponent(pos, 1.0);
-                    Dispatcher.Invoke(() => {
-                        //comp_manager.Update();
-                        DynamicParticleLabel.Content = "Particles: " + current_particles;
-                        FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
-                        AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
-                    });
-                    ++current_particles;
-                }
-            }
-        }*/
-
-        /*private void Update3DAggregateOnTimedEventTest(object source, ElapsedEventArgs e) {
-            lock(locker) {
-                BlockingCollection<Tuple<int, int, int>> blocking_queue = dla_3d.ProcessBatchQueue();
-                while (blocking_queue.Count != 0) {
-                    Tuple<int, int, int> agg_tuple = blocking_queue.Take();
-                    Point3D pos = new Point3D(agg_tuple.Item1, agg_tuple.Item2, agg_tuple.Item3);
-                    //comp_manager.AddParticleToComponent(pos, 1.0);
-                    Dispatcher.Invoke(() => {
-                        //comp_manager.Update();
-                        DynamicParticleLabel.Content = "Particles: " + current_particles;
-                        FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
-                        AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
-                    });
-                    ++current_particles;
-                }
-            }
-        }*/
-
-        private void Update2DAggregateOnTimedEventTest2(object source, ElapsedEventArgs e, uint total_particles) {
+        /// <summary>
+        /// Updates a 2D aggregate based on current batch list of dla_2d buffer, processing this list
+        /// and adding its contents to the simulation view.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        /// <param name="total_particles"></param>
+        private void Update2DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             lock (locker) {
                 List<KeyValuePair<int, int>> buffer = new List<KeyValuePair<int, int>>();
-                buffer = dla_2d.ConsumeBuffer((current_particles == 0) ? 0 : current_particles-1);
-                foreach (var p in buffer) {
+                buffer = dla_2d.ConsumeBuffer((current_particles == 0) ? 0 : current_particles-1); // fetch the batch list
+                foreach (var p in buffer) { // iterate over all aggregate particles in buffer adding to view
                     aggregate_manager.AddParticle(new Point3D(p.Key, p.Value, 0.0), colour_list[(int)current_particles], 1.0);
                     ++current_particles;
                     Dispatcher.Invoke(() => {
@@ -566,7 +537,7 @@ namespace DLAProject {
                         if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);
                         switch (chart_type) {
                             case ChartType.NUMBERRADIUS:
-                                if (current_particles % nrchart.PollingInterval == 0) {
+                                if (current_particles % nrchart.PollingInterval == 0) { // add number-span data points to chart
                                     double agg_radius = Math.Sqrt(dla_2d.GetAggregateSpanningDistance());
                                     if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
                                     nrchart.AddDataPoint(current_particles, agg_radius);
@@ -584,7 +555,14 @@ namespace DLAProject {
             }
         }
 
-        private void Update3DAggregateOnTimedEventTest2(object source, ElapsedEventArgs e, uint total_particles) {
+        /// <summary>
+        /// Updates a 3D aggregate based on current batch list of dla_3d buffer, processing this list
+        /// and adding its contents to the simulation view.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        /// <param name="total_particles"></param>
+        private void Update3DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
             lock (locker) {
                 List<Tuple<int, int, int>> buffer = new List<Tuple<int, int, int>>();
                 buffer = dla_3d.ConsumeBuffer((current_particles == 0) ? 0 : current_particles - 1);
@@ -615,96 +593,6 @@ namespace DLAProject {
                 }
             }
         }
-
-        /// <summary>
-        /// Updates a 2D aggregate based on current contents of dla_2d batch_queue - processes this
-        /// batch_queue and adds its contents to the simulation view.
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="e"></param>
-        /*private void Update2DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
-            // lock around aggregate updating and batch queue processing to prevent 
-            // non-dereferencable std::deque iterator run-time errors
-            lock (locker) {
-                // get and process the batch_queue from the DLA handle
-                BlockingCollection<KeyValuePair<int, int>> blocking_queue = dla_2d.ProcessBatchQueue();
-                // loop over blocking_queue adding contents to interface and dequeueing on each iteration
-                while (blocking_queue.Count != 0) {
-                    KeyValuePair<int, int> agg_kvp = blocking_queue.Take();
-                    Point3D pos = new Point3D(agg_kvp.Key, agg_kvp.Value, 0);
-                    aggregate_manager.AddParticle(pos, colour_list[(int)current_particles], 1.0);
-                    ++current_particles;
-                    // dispatch GUI updates to UI thread
-                    Dispatcher.Invoke(() => {
-                        aggregate_manager.Update();
-                        DynamicParticleLabel.Content = "Particles: " + current_particles;
-                        AggMissesLabel.Content = "Aggregate Misses: " + dla_2d.GetAggregateMisses();
-                        if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_2d.EstimateFractalDimension(), 3);                       
-                        switch (chart_type) {
-                            case ChartType.NUMBERRADIUS:
-                                if (current_particles % nrchart.PollingInterval == 0) {
-                                    double agg_radius = Math.Sqrt(dla_2d.GetAggregateSpanningDistance());
-                                    if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
-                                    nrchart.AddDataPoint(current_particles, agg_radius);
-                                }
-                                if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
-                                    nrchart.XAxisStep += 200;
-                                    nrchart.XAxisMax += 2000;
-                                }                               
-                                break;
-                            case ChartType.RATEGENERATION:
-                                // TODO: rate generation chart updating
-                                break;
-                        }
-                    });
-                }
-            }
-        }*/
-        
-        /// <summary>
-        /// Updates a 3D aggregate based on current contents of dla_3d batch_queue - processes this
-        /// batch_queue and adds its contents to the simulation view.
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="e"></param>
-        /*private void Update3DAggregateOnTimedEvent(object source, ElapsedEventArgs e, uint total_particles) {
-            // lock around aggregate updating and batch queue processing to prevent 
-            // non-dereferencable std::deque iterator run-time errors
-            lock (locker) {
-                // get and process the batch_queue from the DLA handle
-                BlockingCollection<Tuple<int, int, int>> blocking_queue = dla_3d.ProcessBatchQueue();
-                // loop over blocking_queue adding contents to interface and dequeueing on each iteration
-                while (blocking_queue.Count != 0) {
-                    Tuple<int, int, int> agg_tuple = blocking_queue.Take();
-                    Point3D pos = new Point3D(agg_tuple.Item1, agg_tuple.Item2, agg_tuple.Item3);
-                    aggregate_manager.AddParticle(pos, colour_list[(int)current_particles], 1.0);
-                    ++current_particles;
-                    // dispatch GUI updates to UI thread
-                    Dispatcher.Invoke(() => {
-                        aggregate_manager.Update();
-                        DynamicParticleLabel.Content = "Particles: " + current_particles;
-                        AggMissesLabel.Content = "Aggregate Misses: " + dla_3d.GetAggregateMisses();
-                        if (current_particles % 100 == 0) FracDimLabel.Content = "Est. Fractal Dimension: " + Math.Round(dla_3d.EstimateFractalDimension(), 3);
-                        switch (chart_type) {
-                            case ChartType.NUMBERRADIUS:
-                                if (current_particles % nrchart.PollingInterval == 0) {
-                                    double agg_radius = Math.Sqrt(dla_3d.GetAggregateSpanningDistance());
-                                    if (agg_radius >= nrchart.YAxisMax) nrchart.YAxisMax += 20.0;
-                                    nrchart.AddDataPoint(current_particles, agg_radius);
-                                }
-                                if (current_particles >= nrchart.XAxisMax && current_particles != total_particles) {
-                                    nrchart.XAxisStep += 200;
-                                    nrchart.XAxisMax += 2000;
-                                }                               
-                                break;
-                            case ChartType.RATEGENERATION:
-                                // TODO: rate generation chart updating
-                                break;
-                        }
-                    });
-                }
-            }
-        }*/
 
         #endregion
    
