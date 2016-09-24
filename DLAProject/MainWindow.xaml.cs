@@ -306,6 +306,11 @@ namespace DLAProject {
                         aboveoroutsidespawnloc_checkbox.Content = "Above Attractor Plane";
                         beloworinsidespawnloc_checkbox.Content = "Below Attractor Plane";
                         break;
+                    case ManagedAttractorType.Circle:
+                        attractorsize_slider.IsEnabled = true;
+                        aboveoroutsidespawnloc_checkbox.Content = "Outside Attractor Circle";
+                        beloworinsidespawnloc_checkbox.Content = "Inside Attractor Circle";
+                        break;
                 }
             }
             if (hasFinished && isCleared && attractor_type_str != null) {
@@ -458,17 +463,17 @@ namespace DLAProject {
         private void RenderAttractorGeometry() {
             if (!showAttractor || aggregate_manager == null) return;
             switch (attractor_type) {
-                case ManagedAttractorType.Point:
+                case ManagedAttractorType.Point:    // render single point at origin
                     aggregate_manager.AddParticle(new Point3D(0.0, 0.0, 0.0), Colors.White, 1.0);
                     aggregate_manager.Update();
                     break;
-                case ManagedAttractorType.Line:
+                case ManagedAttractorType.Line: // render line of length attractorsize_slider.Value symmetrical about origin
                     for (int i = -(int)attractorsize_slider.Value / 2; i < (int)attractorsize_slider.Value / 2; ++i) {
                         aggregate_manager.AddParticle(new Point3D(i, 0.0, 0.0), Colors.White, 1.0);
                         aggregate_manager.Update();
                     }
                     break;
-                case ManagedAttractorType.Plane:
+                case ManagedAttractorType.Plane:    // render plane of length, width attractorsize_slider.Value symmetrical about origin
                     for (int i = -(int)attractorsize_slider.Value / 2; i < (int)attractorsize_slider.Value / 2; ++i) {
                         for (int j = -(int)attractorsize_slider.Value / 2; j < (int)attractorsize_slider.Value / 2; ++j) {
                             aggregate_manager.AddParticle(new Point3D(i, j, 0.0), Colors.White, 1.0);
@@ -476,9 +481,22 @@ namespace DLAProject {
                         }
                     }
                     break;
+                case ManagedAttractorType.Circle:   // render circle of radius attractorsize_slider.Value with centre at origin
+                    for (double theta = 0.0; theta <= 2*Math.PI; theta+=Math.PI/180.0) {
+                        double x = attractorsize_slider.Value * Math.Cos(theta);
+                        double y = attractorsize_slider.Value * Math.Sin(theta);
+                        aggregate_manager.AddParticle(new Point3D(x, y, 0.0), Colors.White, 1.0);
+                        aggregate_manager.Update();
+                    }
+                    break;
             }
         }
 
+        /// <summary>
+        /// Re-render the attractor geometry upon changing the value of the attractor size slider.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnAttractorSizeSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
             if (!hasFinished || !isCleared) return;
             if (aggregate_manager != null) aggregate_manager.ClearAggregate();

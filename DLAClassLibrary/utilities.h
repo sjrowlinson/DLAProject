@@ -41,10 +41,10 @@ namespace utl {
 	 */
 	template<class Tuple, std::size_t N>
 	struct tuple_distance_t {
-		static auto tuple_distance(const Tuple& t, attractor_type att) {
+		static auto tuple_distance(const Tuple& t, attractor_type att, std::size_t att_size) {
 			switch (att) {
 			case attractor_type::POINT: // compute r^2 of point from origin
-				return tuple_distance_t<Tuple, N - 1>::tuple_distance(t, att)
+				return tuple_distance_t<Tuple, N - 1>::tuple_distance(t, att, att_size)
 					+ std::get<N - 1>(t)*std::get<N - 1>(t);
 			case attractor_type::LINE: // compute y distance from origin line
 				if (N == 2) return std::get<N - 1>(t);
@@ -53,7 +53,8 @@ namespace utl {
 			case attractor_type::PLANE: // compute z distance from origin plane
 				return std::get<N - 1>(t);
 			case attractor_type::CIRCLE:
-				return 0;
+				return tuple_distance_t<Tuple, N - 1>::tuple_distance(t, att, att_size)
+					+ std::get<N - 1>(t)*std::get<N - 1>(t);
 			default:
 				return std::get<0>(t);
 			}
@@ -62,7 +63,7 @@ namespace utl {
 	// base-helper
 	template<class Tuple>
 	struct tuple_distance_t<Tuple, 1> {
-		static auto tuple_distance(const Tuple& t, attractor_type att) {
+		static auto tuple_distance(const Tuple& t, attractor_type att, std::size_t att_size) {
 			return std::get<0>(t)*std::get<0>(t);
 		}
 	};
@@ -79,13 +80,13 @@ namespace utl {
 			: att(_att), att_size(_att_size) {}
 		template<class... Args>
 		bool operator()(const std::tuple<Args...>& lhs, const std::tuple<Args...>& rhs) const {
-			return tuple_distance_t<decltype(lhs), sizeof...(Args)>::tuple_distance(lhs, att)
-				< tuple_distance_t<decltype(rhs), sizeof...(Args)>::tuple_distance(rhs, att);
+			return tuple_distance_t<decltype(lhs), sizeof...(Args)>::tuple_distance(lhs, att, att_size)
+				< tuple_distance_t<decltype(rhs), sizeof...(Args)>::tuple_distance(rhs, att, att_size);
 		}
 		template<class Ty1, class Ty2>
 		bool operator()(const std::pair<Ty1, Ty2>& lhs, const std::pair<Ty1, Ty2>& rhs) const {
-			return tuple_distance_t<decltype(lhs), 2>::tuple_distance(lhs, att)
-				< tuple_distance_t<decltype(rhs), 2>::tuple_distance(rhs, att);
+			return tuple_distance_t<decltype(lhs), 2>::tuple_distance(lhs, att, att_size)
+				< tuple_distance_t<decltype(rhs), 2>::tuple_distance(rhs, att, att_size);
 		}
 	};
 	// TUPLE_HASH

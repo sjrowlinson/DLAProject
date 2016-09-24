@@ -99,8 +99,11 @@ void DLA_3d::generate(std::size_t n) {
 double DLA_3d::estimate_fractal_dimension() const {
 	if (aggregate_pq.empty()) return 0.0;
 	// find radius which minimally bounds the aggregate
-	double bounding_radius = utl::tuple_distance_t<decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor);
-	if (attractor == attractor_type::POINT || attractor == attractor_type::LINE) bounding_radius = std::sqrt(bounding_radius);
+	double bounding_radius = utl::tuple_distance_t<
+		decltype(aggregate_pq.top()), 
+		3>::tuple_distance(aggregate_pq.top(), attractor, attractor_size);
+	if (attractor == attractor_type::POINT || attractor == attractor_type::LINE
+		|| attractor == attractor_type::CIRCLE) bounding_radius = std::sqrt(bounding_radius);
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
@@ -134,7 +137,7 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 	switch (attractor) {
 	case attractor_type::POINT:
 		spawn_diam = (aggregate_pq.empty() ? 0 : 2 * static_cast<int>(std::sqrt(utl::tuple_distance_t<
-			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor)))) + boundary_offset;
+			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor, attractor_size)))) + boundary_offset;
 		if (is_spawn_source_above && is_spawn_source_below) {
 			if (placement_pr < 1.0 / 3.0) {	// positive/negative z-plane of boundary
 				std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
@@ -172,7 +175,7 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 		break;
 	case attractor_type::LINE:
 		spawn_diam = (aggregate_pq.empty() ? 0 : 2*static_cast<int>(std::sqrt(utl::tuple_distance_t<
-			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor)))) + boundary_offset;
+			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor, attractor_size)))) + boundary_offset;
 		std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
 		if (is_spawn_source_above && is_spawn_source_below) {
 			if (placement_pr < 0.5) {	// positive/negative z-plane of boundary
@@ -222,7 +225,9 @@ bool DLA_3d::aggregate_collision(const std::tuple<int,int,int>& current, const s
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		push_particle(previous, ++count);
 		std::tuple<int,int,int> max_dist = aggregate_pq.top();
-		aggregate_span = aggregate_pq.empty() ? 0 : utl::tuple_distance_t<decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor);
+		aggregate_span = aggregate_pq.empty() ? 0 : utl::tuple_distance_t<
+			decltype(aggregate_pq.top()), 
+			3>::tuple_distance(aggregate_pq.top(), attractor, attractor_size);
 		return true;
 	}
 	return false;

@@ -89,6 +89,7 @@
                 <ComboBoxItem Name="PointItem" IsSelected="True" Content="Point"/>
                 <ComboBoxItem Name="LineItem" Content="Line"/>
                 <ComboBoxItem Name="PlaneItem" Content="Plane"/>
+                <ComboBoxItem Name="CircleItem" Content="Circle"/>
             </ComboBox>
 
             <Slider Maximum="10000" TickPlacement="BottomRight" TickFrequency="200" IsSnapToTickEnabled="True" x:Name="particles_slider" Margin="0,62,111,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="337"/>

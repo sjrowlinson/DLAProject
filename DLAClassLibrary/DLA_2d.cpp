@@ -104,7 +104,9 @@ void DLA_2d::generate(std::size_t n) {
 double DLA_2d::estimate_fractal_dimension() const {
 	if (aggregate_pq.empty()) return 0.0;
 	// find radius which minimally bounds the aggregate
-	double bounding_radius = utl::tuple_distance_t<decltype(aggregate_pq.top()), 2>::tuple_distance(aggregate_pq.top(), attractor);
+	double bounding_radius = utl::tuple_distance_t<
+		decltype(aggregate_pq.top()), 
+		2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size);
 	if (attractor == attractor_type::POINT) bounding_radius = std::sqrt(bounding_radius);
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
@@ -170,7 +172,8 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 			spawn_pos.second = (is_spawn_source_above) ? spawn_diam : -spawn_diam; // upper : lower
 		break;
 	case attractor_type::CIRCLE:
-		spawn_diam = (aggregate_pq.empty() ? attractor_size : aggregate_pq.top().second) + boundary_offset;
+		spawn_diam = (aggregate_pq.empty() ? attractor_size*attractor_size : utl::tuple_distance_t<
+			decltype(aggregate_pq.top()), 2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size)) + boundary_offset;
 		if (is_spawn_source_above && is_spawn_source_below) {
 			if (placement_pr < 0.5) { // spawn at origin
 				spawn_pos.first = 0;
@@ -219,7 +222,9 @@ bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::p
 	else if (aggregate_map.find(current) != aggregate_map.end() || attractor_set.find(current) != attractor_set.end()) {
 		// insert previous position of particle to aggregrate_map and aggregrate priority queue
 		push_particle(previous, ++count);
-		aggregate_span = aggregate_pq.empty() ? 0 : utl::tuple_distance_t<decltype(aggregate_pq.top()), 2>::tuple_distance(aggregate_pq.top(), attractor);
+		aggregate_span = aggregate_pq.empty() ? 0 : utl::tuple_distance_t<
+			decltype(aggregate_pq.top()),
+			2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size);
 		return true;
 	}
 	return false;
