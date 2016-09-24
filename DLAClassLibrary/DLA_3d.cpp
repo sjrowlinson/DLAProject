@@ -11,7 +11,7 @@ DLA_3d::DLA_3d(const DLA_3d& other) : DLAContainer(other),
 	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), attractor_set(other.attractor_set),
 	buffer(other.buffer) {}
 
-DLA_3d::DLA_3d(DLA_3d&& other) : DLAContainer(std::move(other)),
+DLA_3d::DLA_3d(DLA_3d&& other) noexcept : DLAContainer(std::move(other)),
 	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)),
 	attractor_set(std::move(other.attractor_set)), buffer(std::move(other.buffer)) {}
 

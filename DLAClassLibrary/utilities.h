@@ -28,6 +28,7 @@ enum class attractor_type {
 	POINT,
 	LINE,
 	PLANE, // not applicable for 2D
+	CIRCLE,
 };
 
 namespace utl {
@@ -51,6 +52,8 @@ namespace utl {
 					+ std::get<N - 1>(t)*std::get<N - 1>(t);
 			case attractor_type::PLANE: // compute z distance from origin plane
 				return std::get<N - 1>(t);
+			case attractor_type::CIRCLE:
+				return 0;
 			default:
 				return std::get<0>(t);
 			}
@@ -103,7 +106,7 @@ namespace utl {
 	struct tuple_hash_compute<Tuple, 1> {
 		static std::size_t hash_compute(const Tuple& t) {
 			using type = typename std::tuple_element<0, Tuple>::type;
-			return 51 + std::hash<type>()(std::get<0>(t)) * 51;
+			return 51U + std::hash<type>()(std::get<0>(t)) * 51U;
 		}
 	};
 	/**

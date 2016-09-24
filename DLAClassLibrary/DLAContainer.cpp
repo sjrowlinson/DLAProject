@@ -11,7 +11,7 @@ DLAContainer::DLAContainer(const DLAContainer& other)
 	: lattice(other.lattice), attractor(other.attractor),
 		coeff_stick(other.coeff_stick), pr_gen(other.pr_gen), attractor_size(other.attractor_size) {}
 
-DLAContainer::DLAContainer(DLAContainer&& other)
+DLAContainer::DLAContainer(DLAContainer&& other) noexcept
 	: lattice(std::move(other.lattice)), attractor(std::move(other.attractor)),
 	coeff_stick(std::move(other.coeff_stick)), pr_gen(std::move(other.pr_gen)), attractor_size(std::move(other.attractor_size)) {}
 
@@ -153,6 +153,7 @@ bool DLAContainer::lattice_boundary_collision(std::pair<int,int>& current, const
 	// choose correct boundary collision detection based on type of attractor
 	switch (attractor) {
 	case attractor_type::POINT:
+	case attractor_type::CIRCLE:
 		// reflect particle from boundary
 		if (std::abs(current.first) > ((spawn_diam / 2) + epsilon) || std::abs(current.second) > ((spawn_diam / 2) + epsilon)) {
 			current = previous;

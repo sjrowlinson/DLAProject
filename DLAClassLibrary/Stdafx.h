@@ -3,5 +3,7 @@
 // but are changed infrequently
 
 #pragma once
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 

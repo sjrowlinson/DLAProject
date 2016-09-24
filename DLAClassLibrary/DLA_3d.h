@@ -57,7 +57,7 @@ public:
 	 *
 	 * \param _other rvalue reference to DLA_2d instance.
 	 */
-	DLA_3d(DLA_3d&& other);
+	DLA_3d(DLA_3d&& other) noexcept;
 	/**
 	 * \copydoc DLAContainer::~DLAContainer()
 	 */

@@ -11,7 +11,7 @@ DLA_2d::DLA_2d(const DLA_2d& other) : DLAContainer(other),
 	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), attractor_set(other.attractor_set),
 		buffer(other.buffer) {}
 
-DLA_2d::DLA_2d(DLA_2d&& other) : DLAContainer(std::move(other)),
+DLA_2d::DLA_2d(DLA_2d&& other) noexcept : DLAContainer(std::move(other)),
 	aggregate_map(std::move(other.aggregate_map)), aggregate_pq(std::move(other.aggregate_pq)),
 	attractor_set(std::move(other.attractor_set)), buffer(std::move(other.buffer)) {}
 
@@ -42,6 +42,14 @@ void DLA_2d::initialise_attractor_structure() {
 	case attractor_type::LINE:	// insert line extending from [-att_size/2, +att_size/2] to attractor_set
 		for (int i = -static_cast<int>(attractor_size) / 2; i < static_cast<int>(attractor_size) / 2; ++i)
 			attractor_set.insert(std::make_pair(i, 0));
+		break;
+	case attractor_type::CIRCLE: // insert circle of radius att_size to attractor_set
+		for (double theta = 0.0; theta <= 2.0*M_PI; theta += M_PI / 180.0) {
+			attractor_set.insert(std::make_pair(
+				static_cast<int>(attractor_size*std::cos(theta)),
+				static_cast<int>(attractor_size*std::sin(theta))
+			));
+		}
 		break;
 	}
 }
@@ -160,6 +168,39 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 			spawn_pos.second = (placement_pr < 0.5) ? spawn_diam : -spawn_diam; // upper : lower 		
 		else 
 			spawn_pos.second = (is_spawn_source_above) ? spawn_diam : -spawn_diam; // upper : lower
+		break;
+	case attractor_type::CIRCLE:
+		spawn_diam = (aggregate_pq.empty() ? attractor_size : aggregate_pq.top().second) + boundary_offset;
+		if (is_spawn_source_above && is_spawn_source_below) {
+			if (placement_pr < 0.5) { // spawn at origin
+				spawn_pos.first = 0;
+				spawn_pos.second = 0;
+			}
+			else {	// spawn on bounding box boundary
+				if (placement_pr < 0.75) { // upper/lower
+					spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+					spawn_pos.second = (placement_pr < 0.625) ? spawn_diam / 2 : -spawn_diam / 2;
+				}
+				else { // left/right
+					spawn_pos.first = (placement_pr < 0.875) ? spawn_diam / 2 : -spawn_diam / 2;
+					spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				}
+			}
+		}
+		else if (is_spawn_source_above) { // spawn on bounding box boundary
+			if (placement_pr < 0.5) {	// spawn on upper or lower line of lattice boundary
+				spawn_pos.first = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				spawn_pos.second = (placement_pr < 0.25) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
+			else {	// spawn on left/right line of lattice boundary
+				spawn_pos.first = (placement_pr < 0.75) ? spawn_diam / 2 : -spawn_diam / 2;
+				spawn_pos.second = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			}
+		}
+		else if (is_spawn_source_below) { // spawn at origin
+			spawn_pos.first = 0;
+			spawn_pos.second = 0;
+		}
 		break;
 	}
 }

@@ -24,6 +24,7 @@ namespace DLAClassLibrary {
 		Point,
 		Line,
 		Plane,
+		Circle
 	};
 	/**
 	 * \class ManagedDLA2DContainer

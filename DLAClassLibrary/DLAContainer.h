@@ -50,7 +50,7 @@ public:
 	 *
  	 * \param other rvalue reference to DLAContainer instance.
 	 */
-	DLAContainer(DLAContainer&& other);
+	DLAContainer(DLAContainer&& other) noexcept;
 	/**
 	 * \brief Destructs the container, releasing all memory handled by the aggregate structure.
 	 */
