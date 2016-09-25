@@ -67,6 +67,9 @@
     <Compile Include="AggregateComponentManager.cs" />
     <Compile Include="GenerationRateChart.cs" />
     <Compile Include="NumberRadiusChart.cs" />
+    <Compile Include="ParticleGeometry3D\AggregateParticleGeometry3D.cs" />
+    <Compile Include="ParticleGeometry3D\RoundGeometry3D.cs" />
+    <Compile Include="ParticleGeometry3D\SphereGeometry3D.cs" />
     <Compile Include="TrackView.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
