@@ -105,10 +105,10 @@ void DLA_2d::generate(std::size_t n) {
 double DLA_2d::estimate_fractal_dimension() const {
 	if (aggregate_pq.empty()) return 0.0;
 	// find radius which minimally bounds the aggregate
-	double bounding_radius = utl::tuple_distance_t<
+	double bounding_radius = std::abs(utl::tuple_distance_t<
 		decltype(aggregate_pq.top()), 
-		2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size);
-	if (attractor == attractor_type::POINT) bounding_radius = std::sqrt(bounding_radius);
+		2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size));
+	if (attractor == attractor_type::POINT || attractor == attractor_type::CIRCLE) bounding_radius = std::sqrt(bounding_radius);
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }

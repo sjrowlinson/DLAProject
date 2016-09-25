@@ -26,6 +26,7 @@ const DLA_3d::aggregate3d_buffer_vector& DLA_3d::aggregate_buffer() const noexce
 void DLA_3d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 	DLAContainer::set_attractor_type(attr, att_size);
 	aggregate_pq.comparator().att = attr;	// get handle to comparator of pq and alter its attractor_type field
+	aggregate_pq.comparator().att_size = attractor_size;
 	if (!aggregate_pq.empty()) aggregate_pq.reheapify();	// perform reordering of pq based on new attractor_type
 }
 
@@ -44,6 +45,15 @@ void DLA_3d::initialise_attractor_structure() {
 		for (int i = -static_cast<int>(attractor_size) / 2; i < static_cast<int>(attractor_size) / 2; ++i) {
 			for (int j = -static_cast<int>(attractor_size) / 2; j < static_cast<int>(attractor_size) / 2; ++j)
 				attractor_set.insert(std::make_tuple(i, j, 0));
+		}
+		break;
+	case attractor_type::CIRCLE:	// insert circle of radius att_size to attractor_set
+		for (double theta = 0.0; theta <= 2.0*M_PI; theta += M_PI / 180.0) {
+			attractor_set.insert(std::make_tuple(
+				static_cast<int>(attractor_size*std::cos(theta)),
+				static_cast<int>(attractor_size*std::sin(theta)),
+				0
+			));
 		}
 		break;
 	}
@@ -99,9 +109,9 @@ void DLA_3d::generate(std::size_t n) {
 double DLA_3d::estimate_fractal_dimension() const {
 	if (aggregate_pq.empty()) return 0.0;
 	// find radius which minimally bounds the aggregate
-	double bounding_radius = utl::tuple_distance_t<
+	double bounding_radius = std::abs(utl::tuple_distance_t<
 		decltype(aggregate_pq.top()), 
-		3>::tuple_distance(aggregate_pq.top(), attractor, attractor_size);
+		3>::tuple_distance(aggregate_pq.top(), attractor, attractor_size));
 	if (attractor == attractor_type::POINT || attractor == attractor_type::LINE
 		|| attractor == attractor_type::CIRCLE) bounding_radius = std::sqrt(bounding_radius);
 	// compute fractal dimension via ln(N)/ln(rmin)
@@ -206,6 +216,51 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 			std::get<2>(current) = (placement_pr < 0.5) ? spawn_diam : -spawn_diam; // positive : negative z-plane
 		else
 			std::get<2>(current) = (is_spawn_source_above) ? spawn_diam : -spawn_diam; // positive : negative z-plane
+		break;
+	case attractor_type::CIRCLE:
+		spawn_diam = 2 * static_cast<int>((aggregate_pq.empty() ? attractor_size : std::sqrt(utl::tuple_distance_t<
+			decltype(aggregate_pq.top()), 3>::tuple_distance(aggregate_pq.top(), attractor, attractor_size)))) + boundary_offset;
+		if (is_spawn_source_above && is_spawn_source_below) {
+			if (placement_pr < 0.5) {
+				std::get<0>(current) = 0;
+				std::get<1>(current) = 0;
+				std::get<2>(current) = 0;
+			}
+			else {
+				if (placement_pr < 2.0 / 3.0) {	// positive/negative z-plane of boundary
+					std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+					std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+					std::get<2>(current) = (placement_pr < 7.0 / 12.0) ? spawn_diam / 2 : -spawn_diam / 2;
+				}
+				else if (placement_pr >= 2.0 / 3.0 && placement_pr < 5.0 / 6.0) { // positive/negative x-plane of boundary
+					std::get<0>(current) = (placement_pr < 9.0/12.0) ? spawn_diam / 2 : -spawn_diam / 2;
+					std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+					std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				}
+				else {	// positive/negative y-plane of boundary
+					std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+					std::get<1>(current) = (placement_pr < 11.0 / 12.0) ? spawn_diam / 2 : -spawn_diam / 2;
+					std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				}
+			}
+		}
+		else if (is_spawn_source_above) { // spawn on bounding box boundary
+			if (placement_pr < 1.0 / 3.0) {	// positive/negative z-plane of boundary
+				std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<2>(current) = (placement_pr < 1.0 / 6.0) ? spawn_diam / 2 : -spawn_diam / 2;
+			}
+			else if (placement_pr >= 1.0 / 3.0 && placement_pr < 2.0 / 3.0) { // positive/negative x-plane of boundary
+				std::get<0>(current) = (placement_pr < 0.5) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<1>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			}
+			else {	// positive/negative y-plane of boundary
+				std::get<0>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+				std::get<1>(current) = (placement_pr < 5.0 / 6.0) ? spawn_diam / 2 : -spawn_diam / 2;
+				std::get<2>(current) = static_cast<int>(spawn_diam*(pr_gen() - 0.5));
+			}
+		}
 		break;
 	}
 }

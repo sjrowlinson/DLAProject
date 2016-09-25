@@ -210,6 +210,19 @@ bool DLAContainer::lattice_boundary_collision(std::tuple<int,int,int>& current, 
 			return true;
 		}
 		break;
+	case attractor_type::CIRCLE:
+		if (is_spawn_source_above) {
+			if (std::abs(std::get<0>(current)) > ((spawn_diam / 2) + epsilon)
+				|| std::abs(std::get<1>(current)) > ((spawn_diam / 2) + epsilon)
+				|| std::abs(std::get<2>(current)) > ((spawn_diam / 2) + epsilon)) {
+				current = previous;
+				return true;
+			}
+		}
+		else {
+
+		}
+		break;
 	}
 	return false;
 }
