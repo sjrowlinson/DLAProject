@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
+using DLAProject.ParticleGeometry3D;
 
 namespace DLAProject {
 
@@ -97,6 +98,8 @@ namespace DLAProject {
         /// </summary>
         public void Update3D() {
             // TODO: apply simulation view updates creating spheres to add to particle_model
+            var p = particle_stack.Peek();
+            int pos_index = particle_stack.Count * 4;
         }
 
         /// <summary>

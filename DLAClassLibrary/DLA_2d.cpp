@@ -108,7 +108,8 @@ double DLA_2d::estimate_fractal_dimension() const {
 	double bounding_radius = std::abs(utl::tuple_distance_t<
 		decltype(aggregate_pq.top()), 
 		2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size));
-	if (attractor == attractor_type::POINT || attractor == attractor_type::CIRCLE) bounding_radius = std::sqrt(bounding_radius);
+	if (attractor == attractor_type::CIRCLE) bounding_radius = std::sqrt(bounding_radius - attractor_size);
+	if (attractor == attractor_type::POINT) bounding_radius = std::sqrt(bounding_radius);
 	// compute fractal dimension via ln(N)/ln(rmin)
 	return std::log(aggregate_map.size()) / std::log(bounding_radius);
 }
@@ -225,7 +226,8 @@ bool DLA_2d::aggregate_collision(const std::pair<int,int>& current, const std::p
 		push_particle(previous, ++count);
 		aggregate_span = aggregate_pq.empty() ? 0 : utl::tuple_distance_t<
 			decltype(aggregate_pq.top()),
-			2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size);
+			2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size) - 
+			(attractor == attractor_type::CIRCLE ? attractor_size : 0);
 		return true;
 	}
 	return false;

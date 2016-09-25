@@ -9,6 +9,7 @@ namespace DLAProject.ParticleGeometry3D {
     public abstract class RoundGeometry3D {
         protected int seperators = 10;
         protected int radius = 20;
+        protected Point3D centre = new Point3D(0.0, 0.0, 0.0);
         protected Point3DCollection points;
         protected Int32Collection triangle_indices;
         /// <summary>
@@ -17,6 +18,13 @@ namespace DLAProject.ParticleGeometry3D {
         public virtual int Radius {
             get { return radius; }
             set { radius = value; CalculateGeometry(); }
+        }
+        /// <summary>
+        /// Gets or sets the centre point of the symmetrical mesh.
+        /// </summary>
+        public virtual Point3D Centre {
+            get { return centre; }
+            set { centre = value; CalculateGeometry(); }
         }
         /// <summary>
         /// Gets or sets the number of seperators of the symmetrical mesh.
