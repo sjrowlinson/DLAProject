@@ -182,7 +182,7 @@ namespace DLAClassLibrary {
 			System::Threading::Monitor::Enter(lock_obj);	// define critical section start
 			try {	// execute critical section
 				// read from last marked buffer index up to size of buffer and write these data to batch list
-				for (int i = marked_index; i < native_dla_2d_ptr->aggregate_buffer().size(); ++i) {
+				for (std::size_t i = marked_index; i < native_dla_2d_ptr->aggregate_buffer().size(); ++i) {
 					buffer->Add(System::Collections::Generic::KeyValuePair<int, int>(
 						native_dla_2d_ptr->aggregate_buffer()[i].first,
 						native_dla_2d_ptr->aggregate_buffer()[i].second
@@ -350,7 +350,7 @@ namespace DLAClassLibrary {
 			System::Threading::Monitor::Enter(lock_obj);	// define critical section start
 			try {	// execute critical section
 				// read from last marked buffer index up to size of buffer and write these data to batch list
-				for (int i = marked_index; i < native_dla_3d_ptr->aggregate_buffer().size(); ++i) {
+				for (std::size_t i = marked_index; i < native_dla_3d_ptr->aggregate_buffer().size(); ++i) {
 					buffer->Add(gcnew System::Tuple<int, int, int>(
 						std::get<0>(native_dla_3d_ptr->aggregate_buffer()[i]),
 						std::get<1>(native_dla_3d_ptr->aggregate_buffer()[i]),

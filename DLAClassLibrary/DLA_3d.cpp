@@ -199,7 +199,7 @@ void DLA_3d::spawn_particle(std::tuple<int,int,int>& current, int& spawn_diam) n
 		}
 		break;
 	case attractor_type::PLANE:
-		spawn_diam = (aggregate_pq.empty() ? 0 : std::get<2>(aggregate_pq.top())) + boundary_offset;
+		spawn_diam = (aggregate_pq.empty() ? 0 : std::abs(std::get<2>(aggregate_pq.top()))) + boundary_offset;
 		std::get<0>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
 		std::get<1>(current) = static_cast<int>(attractor_size*(pr_gen() - 0.5));
 		if (is_spawn_source_above && is_spawn_source_below)

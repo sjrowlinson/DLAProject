@@ -80,13 +80,13 @@ namespace utl {
 			: att(_att), att_size(_att_size) {}
 		template<class... Args>
 		bool operator()(const std::tuple<Args...>& lhs, const std::tuple<Args...>& rhs) const {
-			return tuple_distance_t<decltype(lhs), sizeof...(Args)>::tuple_distance(lhs, att, att_size)
-				< tuple_distance_t<decltype(rhs), sizeof...(Args)>::tuple_distance(rhs, att, att_size);
+			return std::abs(tuple_distance_t<decltype(lhs), sizeof...(Args)>::tuple_distance(lhs, att, att_size))
+				< std::abs(tuple_distance_t<decltype(rhs), sizeof...(Args)>::tuple_distance(rhs, att, att_size));
 		}
 		template<class Ty1, class Ty2>
 		bool operator()(const std::pair<Ty1, Ty2>& lhs, const std::pair<Ty1, Ty2>& rhs) const {
-			return tuple_distance_t<decltype(lhs), 2>::tuple_distance(lhs, att, att_size)
-				< tuple_distance_t<decltype(rhs), 2>::tuple_distance(rhs, att, att_size);
+			return std::abs(tuple_distance_t<decltype(lhs), 2>::tuple_distance(lhs, att, att_size))
+				< std::abs(tuple_distance_t<decltype(rhs), 2>::tuple_distance(rhs, att, att_size));
 		}
 	};
 	// TUPLE_HASH

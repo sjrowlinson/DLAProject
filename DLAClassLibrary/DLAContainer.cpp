@@ -153,7 +153,6 @@ bool DLAContainer::lattice_boundary_collision(std::pair<int,int>& current, const
 	// choose correct boundary collision detection based on type of attractor
 	switch (attractor) {
 	case attractor_type::POINT:
-	case attractor_type::CIRCLE:
 		// reflect particle from boundary
 		if (std::abs(current.first) > ((spawn_diam / 2) + epsilon) || std::abs(current.second) > ((spawn_diam / 2) + epsilon)) {
 			current = previous;
@@ -164,6 +163,17 @@ bool DLAContainer::lattice_boundary_collision(std::pair<int,int>& current, const
 		if (std::abs(current.first) > ((static_cast<int>(attractor_size) / 2) + epsilon) || std::abs(current.second) > (spawn_diam + epsilon)) {
 			current = previous;
 			return true;
+		}
+		break;
+	case attractor_type::CIRCLE:
+		if (is_spawn_source_above) {
+			if (std::abs(current.first) > ((spawn_diam / 2) + epsilon) || std::abs(current.second) > ((spawn_diam / 2) + epsilon)) {
+				current = previous;
+				return true;
+			}
+		}
+		else {
+			// do nothing, cannot get outside circle attractor
 		}
 		break;
 	}

@@ -29,6 +29,7 @@ void DLA_2d::set_attractor_type(attractor_type attr, std::size_t att_size) {
 		throw std::invalid_argument("Cannot set attractor type of 2D DLA to PLANE.");
 	DLAContainer::set_attractor_type(attr, att_size);
 	aggregate_pq.comparator().att = attr;	// get handle to comparator of pq and alter its attractor_type field
+	aggregate_pq.comparator().att_size = attractor_size;
 	if (!aggregate_pq.empty()) aggregate_pq.reheapify(); // perform reordering of pq based on new attractor_type
 }
 
@@ -164,7 +165,7 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 		}
 		break;
 	case attractor_type::LINE:
-		spawn_diam = (aggregate_pq.empty() ? 0 : aggregate_pq.top().second) + boundary_offset;
+		spawn_diam = (aggregate_pq.empty() ? 0 : std::abs(aggregate_pq.top().second)) + boundary_offset;
 		spawn_pos.first = static_cast<int>(attractor_size*(pr_gen() - 0.5));
 		if (is_spawn_source_above && is_spawn_source_below) 			
 			spawn_pos.second = (placement_pr < 0.5) ? spawn_diam : -spawn_diam; // upper : lower 		
@@ -172,8 +173,8 @@ void DLA_2d::spawn_particle(std::pair<int,int>& spawn_pos, int& spawn_diam) noex
 			spawn_pos.second = (is_spawn_source_above) ? spawn_diam : -spawn_diam; // upper : lower
 		break;
 	case attractor_type::CIRCLE:
-		spawn_diam = (aggregate_pq.empty() ? attractor_size*attractor_size : utl::tuple_distance_t<
-			decltype(aggregate_pq.top()), 2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size)) + boundary_offset;
+		spawn_diam = 2*static_cast<int>((aggregate_pq.empty() ? attractor_size : std::sqrt(utl::tuple_distance_t<
+			decltype(aggregate_pq.top()), 2>::tuple_distance(aggregate_pq.top(), attractor, attractor_size)))) + boundary_offset;
 		if (is_spawn_source_above && is_spawn_source_below) {
 			if (placement_pr < 0.5) { // spawn at origin
 				spawn_pos.first = 0;
