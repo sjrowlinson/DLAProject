@@ -7,7 +7,7 @@ DLA_2d::DLA_2d(const double& _coeff_stick) : DLAContainer(_coeff_stick),
 DLA_2d::DLA_2d(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) : DLAContainer(ltt, att, att_size, _coeff_stick),
 	aggregate_pq(utl::distance_comparator(att, att_size)) {	initialise_attractor_structure(); }
 
-DLA_2d::DLA_2d(const DLA_2d& other) : DLAContainer(other),
+DLA_2d::DLA_2d(const DLA_2d& other) noexcept : DLAContainer(other),
 	aggregate_map(other.aggregate_map), aggregate_pq(other.aggregate_pq), attractor_set(other.attractor_set),
 		buffer(other.buffer) {}
 

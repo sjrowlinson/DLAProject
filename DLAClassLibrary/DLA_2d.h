@@ -49,7 +49,7 @@ public:
 	 *
 	 * \param _other const reference to DLA_2d instance.
 	 */
-	DLA_2d(const DLA_2d& other);
+	DLA_2d(const DLA_2d& other) noexcept;
 	/**
 	 * \brief Move constructor, uses move-semantics for constructing a DLA_2d.
 	 *        from an rvalue reference of a DLA_2d - leaving that container.

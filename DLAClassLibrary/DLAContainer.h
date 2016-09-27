@@ -42,7 +42,7 @@ public:
 	 *
 	 * \param other const reference to DLAContainer instance.
 	 */
-	DLAContainer(const DLAContainer& other);
+	DLAContainer(const DLAContainer& other) noexcept;
 	/**
 	 * \brief Move constructor, uses move-semantics for constructing a DLAContainer 
 	 *        from an rvalue reference of a DLAContainer - leaving that container

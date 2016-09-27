@@ -7,7 +7,7 @@ DLAContainer::DLAContainer(const double& _coeff_stick)
 DLAContainer::DLAContainer(lattice_type ltt, attractor_type att, std::size_t att_size, const double& _coeff_stick) 
 	: lattice(ltt), attractor(att), pr_gen(), attractor_size(att_size) { set_coeff_stick(_coeff_stick); }
 
-DLAContainer::DLAContainer(const DLAContainer& other)
+DLAContainer::DLAContainer(const DLAContainer& other) noexcept
 	: lattice(other.lattice), attractor(other.attractor),
 		coeff_stick(other.coeff_stick), pr_gen(other.pr_gen), attractor_size(other.attractor_size) {}
 
